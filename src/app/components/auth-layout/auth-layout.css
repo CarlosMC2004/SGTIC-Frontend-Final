@@ -1,0 +1,54 @@
+/* Contenedor principal: Ocupa toda la altura de la pantalla */
+.layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden; /* Evita scrool innecesario */
+}
+
+.brand-section {
+  display: none;
+  width: 100%;  
+  background-image: url('https://www.uteq.edu.ec/assets/images/sliders/general/img-sld-20-00007.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: white;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+
+.brand-content {
+  z-index: 2; /* Para que el texto quede sobre la imagen */
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Lado Derecho: Donde va el formulario */
+.form-section {
+  width: 100%; /* En móvil ocupa todo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa; /* Gris muy suave */
+}
+
+/* Contenedor interno para limitar el ancho del formulario */
+.form-wrapper {
+  width: 100%;
+  max-width: 400px; /* Que no se estire demasiado */
+  padding: 20px;
+}
+
+/* RESPONSIVE: En pantallas grandes (Desktop), mostramos el lado izquierdo */
+@media (min-width: 768px) {
+  .brand-section {
+    display: flex; /* Se muestra flex para centrar contenido */
+  }
+  .form-section {
+    width: 50%; /* Comparte espacio 50/50 */
+  }
+}
