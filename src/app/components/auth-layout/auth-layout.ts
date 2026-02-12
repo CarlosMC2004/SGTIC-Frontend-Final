@@ -1,3 +1,4 @@
+import { Component } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -6,6 +7,11 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './auth-layout.html',
+  styleUrl: './auth-layout.css'
+})
+export class AuthLayoutComponent {
+  // Aquí podrías poner @Input() si quisieras cambiar el título dinámicamente
+}
   styleUrls: ['./auth-layout.css']
 })
 export class AuthLayoutComponent {
