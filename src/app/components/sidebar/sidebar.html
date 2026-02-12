@@ -1,0 +1,54 @@
+<aside class="sidebar">
+  <div class="logo-section">
+    <div class="icon-box">
+      <span class="material-symbols-outlined">school</span>
+    </div>
+    <h1>SGTT</h1>
+  </div>
+
+  <nav class="menu">
+
+    <ng-container *ngIf="role === 'coordinador'">
+      <a class="menu-item" routerLink="/inicio-coordinador" routerLinkActive="active">
+        <span class="material-symbols-outlined">home</span>
+        <span>Inicio</span>
+      </a>
+      <a class="menu-item" routerLink="/revision-requisitos" routerLinkActive="active">
+        <span class="material-symbols-outlined">description</span>
+        <span>Solicitudes</span>
+      </a>
+      <a class="menu-item" routerLink="/banco-temas" routerLinkActive="active">
+        <span class="material-symbols-outlined">library_books</span>
+        <span>Banco de Temas</span>
+      </a>
+      <a class="menu-item" routerLink="/asignaciones" routerLinkActive="active">
+        <span class="material-symbols-outlined">assignment_ind</span>
+        <span>Asignaciones</span>
+      </a>
+
+      <a class="menu-item" routerLink="/docentes" routerLinkActive="active">
+        <span class="material-symbols-outlined">group</span> <span>Docentes</span>
+      </a>
+
+    </ng-container>
+
+    <ng-container *ngIf="role === 'estudiante'">
+      <a class="menu-item" routerLink="/inicio-estudiante" routerLinkActive="active">
+        <span class="material-symbols-outlined">home</span>
+        <span>Mi Inicio</span>
+      </a>
+      <a class="menu-item" routerLink="/mis-proyectos" routerLinkActive="active">
+        <span class="material-symbols-outlined">folder_shared</span>
+        <span>Mi Proyecto</span>
+      </a>
+    </ng-container>
+
+  </nav>
+
+  <div class="logout">
+    <button>
+      <span class="material-symbols-outlined">logout</span>
+      <span>Logout</span>
+    </button>
+  </div>
+</aside>
