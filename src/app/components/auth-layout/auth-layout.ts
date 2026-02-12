@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,10 +6,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './auth-layout.html',
-  styleUrls: ['./auth-layout.css']
+  styleUrl: './auth-layout.css'
 })
 export class AuthLayoutComponent {
-  @Input() pageTitle: string = '';
-  @Input() quote: string = '';
-  @Input() author: string = '';
+  // Aquí podrías poner @Input() si quisieras cambiar el título dinámicamente
 }

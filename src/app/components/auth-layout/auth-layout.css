@@ -1,93 +1,53 @@
-:root {
-  --primary-dark: #1B5E20;
-  --text-color: #333;
-}
-
-.auth-container {
+.layout-container {
   display: flex;
   height: 100vh;
   width: 100%;
-  overflow: hidden;
-  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden; /* Evita scrool innecesario */
 }
 
-.auth-image-side {
-  flex: 1;
-  background-image: url('https://www.aldia.com.ec/wp-content/uploads/2021/07/uteq.jpg');
+.brand-section {
+  display: none;
+  width: 100%;  
+  background-image: url('https://www.uteq.edu.ec/assets/images/sliders/general/img-sld-20-00007.jpg');
   background-size: cover;
+  background-repeat: no-repeat;
   background-position: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
   color: white;
-}
-
-.overlay {
-  background: rgba(20, 50, 20, 0.85);
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  padding: 3rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-.logo-icon { width: 24px; height: 24px; }
-
-.quote-text {
-  font-size: 1.5rem;
-  line-height: 1.4;
-  margin-bottom: 1rem;
-  font-weight: 300;
-}
-
-.auth-content-side {
-  width: 500px;
-  background: white;
-  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
-  overflow-y: auto;
+  position: relative;
 }
 
-.auth-form-wrapper {
-  width: 100%;
-  max-width: 380px;
-}
 
-.auth-form-wrapper h2 {
-  font-size: 1.8rem;
-  color: #111;
-  margin-bottom: 0.5rem;
-}
-
-.header-mobile { display: none; margin-bottom: 2rem; color: var(--primary-dark); }
-
-.auth-footer {
-  margin-top: 3rem;
+.brand-content {
+  z-index: 2; /* Para que el texto quede sobre la imagen */
   text-align: center;
-  font-size: 0.75rem;
-  color: #888;
+  padding: 2rem;
 }
 
-@media (max-width: 900px) {
-  .auth-image-side {
-    display: none;
+/* Lado Derecho: Donde va el formulario */
+.form-section {
+  width: 100%; /* En móvil ocupa todo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa; /* Gris muy suave */
+}
+
+/* Contenedor interno para limitar el ancho del formulario */
+.form-wrapper {
+  width: 100%;
+  max-width: 400px; /* Que no se estire demasiado */
+  padding: 20px;
+}
+
+/* RESPONSIVE: En pantallas grandes (Desktop), mostramos el lado izquierdo */
+@media (min-width: 768px) {
+  .brand-section {
+    display: flex; /* Se muestra flex para centrar contenido */
   }
-  .auth-content-side {
-    width: 100%;
-  }
-  .header-mobile {
-    display: block;
-    text-align: center;
+  .form-section {
+    width: 50%; /* Comparte espacio 50/50 */
   }
 }

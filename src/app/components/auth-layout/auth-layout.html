@@ -1,37 +1,15 @@
-<link rel="stylesheet" href="auth-layout.css">
-
-<div class="auth-container">
-
-  <div class="auth-image-side">
-    <div class="overlay">
-      <div class="brand">
-        <svg fill="currentColor" viewBox="0 0 24 24" class="logo-icon"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-        </svg>
-        <span>Gestión de Grados</span>
-      </div>
-
-      <div class="quote-container" *ngIf="quote">
-        <p class="quote-text">"{{ quote }}"</p>
-        <p class="quote-author">— {{ author }}</p>
-      </div>
+<div class="layout-container">
+  
+  <div class="brand-section">
+    <div class="brand-content">
     </div>
   </div>
 
-  <div class="auth-content-side">
-    <div class="auth-form-wrapper">
-      <div class="header-mobile">
-        <svg fill="currentColor" viewBox="0 0 24 24" width="40"><path d="M12 3L1 9l11 6 11-6-11-6zm0 2.25l8.15 4.45L12 14.15 3.85 9.7 12 5.25zM4 11v8h16v-8l-8 4.5L4 11z"/>
-        </svg>
-      </div>
-
-      <h2 *ngIf="pageTitle">{{ pageTitle }}</h2>
-
+  <div class="form-section">
+    <div class="form-wrapper">
+      
       <ng-content></ng-content>
-
-      <footer class="auth-footer">
-        <p>© 2024 Universidad Central. Todos los derechos reservados.</p>
-        <p>Privacidad • Términos</p>
-      </footer>
+      
     </div>
   </div>
 

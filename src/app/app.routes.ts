@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
-import { MenuPrincipalAdminComponent } from './pages/administrator/main-menu/main-menu';
+import { LoginComponent } from './pages/general/login/login';
 
 export const routes: Routes = [
-    { path: 'main-menu', component: MenuPrincipalAdminComponent },
+    //RUTA PARA EL LOGIN
+    { path: 'login', component: LoginComponent },
 ];

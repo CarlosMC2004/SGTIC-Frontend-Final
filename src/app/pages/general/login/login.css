@@ -1,0 +1,118 @@
+.login-container {
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.subtitle {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  font-size: 100rem;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1%;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+input {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  background-color: #f3f4f6;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  background-color: #fff;
+  border-color: #1b5e20;
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1);
+}
+
+input.error {
+  border-color: #d32f2f;
+  background-color: #fff5f5;
+}
+
+.icon {
+  position: absolute;
+  right: 15px;
+  color: #1b5e20;
+  font-size: 1.1rem;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.error-msg {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.forgot-pass {
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.forgot-pass a {
+  color: #1b5e20;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Botón Principal */
+.btn-login {
+  width: 100%;
+  background-color: #1b5e20; /* Verde Fuerte */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-login:hover {
+  background-color: #144a18;
+}
+
+.btn-login:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.footer-links {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  color: #888;
+}
+
+.footer-links a {
+  color: #1b5e20;
+  font-weight: bold;
+  text-decoration: none;
+}
