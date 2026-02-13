@@ -10,29 +10,17 @@
         <span class="separator">›</span> 
         <span class="current">Estructura Institucional</span>
       </div>
-      
-      <div class="top-actions">
-        <div class="search-box">
-          <span class="material-symbols-outlined">search</span>
-          <input type="text" placeholder="Buscar facultad...">
-        </div>
-        <button class="icon-btn">
-          <span class="material-symbols-outlined">notifications</span>
-        </button>
-        <div class="profile-pic">
-          <img src="https://i.pravatar.cc/150?u=admin2" alt="Profile">
-        </div>
-      </div>
-    </header>
+      </header>
 
     <section class="page-header">
       <div class="header-text">
         <h1>Estructura Institucional</h1>
         <p>Administra las facultades y sus respectivas carreras profesionales.</p>
       </div>
-      <button class="btn-primary">
+      
+      <button class="btn-primary" (click)="openModal('facultad')">
         <span class="material-symbols-outlined">add</span>
-        Nueva Facultad
+        Nueva Facultad 
       </button>
     </section>
 
@@ -53,14 +41,10 @@
       <div class="faculty-card" *ngFor="let faculty of faculties">
         <div class="card-top">
           <div class="faculty-header">
-            <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
-              <span class="material-symbols-outlined">{{ faculty.icon }}</span>
-            </div>
-            <div class="actions">
-              <button class="action-btn"><span class="material-symbols-outlined">edit</span></button>
-              <button class="action-btn"><span class="material-symbols-outlined">delete</span></button>
-            </div>
-          </div>
+             <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
+               <span class="material-symbols-outlined">{{ faculty.icon }}</span>
+             </div>
+             </div>
           
           <div class="faculty-title-row">
             <h3>{{ faculty.name }}</h3>
@@ -78,35 +62,34 @@
           </ul>
         </div>
 
-        <button class="btn-dashed">
+        <button class="btn-dashed" (click)="openModal('carrera', faculty.id)">
           <span class="material-symbols-outlined">add_circle_outline</span>
           Agregar Carrera
         </button>
       </div>
 
-      <div class="add-new-card">
+      <div class="add-new-card" (click)="openModal('facultad')">
         <div class="add-content">
           <div class="plus-circle">
             <span class="material-symbols-outlined">add</span>
           </div>
           <h3>Añadir Nueva Facultad</h3>
-          <p>Expande la estructura institucional agregando una nueva unidad académica.</p>
+          <p>Expande la estructura institucional.</p>
         </div>
       </div>
 
     </section>
 
-    <footer class="pagination-footer">
-      <span class="showing-text">Mostrando 4 de 12 facultades registradas</span>
-      
-      <div class="pagination-controls">
-        <button class="page-btn">Anterior</button>
-        <button class="page-num active">1</button>
-        <button class="page-num">2</button>
-        <button class="page-num">3</button>
-        <button class="page-btn">Siguiente</button>
-      </div>
-    </footer>
+    </main>
 
-  </main>
+  <app-modal-management-structure
+    *ngIf="showModal"
+    [initialTab]="currentModalTab"
+    [preselectedFacultyId]="selectedFacultyId"
+    [facultadesList]="mappedFacultiesForModal"
+    (close)="closeModal()"
+    (saveFacultad)="handleSaveFacultad($event)"
+    (saveCarrera)="handleSaveCarrera($event)">
+  </app-modal-management-structure>
+
 </div>

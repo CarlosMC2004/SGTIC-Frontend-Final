@@ -1,0 +1,74 @@
+<div class="modal-overlay" (click)="onClose()"></div>
+
+<div class="modal-container">
+  <div class="modal-header">
+    <div>
+      <h2 class="modal-title">Estructura Institucional</h2>
+      <p class="modal-subtitle">Gestionar Facultades y Carreras.</p>
+    </div>
+    <button class="btn-close" (click)="onClose()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <div class="tab-header">
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'facultad'" 
+            (click)="activeTab = 'facultad'">
+      Nueva Facultad
+    </button>
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'carrera'" 
+            (click)="activeTab = 'carrera'">
+      Nueva Carrera
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div *ngIf="activeTab === 'facultad'" class="form-section">
+      <div class="form-group">
+        <label>Nombre de la Facultad</label>
+        <input type="text" placeholder="Ej: Facultad de Ciencias..." [(ngModel)]="facultadData.nombre">
+      </div>
+      <div class="form-group">
+        <label>Siglas</label>
+        <input type="text" placeholder="Ej: FCI" [(ngModel)]="facultadData.siglas" maxlength="10">
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'carrera'" class="form-section">
+      <div class="form-group">
+        <label>Facultad Perteneciente</label>
+        <select [(ngModel)]="carreraData.id_facultad">
+          <option [ngValue]="null" disabled>Seleccione una facultad...</option>
+          <option *ngFor="let fac of facultadesList" [value]="fac.id_facultad">
+            {{ fac.nombre }} ({{ fac.siglas }})
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Nombre de la Carrera</label>
+        <input type="text" placeholder="Ej: Ingeniería de Software" [(ngModel)]="carreraData.nombre">
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn-cancel" (click)="onClose()">Cancelar</button>
+    
+    <button *ngIf="activeTab === 'facultad'" 
+            class="btn-save" 
+            (click)="onSaveFacultad()" 
+            [disabled]="!facultadData.nombre || !facultadData.siglas">
+      Guardar Facultad
+    </button>
+
+    <button *ngIf="activeTab === 'carrera'" 
+            class="btn-save" 
+            (click)="onSaveCarrera()" 
+            [disabled]="!carreraData.nombre || !carreraData.id_facultad">
+      Guardar Carrera
+    </button>
+  </div>
+</div>

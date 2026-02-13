@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FacultyAdminComponent } from './add-capability';
+import { UserManagement } from './user-management';
 
-describe('FacultyAdminComponent', () => {
-  let component: FacultyAdminComponent;
-  let fixture: ComponentFixture<FacultyAdminComponent>;
+describe('UserManagement', () => {
+  let component: UserManagement;
+  let fixture: ComponentFixture<UserManagement>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FacultyAdminComponent]
+      imports: [UserManagement]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FacultyAdminComponent);
+    fixture = TestBed.createComponent(UserManagement);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

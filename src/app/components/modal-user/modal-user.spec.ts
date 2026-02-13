@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CareerAdminComponent } from './add-career';
+import { ModalUser } from './modal-user';
 
-describe('CareerAdminComponent', () => {
-  let component: CareerAdminComponent;
-  let fixture: ComponentFixture<CareerAdminComponent>;
+describe('ModalUser', () => {
+  let component: ModalUser;
+  let fixture: ComponentFixture<ModalUser>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CareerAdminComponent]
+      imports: [ModalUser]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CareerAdminComponent);
+    fixture = TestBed.createComponent(ModalUser);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
