@@ -1,40 +1,42 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SidebarComponent } from '../../../components/sidebar/sidebar'; // Asegúrate de que la ruta sea correcta
 
-interface User {
+interface UserData {
   name: string;
   email: string;
   role: 'STUDENT' | 'TEACHER' | 'ADMIN';
   status: 'Active' | 'Inactive';
   lastLogin: string;
-  avatarColor: string; // Para simular el avatar
+  initial: string; // Para el avatar si no hay imagen
+  color: string;   // Color del avatar
 }
 
-interface MasterConfig {
+interface MasterData {
   title: string;
-  description: string;
   icon: string;
-  actionText: string;
+  colorClass: string;
 }
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SidebarComponent],
   templateUrl: './main-menu.html',
   styleUrls: ['./main-menu.css']
 })
-export class MenuPrincipalAdminComponent {
+export class AdminDashboardComponent {
   
-  // Datos simulados para la tabla de usuarios
-  recentUsers: User[] = [
+  // Datos simulados para la tabla
+  recentUsers: UserData[] = [
     {
       name: 'Ana Martinez',
       email: 'ana.m@university.edu',
       role: 'STUDENT',
       status: 'Active',
       lastLogin: '2 hours ago',
-      avatarColor: '#FF8A65'
+      initial: 'A',
+      color: '#ff8a65'
     },
     {
       name: 'Dr. Robert Chen',
@@ -42,7 +44,8 @@ export class MenuPrincipalAdminComponent {
       role: 'TEACHER',
       status: 'Active',
       lastLogin: '1 day ago',
-      avatarColor: '#BA68C8'
+      initial: 'D',
+      color: '#ba68c8'
     },
     {
       name: 'Marco Polo',
@@ -50,37 +53,26 @@ export class MenuPrincipalAdminComponent {
       role: 'ADMIN',
       status: 'Inactive',
       lastLogin: '5 days ago',
-      avatarColor: '#90A4AE'
+      initial: 'M',
+      color: '#90a4ae'
     }
   ];
 
-  // Datos para las tarjetas de configuración
-  masterConfigs: MasterConfig[] = [
-    {
-      title: 'Faculties',
-      description: 'Manage university departments and institutional structures.',
-      icon: 'fa-solid fa-university',
-      actionText: 'Manage Records'
-    },
-    {
-      title: 'Careers',
-      description: 'Define and configure degree programs and academic requirements.',
-      icon: 'fa-solid fa-graduation-cap',
-      actionText: 'Manage Careers'
-    },
-    {
-      title: 'Periods',
-      description: 'Set up academic semesters, years, and active timeframes.',
-      icon: 'fa-regular fa-calendar-check',
-      actionText: 'Config Periods'
-    },
-    {
-      title: 'Modes',
-      description: 'Define thesis titulation formats and graduation pathways.',
-      icon: 'fa-solid fa-book-open',
-      actionText: 'Define Modes'
-    }
+  // Datos para las tarjetas inferiores
+  masterConfigs: MasterData[] = [
+    { title: 'Faculties', icon: 'domain', colorClass: 'bg-green' },
+    { title: 'Careers', icon: 'school', colorClass: 'bg-teal' },
+    { title: 'Periods', icon: 'calendar_today', colorClass: 'bg-olive' },
+    { title: 'Modes', icon: 'category', colorClass: 'bg-emerald' }
   ];
 
-  constructor() {}
+  // Helper para asignar clases CSS según el rol
+  getRoleClass(role: string): string {
+    switch (role) {
+      case 'STUDENT': return 'badge-student';
+      case 'TEACHER': return 'badge-teacher';
+      case 'ADMIN': return 'badge-admin';
+      default: return '';
+    }
+  }
 }
