@@ -40,16 +40,16 @@
   margin-top: 4px;
 }
 
-/* Botón Principal */
 .btn-primary {
-  background-color: #27684a; /* Tu verde oficial */
+  display: none;
+  background-color: #27684a;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
-  display: flex;
+  /*display: flex;*/
   align-items: center;
   gap: 8px;
   cursor: pointer;

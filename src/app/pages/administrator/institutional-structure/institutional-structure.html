@@ -1,86 +1,86 @@
 <div class="layout-wrapper">
-  
+
   <app-sidebar role="admin"></app-sidebar>
 
-  <main class="main-content">
-    
-    <header class="top-bar">
-      <div class="breadcrumbs">
-        <span class="text-muted">Dashboard</span> 
-        <span class="separator">›</span> 
-        <span class="current">Estructura Institucional</span>
-      </div>
-      </header>
+  <div class="main-wrapper">
+    <app-header></app-header>
 
-    <section class="page-header">
-      <div class="header-text">
-        <h1>Estructura Institucional</h1>
-        <p>Administra las facultades y sus respectivas carreras profesionales.</p>
-      </div>
-      
-      <button class="btn-primary" (click)="openModal('facultad')">
-        <span class="material-symbols-outlined">add</span>
-        Nueva Facultad 
-      </button>
-    </section>
+    <main class="main-content">
 
-    <section class="stats-grid">
-      <div class="stat-card" *ngFor="let stat of stats">
-        <div class="stat-icon-box">
-          <span class="material-symbols-outlined">{{ stat.icon }}</span>
-        </div>
-        <div class="stat-info">
-          <span class="stat-label">{{ stat.title }}</span>
-          <span class="stat-value">{{ stat.value }}</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="faculties-grid">
-      
-      <div class="faculty-card" *ngFor="let faculty of faculties">
-        <div class="card-top">
-          <div class="faculty-header">
-             <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
-               <span class="material-symbols-outlined">{{ faculty.icon }}</span>
-             </div>
-             </div>
-          
-          <div class="faculty-title-row">
-            <h3>{{ faculty.name }}</h3>
-            <span class="badge">{{ faculty.careersCount }} CARRERAS</span>
-          </div>
-          <p class="subtitle">{{ faculty.subtitle }}</p>
+      <section class="page-header">
+        <div class="header-text">
+          <h1>Institutional Structure</h1>
+          <p>Manage faculties and their respective professional programs.</p>
         </div>
 
-        <div class="careers-list">
-          <ul>
-            <li *ngFor="let career of faculty.careers">
-              <span class="dot"></span>
-              {{ career.name }}
-            </li>
-          </ul>
-        </div>
-
-        <button class="btn-dashed" (click)="openModal('carrera', faculty.id)">
-          <span class="material-symbols-outlined">add_circle_outline</span>
-          Agregar Carrera
+        <button class="btn-primary" (click)="openModal('facultad')">
+          <span class="material-symbols-outlined">add</span>
+          New Faculty
         </button>
-      </div>
+      </section>
 
-      <div class="add-new-card" (click)="openModal('facultad')">
-        <div class="add-content">
-          <div class="plus-circle">
-            <span class="material-symbols-outlined">add</span>
+      <section class="stats-grid">
+        <div class="stat-card" *ngFor="let stat of stats">
+          <div class="stat-icon-box">
+            <span class="material-symbols-outlined">{{ stat.icon }}</span>
           </div>
-          <h3>Añadir Nueva Facultad</h3>
-          <p>Expande la estructura institucional.</p>
+          <div class="stat-info">
+            <span class="stat-label">{{ stat.title }}</span>
+            <span class="stat-value">{{ stat.value }}</span>
+          </div>
         </div>
-      </div>
+      </section>
 
-    </section>
+      <section class="faculties-grid">
 
+        <div class="faculty-card" *ngFor="let faculty of faculties">
+          <div class="card-top">
+            <div class="faculty-header">
+              <div
+                class="icon-wrapper"
+                [style.background-color]="faculty.iconBg"
+                [style.color]="faculty.iconColor"
+              >
+                <span class="material-symbols-outlined">{{ faculty.icon }}</span>
+              </div>
+            </div>
+
+            <div class="faculty-title-row">
+              <h3>{{ faculty.name }}</h3>
+              <span class="badge">{{ faculty.careersCount }} PROGRAMS</span>
+            </div>
+            <p class="subtitle">{{ faculty.subtitle }}</p>
+          </div>
+
+          <div class="careers-list">
+            <ul>
+              <li *ngFor="let career of faculty.careers">
+                <span class="dot"></span>
+                {{ career.name }}
+              </li>
+            </ul>
+          </div>
+
+          <button class="btn-dashed" (click)="openModal('carrera', faculty.id)">
+            <span class="material-symbols-outlined">add_circle_outline</span>
+            Add Program
+          </button>
+        </div>
+
+        <div class="add-new-card" (click)="openModal('facultad')">
+          <div class="add-content">
+            <div class="plus-circle">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+            <h3>Add New Faculty</h3>
+            <p>Expand the institutional structure.</p>
+          </div>
+        </div>
+
+      </section>
     </main>
+  </div>
+
 
   <app-modal-management-structure
     *ngIf="showModal"

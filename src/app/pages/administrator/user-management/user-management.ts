@@ -1,58 +1,59 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SidebarComponent } from '../../../components/sidebar/sidebar'; // Ajusta la ruta
-import { UserModalComponent, User } from './../../../components/modal-user/modal-user'; // Importamos el modal local
+import { SidebarComponent } from '../../../components/sidebar/sidebar';
+import { UserModalComponent, User } from './../../../components/modal-user/modal-user';
+import {HeaderComponent} from '../../../components/header/header';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, UserModalComponent],
+  imports: [CommonModule, FormsModule, SidebarComponent, UserModalComponent, HeaderComponent],
   templateUrl: './user-management.html',
   styleUrls: ['./user-management.css']
 })
 export class UserManagementComponent {
-  
+
   showModal = false;
   selectedUser: User | null = null;
   searchText = '';
 
   // Mock Data (Simulando tabla 'usuario' + 'usuario_rol' + 'credencial')
   users: User[] = [
-    { 
-      id_usuario: 1, 
-      identificacion: '0928374102', 
-      nombres: 'Carlos', 
-      apellidos: 'Ramirez', 
-      correo: 'admin@sgtt.edu', 
-      activo: true, 
+    {
+      id_usuario: 1,
+      identificacion: '0928374102',
+      nombres: 'Carlos',
+      apellidos: 'Ramirez',
+      correo: 'admin@sgtt.edu',
+      activo: true,
       username: 'cramirez',
-      roles: ['Admin'] 
+      roles: ['Admin']
     },
-    { 
-      id_usuario: 2, 
-      identificacion: '1203948571', 
-      nombres: 'Maria', 
-      apellidos: 'Gonzalez', 
-      correo: 'maria.gonzalez@sgtt.edu', 
-      activo: true, 
+    {
+      id_usuario: 2,
+      identificacion: '1203948571',
+      nombres: 'Maria',
+      apellidos: 'Gonzalez',
+      correo: 'maria.gonzalez@sgtt.edu',
+      activo: true,
       username: 'mgonzalez',
-      roles: ['Teacher', 'Coordinator'] 
+      roles: ['Teacher', 'Coordinator']
     },
-    { 
-      id_usuario: 3, 
-      identificacion: '1728394012', 
-      nombres: 'Juan', 
-      apellidos: 'Perez', 
-      correo: 'juan.perez@student.edu', 
-      activo: false, 
+    {
+      id_usuario: 3,
+      identificacion: '1728394012',
+      nombres: 'Juan',
+      apellidos: 'Perez',
+      correo: 'juan.perez@student.edu',
+      activo: false,
       username: 'jperez22',
-      roles: ['Student'] 
+      roles: ['Student']
     }
   ];
 
   get filteredUsers() {
-    return this.users.filter(u => 
+    return this.users.filter(u =>
       u.nombres.toLowerCase().includes(this.searchText.toLowerCase()) ||
       u.apellidos.toLowerCase().includes(this.searchText.toLowerCase()) ||
       u.identificacion.includes(this.searchText) ||
