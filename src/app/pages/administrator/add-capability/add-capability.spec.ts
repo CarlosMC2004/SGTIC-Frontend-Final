@@ -1,17 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MenuPrincipalAdminComponent } from './main-menu';
 
-describe('MenuPrincipalAdminComponent', () => {
-  let component: MenuPrincipalAdminComponent;
-  let fixture: ComponentFixture<MenuPrincipalAdminComponent>;
+import { FacultyAdminComponent } from './add-capability';
+
+describe('FacultyAdminComponent', () => {
+  let component: FacultyAdminComponent;
+  let fixture: ComponentFixture<FacultyAdminComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MenuPrincipalAdminComponent]
+      imports: [FacultyAdminComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MenuPrincipalAdminComponent);
+    fixture = TestBed.createComponent(FacultyAdminComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

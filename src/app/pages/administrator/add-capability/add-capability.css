@@ -1,0 +1,102 @@
+/* Header styling */
+.modal-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #333;
+}
+
+.icon-box {
+  background: #54A566;
+  color: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Form layout */
+.faculty-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666;
+  letter-spacing: 0.5px;
+}
+
+input, textarea {
+  padding: 12px;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #54A566;
+  box-shadow: 0 0 0 3px rgba(84, 165, 102, 0.1);
+}
+
+/* Buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-cancel {
+  background: #eee;
+  border: none;
+  color: #555;
+}
+
+.btn-save {
+  background: #54A566;
+  border: none;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(84, 165, 102, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

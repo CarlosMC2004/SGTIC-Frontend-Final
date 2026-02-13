@@ -1,12 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-<<<<<<< HEAD
-import { SidebarComponent } from '../../../components/sidebar/sidebar'; // Asegúrate de que la ruta sea correcta
-=======
-import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { HeaderComponent } from '../../../components/header/header';
->>>>>>> 7073174a95fa2c9626a2ed1edddfa987ee1d8594
 
 interface UserData {
   name: string;
@@ -14,49 +9,34 @@ interface UserData {
   role: 'STUDENT' | 'TEACHER' | 'ADMIN';
   status: 'Active' | 'Inactive';
   lastLogin: string;
-<<<<<<< HEAD
-  initial: string; // Para el avatar si no hay imagen
-  color: string;   // Color del avatar
-=======
   avatarColor: string;
->>>>>>> 7073174a95fa2c9626a2ed1edddfa987ee1d8594
 }
 
 interface MasterData {
   title: string;
   icon: string;
-  colorClass: string;
+  description: string; // Agregada
+  actionText: string;  // Agregada
+  colorClass?: string; // El '?' la hace opcional por si no todos la usan
 }
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-<<<<<<< HEAD
-  imports: [CommonModule, SidebarComponent],
-  templateUrl: './main-menu.html',
-  styleUrls: ['./main-menu.css']
-})
-export class AdminDashboardComponent {
-  
-  // Datos simulados para la tabla
-  recentUsers: UserData[] = [
-=======
   imports: [CommonModule, SidebarComponent, HeaderComponent],
   templateUrl: './main-menu.html',
   styleUrls: ['./main-menu.css']
 })
 export class MenuPrincipalAdminComponent {
 
-  recentUsers: User[] = [
->>>>>>> 7073174a95fa2c9626a2ed1edddfa987ee1d8594
+  recentUsers: UserData[] = [
     {
       name: 'Ana Martinez',
       email: 'ana.m@university.edu',
       role: 'STUDENT',
       status: 'Active',
       lastLogin: '2 hours ago',
-      initial: 'A',
-      color: '#ff8a65'
+      avatarColor: '#ff8a65'
     },
     {
       name: 'Dr. Robert Chen',
@@ -64,8 +44,7 @@ export class MenuPrincipalAdminComponent {
       role: 'TEACHER',
       status: 'Active',
       lastLogin: '1 day ago',
-      initial: 'D',
-      color: '#ba68c8'
+      avatarColor: '#ba68c8'
     },
     {
       name: 'Marco Polo',
@@ -73,32 +52,11 @@ export class MenuPrincipalAdminComponent {
       role: 'ADMIN',
       status: 'Inactive',
       lastLogin: '5 days ago',
-      initial: 'M',
-      color: '#90a4ae'
+      avatarColor: '#90a4ae'
     }
   ];
 
-<<<<<<< HEAD
-  // Datos para las tarjetas inferiores
   masterConfigs: MasterData[] = [
-    { title: 'Faculties', icon: 'domain', colorClass: 'bg-green' },
-    { title: 'Careers', icon: 'school', colorClass: 'bg-teal' },
-    { title: 'Periods', icon: 'calendar_today', colorClass: 'bg-olive' },
-    { title: 'Modes', icon: 'category', colorClass: 'bg-emerald' }
-  ];
-
-  // Helper para asignar clases CSS según el rol
-  getRoleClass(role: string): string {
-    switch (role) {
-      case 'STUDENT': return 'badge-student';
-      case 'TEACHER': return 'badge-teacher';
-      case 'ADMIN': return 'badge-admin';
-      default: return '';
-    }
-  }
-}
-=======
-  masterConfigs: MasterConfig[] = [
     {
       title: 'Faculties',
       description: 'Manage university departments and institutional structures.',
@@ -127,4 +85,3 @@ export class MenuPrincipalAdminComponent {
 
   constructor() {}
 }
->>>>>>> 7073174a95fa2c9626a2ed1edddfa987ee1d8594

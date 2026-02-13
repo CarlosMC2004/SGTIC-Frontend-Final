@@ -1,0 +1,18 @@
+<div class="modal-backdrop" *ngIf="isVisible" (click)="close()">
+  
+  <div class="glass-card" (click)="stopProp($event)">
+    
+    <button class="close-btn" (click)="close()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+
+    <div class="modal-header">
+      <ng-content select="[header]"></ng-content>
+    </div>
+
+    <div class="modal-body">
+      <ng-content></ng-content>
+    </div>
+
+  </div>
+</div>  

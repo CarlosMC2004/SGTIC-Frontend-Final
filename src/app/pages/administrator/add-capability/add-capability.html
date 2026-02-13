@@ -1,0 +1,33 @@
+<app-glass-modal [isVisible]="isModalVisible" (closeEvent)="toggleModal()">
+  <div header class="modal-header-content">
+    <div class="icon-box">
+      <span class="material-symbols-outlined">corporate_fare</span>
+    </div>
+    <h2>New Faculty</h2>
+  </div>
+
+  <form [formGroup]="facultyForm" (ngSubmit)="onSubmit()" class="faculty-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="name">NAME</label>
+        <input type="text" id="name" formControlName="name" placeholder="e.g. Faculty of Engineering">
+      </div>
+      
+      <div class="form-group code-input">
+        <label for="code">CODE</label>
+        <input type="text" id="code" formControlName="code" placeholder="ENG-01">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">DESCRIPTION</label>
+      <textarea id="description" formControlName="description" rows="4" 
+        placeholder="Brief description of the mission and objectives..."></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="toggleModal()">Cancel</button>
+      <button type="submit" class="btn-save" [disabled]="facultyForm.invalid">Save</button>
+    </div>
+  </form>
+</app-glass-modal>
