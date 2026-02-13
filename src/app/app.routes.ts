@@ -9,5 +9,5 @@ export const routes: Routes = [
     //RUTA MENU ADMINISTRADOR
     {path: 'main-menu', component: MenuPrincipalAdminComponent},
     //RUTA DE CONFIGURACION DE ADMINISTRADOR
-    {path: 'AcademicConfiguration', component: AcademicConfiguration}
+    {path: 'academic-configuration', component: AcademicConfiguration}
 ];

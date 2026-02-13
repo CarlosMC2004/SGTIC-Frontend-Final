@@ -9,7 +9,6 @@
 
 .main-wrapper {
   flex: 1;
-  margin-left: 260px; /* Espacio reservado para el Sidebar */
   display: flex;
   flex-direction: column;
 }
