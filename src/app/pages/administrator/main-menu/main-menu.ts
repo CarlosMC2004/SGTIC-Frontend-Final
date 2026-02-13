@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { HeaderComponent } from '../../../components/header/header';
 
-interface User {
+interface UserData {
   name: string;
   email: string;
   role: 'STUDENT' | 'TEACHER' | 'ADMIN';
@@ -13,31 +12,31 @@ interface User {
   avatarColor: string;
 }
 
-interface MasterConfig {
+interface MasterData {
   title: string;
-  description: string;
   icon: string;
-  actionText: string;
-  route: string;
+  description: string; // Agregada
+  actionText: string;  // Agregada
+  colorClass?: string; // El '?' la hace opcional por si no todos la usan
 }
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent, RouterModule],
+  imports: [CommonModule, SidebarComponent, HeaderComponent],
   templateUrl: './main-menu.html',
   styleUrls: ['./main-menu.css']
 })
 export class MenuPrincipalAdminComponent {
 
-  recentUsers: User[] = [
+  recentUsers: UserData[] = [
     {
       name: 'Ana Martinez',
       email: 'ana.m@university.edu',
       role: 'STUDENT',
       status: 'Active',
       lastLogin: '2 hours ago',
-      avatarColor: '#FF8A65'
+      avatarColor: '#ff8a65'
     },
     {
       name: 'Dr. Robert Chen',
@@ -45,7 +44,7 @@ export class MenuPrincipalAdminComponent {
       role: 'TEACHER',
       status: 'Active',
       lastLogin: '1 day ago',
-      avatarColor: '#BA68C8'
+      avatarColor: '#ba68c8'
     },
     {
       name: 'Marco Polo',
@@ -53,38 +52,34 @@ export class MenuPrincipalAdminComponent {
       role: 'ADMIN',
       status: 'Inactive',
       lastLogin: '5 days ago',
-      avatarColor: '#90A4AE'
+      avatarColor: '#90a4ae'
     }
   ];
 
-  masterConfigs: MasterConfig[] = [
+  masterConfigs: MasterData[] = [
     {
       title: 'Faculties',
       description: 'Manage university departments and institutional structures.',
-      icon: 'domain',
-      actionText: 'Manage Records',
-      route: '/admin/faculties'
+      icon: 'domain', // Antes: 'fa-solid fa-university'
+      actionText: 'Manage Records'
     },
     {
       title: 'Careers',
       description: 'Define and configure degree programs and academic requirements.',
-      icon: 'school',
-      actionText: 'Manage Careers',
-      route: '/admin/careers'
+      icon: 'school', // Antes: 'fa-solid fa-graduation-cap'
+      actionText: 'Manage Careers'
     },
     {
       title: 'Periods',
       description: 'Set up academic semesters, years, and active timeframes.',
-      icon: 'calendar_month',
-      actionText: 'Config Periods',
-      route: '/admin/periods'
+      icon: 'calendar_month', // Antes: 'fa-regular fa-calendar-check'
+      actionText: 'Config Periods'
     },
     {
       title: 'Modes',
       description: 'Define thesis titulation formats and graduation pathways.',
-      icon: 'description',
-      actionText: 'Define Modes',
-      route: '/admin/configuration'
+      icon: 'description', // Antes: 'fa-solid fa-book-open'
+      actionText: 'Define Modes'
     }
   ];
 
