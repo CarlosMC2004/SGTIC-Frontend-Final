@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="layout-wrapper">
   
   <app-sidebar role="coordinador"></app-sidebar>
@@ -85,9 +86,103 @@
           <div class="card-icon-box">
              </div>
           <span class="card-title">{{ item.title }}</span>
+=======
+<div class="layout-container">
+
+  <app-sidebar role="admin"></app-sidebar>
+
+  <div class="main-wrapper">
+
+    <app-header></app-header>
+
+    <main class="content-area">
+
+      <div class="page-header-flex">
+        <div>
+          <h1 class="page-title">Admin Dashboard</h1>
+          <p class="page-subtitle">Manage users, faculty settings and system configurations.</p>
+        </div>
+        <button class="btn-primary">
+          <span class="material-symbols-outlined">person_add</span>
+          Create New User
+        </button>
+      </div>
+
+      <h3 class="section-title">Master Data & Configuration</h3>
+      <div class="grid-cards">
+        <div class="config-card" *ngFor="let item of masterConfigs">
+          <div class="icon-wrapper">
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+          </div>
+          <h4>{{item.title}}</h4>
+          <p>{{item.description}}</p>
+          <button class="btn-secondary">{{item.actionText}}</button>
+>>>>>>> 7073174a95fa2c9626a2ed1edddfa987ee1d8594
         </div>
       </div>
     </section>
 
+<<<<<<< HEAD
   </main>
 </div>
+=======
+      <div class="table-card">
+        <div class="card-header">
+          <h3>Recent Users</h3>
+          <div class="header-actions">
+            <button class="icon-btn"><span class="material-symbols-outlined">filter_list</span></button>
+            <button class="icon-btn"><span class="material-symbols-outlined">download</span></button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>USER</th>
+              <th>ROLE</th>
+              <th>STATUS</th>
+              <th>LAST LOGIN</th>
+              <th>ACTIONS</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let user of recentUsers">
+              <td>
+                <div class="user-cell">
+                  <div class="avatar-circle" [style.background-color]="user.avatarColor">
+                    {{user.name.charAt(0)}}
+                  </div>
+                  <div class="user-details">
+                    <span class="name">{{user.name}}</span>
+                    <span class="email">{{user.email}}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                  <span class="badge" [class]="'badge-' + user.role.toLowerCase()">
+                    {{user.role}}
+                  </span>
+              </td>
+              <td>
+                  <span class="status-indicator">
+                    <span class="dot" [class.active]="user.status === 'Active'"></span>
+                    {{user.status}}
+                  </span>
+              </td>
+              <td class="text-muted">{{user.lastLogin}}</td>
+              <td>
+                <button class="action-btn">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+>>>>>>> 7073174a95fa2c9626a2ed1edddfa987ee1d8594

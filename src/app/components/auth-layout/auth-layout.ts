@@ -1,3 +1,4 @@
+//import { Component } from '@angular/core';
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -6,10 +7,19 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './auth-layout.html',
-  styleUrls: ['./auth-layout.css']
+  styleUrl: './auth-layout.css'
 })
+
+// export class AuthLayoutComponent {
+//}
+  //styleUrls: ['./auth-layout.css']
+//})
+
 export class AuthLayoutComponent {
   @Input() pageTitle: string = '';
   @Input() quote: string = '';
   @Input() author: string = '';
+}
+
+export class AuthLayout {
 }
