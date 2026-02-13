@@ -11,35 +11,49 @@
     <ng-container *ngIf="role === 'coordinador'">
       <a class="menu-item" routerLink="/inicio-coordinador" routerLinkActive="active">
         <span class="material-symbols-outlined">home</span>
-        <span>Inicio</span>
+        <span>Home</span>
       </a>
       <a class="menu-item" routerLink="/revision-requisitos" routerLinkActive="active">
         <span class="material-symbols-outlined">description</span>
-        <span>Solicitudes</span>
+        <span>Requests</span>
       </a>
       <a class="menu-item" routerLink="/banco-temas" routerLinkActive="active">
         <span class="material-symbols-outlined">library_books</span>
-        <span>Banco de Temas</span>
+        <span>Topic Bank</span>
       </a>
       <a class="menu-item" routerLink="/asignaciones" routerLinkActive="active">
         <span class="material-symbols-outlined">assignment_ind</span>
-        <span>Asignaciones</span>
+        <span>Assignments</span>
       </a>
-
       <a class="menu-item" routerLink="/docentes" routerLinkActive="active">
-        <span class="material-symbols-outlined">group</span> <span>Docentes</span>
+        <span class="material-symbols-outlined">group</span>
+        <span>Teachers</span>
       </a>
-
     </ng-container>
 
     <ng-container *ngIf="role === 'estudiante'">
       <a class="menu-item" routerLink="/inicio-estudiante" routerLinkActive="active">
         <span class="material-symbols-outlined">home</span>
-        <span>Mi Inicio</span>
+        <span>My Home</span>
       </a>
       <a class="menu-item" routerLink="/mis-proyectos" routerLinkActive="active">
         <span class="material-symbols-outlined">folder_shared</span>
-        <span>Mi Proyecto</span>
+        <span>My Project</span>
+      </a>
+    </ng-container>
+
+    <ng-container *ngIf="role === 'admin'">
+      <a class="menu-item" routerLink="/admin/main-menu" routerLinkActive="active">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a class="menu-item" routerLink="/admin/users" routerLinkActive="active">
+        <span class="material-symbols-outlined">people</span>
+        <span>Users</span>
+      </a>
+      <a class="menu-item" routerLink="/admin/configuration" routerLinkActive="active">
+        <span class="material-symbols-outlined">settings</span>
+        <span>Configuration</span>
       </a>
     </ng-container>
 

@@ -1,0 +1,112 @@
+<div class="layout-wrapper">
+  
+  <app-sidebar role="coordinador"></app-sidebar>
+
+  <main class="main-content">
+    
+    <header class="top-bar">
+      <div class="breadcrumbs">
+        <span class="text-muted">Dashboard</span> 
+        <span class="separator">›</span> 
+        <span class="current">Estructura Institucional</span>
+      </div>
+      
+      <div class="top-actions">
+        <div class="search-box">
+          <span class="material-symbols-outlined">search</span>
+          <input type="text" placeholder="Buscar facultad...">
+        </div>
+        <button class="icon-btn">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div class="profile-pic">
+          <img src="https://i.pravatar.cc/150?u=admin2" alt="Profile">
+        </div>
+      </div>
+    </header>
+
+    <section class="page-header">
+      <div class="header-text">
+        <h1>Estructura Institucional</h1>
+        <p>Administra las facultades y sus respectivas carreras profesionales.</p>
+      </div>
+      <button class="btn-primary">
+        <span class="material-symbols-outlined">add</span>
+        Nueva Facultad
+      </button>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card" *ngFor="let stat of stats">
+        <div class="stat-icon-box">
+          <span class="material-symbols-outlined">{{ stat.icon }}</span>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ stat.title }}</span>
+          <span class="stat-value">{{ stat.value }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="faculties-grid">
+      
+      <div class="faculty-card" *ngFor="let faculty of faculties">
+        <div class="card-top">
+          <div class="faculty-header">
+            <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
+              <span class="material-symbols-outlined">{{ faculty.icon }}</span>
+            </div>
+            <div class="actions">
+              <button class="action-btn"><span class="material-symbols-outlined">edit</span></button>
+              <button class="action-btn"><span class="material-symbols-outlined">delete</span></button>
+            </div>
+          </div>
+          
+          <div class="faculty-title-row">
+            <h3>{{ faculty.name }}</h3>
+            <span class="badge">{{ faculty.careersCount }} CARRERAS</span>
+          </div>
+          <p class="subtitle">{{ faculty.subtitle }}</p>
+        </div>
+
+        <div class="careers-list">
+          <ul>
+            <li *ngFor="let career of faculty.careers">
+              <span class="dot"></span>
+              {{ career.name }}
+            </li>
+          </ul>
+        </div>
+
+        <button class="btn-dashed">
+          <span class="material-symbols-outlined">add_circle_outline</span>
+          Agregar Carrera
+        </button>
+      </div>
+
+      <div class="add-new-card">
+        <div class="add-content">
+          <div class="plus-circle">
+            <span class="material-symbols-outlined">add</span>
+          </div>
+          <h3>Añadir Nueva Facultad</h3>
+          <p>Expande la estructura institucional agregando una nueva unidad académica.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <footer class="pagination-footer">
+      <span class="showing-text">Mostrando 4 de 12 facultades registradas</span>
+      
+      <div class="pagination-controls">
+        <button class="page-btn">Anterior</button>
+        <button class="page-num active">1</button>
+        <button class="page-num">2</button>
+        <button class="page-num">3</button>
+        <button class="page-btn">Siguiente</button>
+      </div>
+    </footer>
+
+  </main>
+</div>
