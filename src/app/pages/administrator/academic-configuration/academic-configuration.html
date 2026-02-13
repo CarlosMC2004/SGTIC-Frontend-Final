@@ -13,7 +13,7 @@
           <h2 class="page-title">Academic Configuration</h2>
           <p class="page-subtitle">Management of degree modalities and knowledge areas</p>
         </div>
-        <button class="btn-primary">
+        <button class="btn-primary" (click)="openModal()">
           <span class="material-symbols-outlined">add</span>
           New Modality
         </button>
@@ -82,7 +82,7 @@
               </button>
             </span>
 
-            <button class="btn-add-tag">
+            <button class="btn-add-tag" (click)="openAreaModal()">
               <span class="material-symbols-outlined">add</span>
               Add Area
             </button>
@@ -114,4 +114,8 @@
 
     </main>
   </div>
+
+  <app-modal-new-modality *ngIf="isModalOpen" (close)="closeModal()" (save)="saveNewModality($event)"></app-modal-new-modality>
+  <app-modal-add-area *ngIf="isAreaModalOpen" (close)="closeAreaModal()" (save)="saveNewArea($event)"></app-modal-add-area>
+
 </div>

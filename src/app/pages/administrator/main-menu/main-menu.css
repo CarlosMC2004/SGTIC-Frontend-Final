@@ -5,13 +5,10 @@
   background-color: #f6f8f7;
   font-family: 'Public Sans', sans-serif; /* Usamos la fuente de tu proyecto */
   overflow: hidden;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f4f6f8; /* Color de fondo gris muy claro */
 }
 
 .main-wrapper {
   flex: 1;
-  margin-left: 260px; /* Espacio reservado para el Sidebar */
   display: flex;
   flex-direction: column;
 }
@@ -35,7 +32,6 @@
   font-weight: 700;
   color: #111815;
   margin: 0;
-  font-size: 15px;
 }
 
 .page-subtitle {
@@ -155,7 +151,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
 .card-header h3 {
@@ -186,9 +181,9 @@
   color: #27684a;
 }
 
-/* Tabla */
 .table-responsive {
   width: 100%;
+  overflow-x: auto;
 }
 
 table {
@@ -196,7 +191,7 @@ table {
   border-collapse: collapse;
 }
 
-thead th {
+th {
   text-align: left;
   padding: 16px 20px;
   font-size: 12px;
@@ -226,6 +221,7 @@ td {
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
