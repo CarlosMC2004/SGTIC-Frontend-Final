@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from '../../../components/sidebar/sidebar';
+import { HeaderComponent } from '../../../components/header/header';
 
 interface User {
   name: string;
@@ -7,7 +10,7 @@ interface User {
   role: 'STUDENT' | 'TEACHER' | 'ADMIN';
   status: 'Active' | 'Inactive';
   lastLogin: string;
-  avatarColor: string; // Para simular el avatar
+  avatarColor: string;
 }
 
 interface MasterConfig {
@@ -20,13 +23,12 @@ interface MasterConfig {
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SidebarComponent, HeaderComponent],
   templateUrl: './main-menu.html',
   styleUrls: ['./main-menu.css']
 })
 export class MenuPrincipalAdminComponent {
-  
-  // Datos simulados para la tabla de usuarios
+
   recentUsers: User[] = [
     {
       name: 'Ana Martinez',
@@ -54,30 +56,29 @@ export class MenuPrincipalAdminComponent {
     }
   ];
 
-  // Datos para las tarjetas de configuración
   masterConfigs: MasterConfig[] = [
     {
       title: 'Faculties',
       description: 'Manage university departments and institutional structures.',
-      icon: 'fa-solid fa-university',
+      icon: 'domain', // Antes: 'fa-solid fa-university'
       actionText: 'Manage Records'
     },
     {
       title: 'Careers',
       description: 'Define and configure degree programs and academic requirements.',
-      icon: 'fa-solid fa-graduation-cap',
+      icon: 'school', // Antes: 'fa-solid fa-graduation-cap'
       actionText: 'Manage Careers'
     },
     {
       title: 'Periods',
       description: 'Set up academic semesters, years, and active timeframes.',
-      icon: 'fa-regular fa-calendar-check',
+      icon: 'calendar_month', // Antes: 'fa-regular fa-calendar-check'
       actionText: 'Config Periods'
     },
     {
       title: 'Modes',
       description: 'Define thesis titulation formats and graduation pathways.',
-      icon: 'fa-solid fa-book-open',
+      icon: 'description', // Antes: 'fa-solid fa-book-open'
       actionText: 'Define Modes'
     }
   ];

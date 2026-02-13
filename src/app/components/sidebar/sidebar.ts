@@ -10,5 +10,4 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrls: ['./sidebar.css']
 })
 export class SidebarComponent {
-  @Input() role: 'coordinador' | 'estudiante' = 'coordinador';
-}
+  @Input() role: 'coordinador' | 'estudiante' | 'admin' = 'coordinador';}
