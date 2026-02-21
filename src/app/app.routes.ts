@@ -4,6 +4,7 @@ import { MenuPrincipalAdminComponent } from './pages/administrator/main-menu/mai
 import {AcademicConfiguration} from './pages/administrator/academic-configuration/academic-configuration';
 import { InstitutionalStructureComponent } from './pages/administrator/institutional-structure/institutional-structure';
 import { UserManagementComponent } from './pages/administrator/user-management/user-management';
+import {StudentRequests} from './pages/coordinator/student-requests/student-requests';
 
 export const routes: Routes = [
     //RUTA PARA EL LOGIN
@@ -16,4 +17,6 @@ export const routes: Routes = [
     { path: 'academic-configuration', component: AcademicConfiguration},
     //RUTA DE GESTION DE USUARIOS
     { path: 'user-management', component: UserManagementComponent},
+    //RUTA GESTION DE SOLICITUDES DE ESTUDIANTES (COORDINADOR)
+  {path: 'student-requests', component: StudentRequests}
 ];
