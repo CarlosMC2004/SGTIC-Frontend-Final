@@ -2,20 +2,20 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-// 1. CORRECCIÓN DEL ERROR: Definimos la interfaz con 'siglas'
 export interface FacultadSimple {
   id_facultad?: number;
   nombre: string;
-  siglas: string; // <--- Esto soluciona tu error de compilación
+  siglas: string;
 }
 
 export interface CarreraSimple {
+  id_carrera?: number;
   id_facultad: number | null;
   nombre: string;
 }
 
 @Component({
-  selector: 'app-modal-management-structure', // Selector actualizado según tu carpeta
+  selector: 'app-modal-management-structure',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './modal-management-structure.html',
@@ -23,12 +23,13 @@ export interface CarreraSimple {
 })
 export class ModalManagementStructureComponent implements OnChanges {
 
-  // --- INPUTS (Datos que vienen del padre) ---
   @Input() initialTab: 'facultad' | 'carrera' = 'facultad';
   @Input() preselectedFacultyId: number | null = null;
-  @Input() facultadesList: FacultadSimple[] = []; // Lista para el select
+  @Input() facultadesList: FacultadSimple[] = [];
 
-  // --- OUTPUTS (Eventos hacia el padre) ---
+  @Input() editData: any = null;
+  @Input() isEditMode: boolean = false;
+
   @Output() close = new EventEmitter<void>();
   @Output() saveFacultad = new EventEmitter<FacultadSimple>();
   @Output() saveCarrera = new EventEmitter<CarreraSimple>();
@@ -39,16 +40,26 @@ export class ModalManagementStructureComponent implements OnChanges {
   facultadData: FacultadSimple = { nombre: '', siglas: '' };
   carreraData: CarreraSimple = { id_facultad: null, nombre: '' };
 
-  // Detectamos cambios para configurar el modal al abrirse
   ngOnChanges(changes: SimpleChanges) {
     if (changes['initialTab']) {
       this.activeTab = this.initialTab;
     }
-    // Si nos pasan un ID de facultad, lo preseleccionamos en el formulario de carrera
-    if (changes['preselectedFacultyId'] && this.preselectedFacultyId) {
+
+    if(changes['editData'] && this.editData) {
+      this.populateFormForEdit();
+    }
+    else if (changes['preselectedFacultyId'] && this.preselectedFacultyId && !this.isEditMode) {
       this.carreraData.id_facultad = this.preselectedFacultyId;
     }
   }
+
+    private populateFormForEdit() {
+      if (this.activeTab === 'facultad') {
+        this.facultadData = { ...this.editData };
+      } else if (this.activeTab === 'carrera') {
+        this.carreraData = { ...this.editData }
+      }
+    }
 
   onClose() {
     this.resetForms();
@@ -59,14 +70,12 @@ export class ModalManagementStructureComponent implements OnChanges {
     if (this.facultadData.nombre.trim() && this.facultadData.siglas.trim()) {
       this.facultadData.siglas = this.facultadData.siglas.toUpperCase();
       this.saveFacultad.emit(this.facultadData);
-      this.resetForms();
     }
   }
 
   onSaveCarrera() {
     if (this.carreraData.nombre.trim() && this.carreraData.id_facultad) {
       this.saveCarrera.emit(this.carreraData);
-      this.resetForms();
     }
   }
 

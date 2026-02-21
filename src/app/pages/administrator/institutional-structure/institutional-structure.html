@@ -10,7 +10,7 @@
         <span class="separator">›</span> 
         <span class="current">Estructura Institucional</span>
       </div>
-      </header>
+    </header>
 
     <section class="page-header">
       <div class="header-text">
@@ -30,8 +30,8 @@
           <span class="material-symbols-outlined">{{ stat.icon }}</span>
         </div>
         <div class="stat-info">
-          <span class="stat-label">{{ stat.title }}</span>
-          <span class="stat-value">{{ stat.value }}</span>
+          <span class="stat-label">{{ stat.Title }}</span>
+          <span class="stat-value">{{ stat.values }}</span>
         </div>
       </div>
     </section>
@@ -44,7 +44,7 @@
              <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
                <span class="material-symbols-outlined">{{ faculty.icon }}</span>
              </div>
-             </div>
+          </div>
           
           <div class="faculty-title-row">
             <h3>{{ faculty.name }}</h3>
@@ -53,14 +53,36 @@
           <p class="subtitle">{{ faculty.subtitle }}</p>
         </div>
 
-        <div class="careers-list">
-          <ul>
-            <li *ngFor="let career of faculty.careers">
-              <span class="dot"></span>
-              {{ career.name }}
-            </li>
-          </ul>
-        </div>
+        <ul class="career-list">
+          <li *ngFor="let career of faculty.careers" class="career-item">
+            
+            <div class="career-info">
+              <span class="status-dot" 
+                    [class.active]="career.active" 
+                    [class.inactive]="!career.active"
+                    [title]="career.active ? 'Activa' : 'Desactivada'">
+              </span>
+              
+              <span class="career-name" [class.text-muted]="!career.active">
+                {{ career.name }}
+              </span>
+            </div>
+
+            <div class="career-actions">
+              <button class="action-btn edit" (click)="openEditModal(career, faculty)" title="Editar">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+
+              <button class="action-btn toggle" 
+                      (click)="toggleCareerStatus(career)" 
+                      [title]="career.active ? 'Desactivar' : 'Activar'">
+                <span class="material-symbols-outlined">
+                  {{ career.active ? 'toggle_on' : 'toggle_off' }}
+                </span>
+              </button>
+            </div>
+          </li>
+        </ul>
 
         <button class="btn-dashed" (click)="openModal('carrera', faculty.id)">
           <span class="material-symbols-outlined">add_circle_outline</span>
@@ -80,14 +102,14 @@
 
     </section>
 
-    </main>
+  </main>
 
   <app-modal-management-structure
     *ngIf="showModal"
     [initialTab]="currentModalTab"
     [preselectedFacultyId]="selectedFacultyId"
     [facultadesList]="mappedFacultiesForModal"
-    (close)="closeModal()"
+    [editData]="dataToEdit"       [isEditMode]="isEditMode"     (close)="closeModal()"
     (saveFacultad)="handleSaveFacultad($event)"
     (saveCarrera)="handleSaveCarrera($event)">
   </app-modal-management-structure>
