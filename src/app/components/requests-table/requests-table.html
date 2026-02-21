@@ -1,0 +1,72 @@
+<div class="table-container">
+
+  <div class="table-actions">
+    <div class="search-box">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input type="text" placeholder="Buscar estudiante...">
+    </div>
+    <button class="btn-filter">
+      <span class="material-symbols-outlined">filter_list</span>
+      Filtrar
+    </button>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+      <tr>
+        <th>CÉDULA</th>
+        <th>ESTUDIANTE</th>
+        <th>CORREO</th>
+        <th class="center-text">FECHA DE ENVÍO</th>
+        <th class="center-text">ESTADO</th>
+        <th class="right-text">ACCIONES</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let req of requestsList">
+        <td>{{ req.identification }}</td>
+        <td>
+          <div class="student-info">
+            <span class="name">{{ req.firstName }} {{req.lastName}}</span>
+            <span class="career">{{ req.career.name}}</span>
+          </div>
+        </td>
+        <td class="email">{{ req.email }}</td>
+
+        <td class="center-text">{{ req.sentDate | date:'shortDate' }}</td>
+
+        <td class="center-text">
+          <span class="status-badge" [ngClass]="req.status">
+            {{ req.status | titlecase }}
+          </span>
+        </td>
+
+        <td class="right-text">
+          <ng-container *ngIf="req.status === 'pendiente'">
+            <button class="btn-approve">Aprobar</button>
+            <button class="btn-reject" (click)="openModal()">Rechazar</button>
+          </ng-container>
+
+          <span *ngIf="req.status !== 'pendiente'" style="color: gray; font-size: 0.9em; font-style: italic;">
+            Ya procesada
+          </span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-bar">
+    <span class="page-info">Mostrando 1 a {{requestsList.length}} de {{requestsList.length}} solicitudes</span>
+    <div class="pagination-controls">
+      <button class="page-btn"><span class="material-symbols-outlined">chevron_left</span></button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn"><span class="material-symbols-outlined">chevron_right</span></button>
+    </div>
+  </div>
+
+  <app-modal-rechazo *ngIf="showModal" (close)="closeModal()"></app-modal-rechazo>
+
+</div>

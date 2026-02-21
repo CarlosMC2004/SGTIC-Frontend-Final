@@ -1,0 +1,24 @@
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-area">
+    <app-header></app-header>
+
+    <div class="content-body">
+      <div class="page-heading">
+        <h3 class="page-title">Solicitudes de Inicio de Titulación</h3>
+        <p class="page-description">
+          Revise y gestione las solicitudes de proyectos de tesis de los estudiantes para el periodo académico actual.
+        </p>
+      </div>
+
+      <app-requests-table></app-requests-table>
+
+      <div class="cards-grid">
+        <app-status-card title="Pendientes" [count]="12" icon="pending_actions" colorType="blue"></app-status-card>
+        <app-status-card title="Aprobadas" [count]="45" icon="check_circle" colorType="green"></app-status-card>
+        <app-status-card title="Rechazadas" [count]="3" icon="cancel" colorType="red"></app-status-card>
+      </div>
+    </div>
+  </main>
+</div>
