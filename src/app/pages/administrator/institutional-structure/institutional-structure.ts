@@ -7,6 +7,7 @@ import { FacultyDashboardAdmin, FacultyDashboardDTO} from '../../../services/fac
 import { FacultyCreate, FacultyCreateDTO } from '../../../services/faculty-create/faculty-create';
 import { CareerCreate, CareerCreateDTO } from '../../../services/career-create/career-create';
 import {HeaderComponent} from '../../../components/header/header';
+import { ManageCareer } from '../../../services/manage-career/manage-career';
 
 interface CareerDisplay {
   id: number;
@@ -35,6 +36,7 @@ interface FacultyDisplay {
 })
 export class InstitutionalStructureComponent implements OnInit {
 
+  private updateCareerServices = inject(ManageCareer);
   private writeCareerService = inject(CareerCreate)
   private writeFacultyService = inject(FacultyCreate);
   private facultyServices = inject(FacultyDashboardAdmin);
@@ -175,8 +177,24 @@ export class InstitutionalStructureComponent implements OnInit {
       return;
     }
 
-    if (this.isEditMode) {
-      console.log('Actualizando carrera...', newFac);
+    if (this.isEditMode && newFac.id_carrera) {
+      const updateDto = {
+        idCareer: newFac.id_carrera,
+        faculty: newFac.id_facultad,
+        name: newFac.nombre
+      };
+
+      this.updateCareerServices.updateCareer(newFac.id_carrera, updateDto).subscribe ({
+        next: (response) => {
+          this.closeModal();
+          this.cargarDatosDelBackend();
+        },
+        error: (err) => {
+          const errorMessage = err.error?.error || 'Error al actualizar la carrera';
+          alert(errorMessage);
+        }
+      });
+
       return;
     }
 
@@ -200,11 +218,16 @@ export class InstitutionalStructureComponent implements OnInit {
   toggleCareerStatus(career: CareerDisplay) {
     const action = career.active ? 'desactivar' : 'activar';
     if(confirm(`¿Estás seguro de que deseas ${action} la carrera ${career.name}?`)) {
-      // Simulación en frontend:
-      career.active = !career.active;
-
-      // TODO: Llamar al backend para persistir el cambio
-      // this.writeCareerService.toggleStatus(career.id, career.active).subscribe(...)
+      this.updateCareerServices.toggleCareerStatus(career.id).subscribe({
+        next: (response) => {
+          career.active = !career.active;
+          this.cd.detectChanges();
+        },
+        error: (err) => {
+          const errorMessage = err.error?.error || 'Error al cambiar el estado de la carrera';
+          alert(errorMessage);
+        }
+      });
     }
   }
 }
