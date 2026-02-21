@@ -1,15 +1,16 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'; // 1. Agregamos OnInit
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
-import {
-  ModalManagementStructureComponent,
-  FacultadSimple,
-  CarreraSimple
-} from '../../../components/modal-management-structure/modal-management-structure';
-import {HeaderComponent} from '../../../components/header/header';
+import { ModalManagementStructureComponent, FacultadSimple, CarreraSimple } from '../../../components/modal-management-structure/modal-management-structure';
+
+import { FacultyDashboardAdmin, FacultyDashboardDTO} from '../../../services/faculty-dashboard-admin/faculty-dashboard-admin';
+import { FacultyCreate, FacultyCreateDTO } from '../../../services/faculty-create/faculty-create';
+import { CareerCreate, CareerCreateDTO } from '../../../services/career-create/career-create';
 
 interface CareerDisplay {
+  id: number;
   name: string;
+  active: boolean;
 }
 
 interface FacultyDisplay {
@@ -27,30 +28,75 @@ interface FacultyDisplay {
 @Component({
   selector: 'app-institutional-structure',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent, HeaderComponent],
+  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent],
   templateUrl: './institutional-structure.html',
   styleUrls: ['./institutional-structure.css']
 })
-export class InstitutionalStructureComponent {
+export class InstitutionalStructureComponent implements OnInit {
 
-  // CONTROL DEL MODAL
-  showModal: boolean = false;
+  private writeCareerService = inject(CareerCreate)
+  private writeFacultyService = inject(FacultyCreate);
+  private facultyServices = inject(FacultyDashboardAdmin);
+  private cd = inject(ChangeDetectorRef)
+
+  showModal = false;
   currentModalTab: 'facultad' | 'carrera' = 'facultad';
   selectedFacultyId: number | null = null;
 
-  //Función para abrir el modal desde "Nueva Facultad" o "Agregar Carrera"
-  openModal(type: 'facultad' | 'carrera', facultyId?: number) {
-    this.currentModalTab = type;
-    this.selectedFacultyId = facultyId || null;
-    this.showModal = true;
+  //Estas variables que pongo aquí son para la edición
+  isEditMode = false;
+  dataToEdit: any = null;
+
+  stats = [
+    {Title: 'Facultades Activas', values: '...', icon: 'school'},
+    {Title: 'Carreras Totales', values: '0', icon: 'book'},
+    {Title: 'Estudiantes', values: '453', icon: 'groups'}
+  ];
+
+  faculties: FacultyDisplay[] = [];
+
+  ngOnInit() {
+    this.cargarDatosDelBackend();
   }
 
-  closeModal() {
-    this.showModal = false;
-    this.selectedFacultyId = null;
+  cargarDatosDelBackend() {
+    this.facultyServices.getDashboardData().subscribe({
+      next: (data: FacultyDashboardDTO[]) => {
+        //Esto actualiza los stats que están estaticos en la parte de arriba
+        this.stats[0].values = data.length.toString();
+        const totatCarreras = data.reduce((acc, curr) => acc + curr.careersCount, 0)  ;
+        this.stats[1].values = totatCarreras.toString();
+
+        // Esto mapea los datos
+        this.faculties = data.map(dto => ({
+          id: dto.id,
+          name: dto.name,
+          subtitle: dto.subtitle || 'Facultad',
+          acronym: dto.subtitle,
+
+          //PArte de estilos
+          icon: dto.icon || 'school',
+          iconBg: dto.iconBg || '#e8f5e9',
+          iconColor: dto.iconColor || '#2e7d32',
+
+          careersCount: dto.careersCount,
+
+          careers: dto.careers ? dto.careers.map((c: any, index: number) => ({
+            id: c.id || index,
+            name: c.name || c,
+            active: c.active !== undefined ? c.active : true
+          })) : []
+        }));
+        this.cd.detectChanges();
+      },
+      error: (err) => {
+        console.error("Erro conectando con Spring Boot:", err);
+        this.stats[0].values = 'Error'
+        this.cd.detectChanges();
+      }
+    });
   }
 
-  //Transformamos los datos complejos de la vista a datos simples para el select del modal
   get mappedFacultiesForModal(): FacultadSimple[] {
     return this.faculties.map(f => ({
       id_facultad: f.id,
@@ -59,69 +105,105 @@ export class InstitutionalStructureComponent {
     }));
   }
 
+  openModal(type: 'facultad' | 'carrera', facultyId?: number) {
+    this.isEditMode = false;
+    this.dataToEdit = null;
+    this.currentModalTab = type;
+    this.selectedFacultyId = facultyId || null;
+    this.showModal = true;
+  }
+
+  openEditModal(career: CareerDisplay, faculty: FacultyDisplay) {
+    this.isEditMode = true;
+    this.currentModalTab = 'carrera';
+    this.selectedFacultyId = faculty.id;
+
+    this.dataToEdit = {
+      id_facultad: faculty.id,
+      nombre: career.name,
+      id_carrera: career.id
+    };
+
+    this.showModal = true
+  }
+
+  closeModal(){
+    this.showModal = false;
+    this.selectedFacultyId = null;
+    this.isEditMode = false;
+    this.dataToEdit = null;
+  }
+
+/*---------------------------------------------------------------------------------------------------------------------------
+                                                      Agregar Nueva Facultad
+---------------------------------------------------------------------------------------------------------------------------*/
+
   handleSaveFacultad(newFac: FacultadSimple) {
-    const newId = this.faculties.length + 1;
-    // Agregamos a la lista visual
-    this.faculties.push({
-      id: newId,
+    if(this.isEditMode){
+      console.log('Actualizando facultad...', newFac)
+      return;
+    }
+
+    const dto: FacultyCreateDTO = {
       name: newFac.nombre,
-      subtitle: 'New Registered Faculty',
-      acronym: newFac.siglas,
-      icon: 'school',
-      iconBg: '#f5f5f5',
-      iconColor: '#333',
-      careersCount: 0,
-      careers: []
+      acronym: newFac.siglas
+    };
+
+    this.writeFacultyService.createFaculty(dto).subscribe({
+      next: (response) => {
+        this.closeModal();
+        this.cargarDatosDelBackend();
+      },
+      error: (err) => {
+        const errorMessage = err.error?.error || 'Error al guardar la facultad';
+        alert(errorMessage);
+      }
     });
-    this.closeModal();
   }
 
-  handleSaveCarrera(newCarrera: CarreraSimple) {
-    // Buscamos la facultad seleccionada y agregamos la carrera
-    const facultyIndex = this.faculties.findIndex(f => f.id === newCarrera.id_facultad);
-    if (facultyIndex !== -1) {
-      this.faculties[facultyIndex].careers.push({ name: newCarrera.nombre });
-      this.faculties[facultyIndex].careersCount++;
+
+/*---------------------------------------------------------------------------------------------------------------------------
+                                                      Agregar Nueva Facultad
+---------------------------------------------------------------------------------------------------------------------------*/
+
+
+  handleSaveCarrera(newFac: CarreraSimple) {
+
+    if (!newFac.id_facultad) {
+      alert('Por favor, selecciona una facultad antes de guardar.');
+      return;
     }
-    this.closeModal();
+
+    if (this.isEditMode) {
+      console.log('Actualizando carrera...', newFac);
+      return;
+    }
+
+    const dto: CareerCreateDTO = {
+      faculty: newFac.id_facultad,
+      name: newFac.nombre
+    };
+
+    this.writeCareerService.createCareer(dto).subscribe({
+      next: (response) => {
+        this.closeModal();
+        this.cargarDatosDelBackend();
+      },
+      error: (err) => {
+        const errorMessage = err.error?.error || 'Error al guardar la carrera';
+        alert(errorMessage);
+      }
+    });
   }
 
-  stats = [
-    { title: 'Active Faculties', value: '12', icon: 'school' },
-    { title: 'Total Programs', value: '48', icon: 'book' },
-    { title: 'Students', value: '4,250', icon: 'groups' }
-  ];
+  toggleCareerStatus(career: CareerDisplay) {
+    const action = career.active ? 'desactivar' : 'activar';
+    if(confirm(`¿Estás seguro de que deseas ${action} la carrera ${career.name}?`)) {
+      // Simulación en frontend:
+      career.active = !career.active;
 
-
-  faculties: FacultyDisplay[] = [
-    {
-      id: 1,
-      name: 'Engineering',
-      subtitle: 'Faculty of Applied Sciences',
-      acronym: 'FCI',
-      icon: 'engineering',
-      iconBg: '#e8f5e9',
-      iconColor: '#2e7d32',
-      careersCount: 8,
-      careers: [
-        { name: 'Software Engineering' },
-        { name: 'Civil Engineering' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Social Sciences',
-      subtitle: 'Division of Humanities',
-      acronym: 'FSS',
-      icon: 'groups',
-      iconBg: '#f1f8e9',
-      iconColor: '#558b2f',
-      careersCount: 5,
-      careers: [
-        { name: 'Clinical Psychology' }
-      ]
+      // TODO: Llamar al backend para persistir el cambio
+      // this.writeCareerService.toggleStatus(career.id, career.active).subscribe(...)
     }
-
-  ];
-  currentPage = 1;
+  }
 }

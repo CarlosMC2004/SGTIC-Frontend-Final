@@ -351,3 +351,97 @@
 }
 
 .page-btn:hover { background-color: #f5f5f5; }
+
+
+
+
+
+
+
+
+
+
+/* Lista de Carreras */
+.career-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.career-item {
+  display: flex;
+  justify-content: space-between; /* Separa info de acciones */
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+  cursor: default;
+}
+
+.career-item:hover {
+  background-color: #f3f4f6; /* Gris muy suave al pasar el mouse */
+}
+
+/* --- Info y Puntito --- */
+.career-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.active {
+  background-color: #22c55e; /* Verde vibrante */
+  box-shadow: 0 0 4px #22c55e;
+}
+
+.status-dot.inactive {
+  background-color: #ef4444; /* Rojo alerta */
+  box-shadow: 0 0 4px #ef4444;
+}
+
+.career-name.text-muted {
+  color: #9ca3af;
+  text-decoration: line-through; /* Opcional: tachar si está desactivada */
+}
+
+/* --- Acciones (Botones) --- */
+.career-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0; /* Ocultos por defecto */
+  transform: translateX(10px);
+  transition: all 0.2s ease;
+}
+
+/* Mostrar acciones SOLO cuando el mouse está sobre el item */
+.career-item:hover .career-actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.action-btn.edit:hover { color: #2563eb; } /* Azul para editar */
+.action-btn.toggle:hover { color: #d97706; } /* Naranja para cambiar estado */
