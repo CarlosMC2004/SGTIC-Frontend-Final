@@ -7,6 +7,7 @@ import { UserManagementComponent } from './pages/administrator/user-management/u
 import {StudentRequests} from './pages/coordinator/student-requests/student-requests';
 import {BankThemes} from './pages/coordinator/bank-themes/bank-themes';
 import {Assignments} from './pages/coordinator/assignments/assignments';
+import { StudentDashboardComponent } from './pages/student/dashboard-student/dashboard-student'
 
 export const routes: Routes = [
     //RUTA PARA EL LOGIN
@@ -19,6 +20,8 @@ export const routes: Routes = [
     { path: 'academic-configuration', component: AcademicConfiguration},
     //RUTA DE GESTION DE USUARIOS
     { path: 'user-management', component: UserManagementComponent},
+    //RUTA DEL DASHBOARD DEL ESTUDIANTE
+    { path: 'student-dashboard', component: StudentDashboardComponent},
     //RUTA GESTION DE SOLICITUDES DE ESTUDIANTES (COORDINADOR)
     {path: 'student-requests', component: StudentRequests},
     //RUTA GESTION DE TEMAS (COORDINADOR)

@@ -1,0 +1,148 @@
+.chart-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.header-titles h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 0;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.real-progress-dot { background-color: #2ecc71; }
+.target-progress-dot { background-color: #d1d5db; }
+
+.chart-body {
+  display: flex;
+  margin-bottom: 40px;
+  min-height: 250px;
+}
+
+.y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-right: 16px;
+  padding-bottom: 24px;
+  color: #888;
+  font-size: 0.8rem;
+  width: 40px;
+}
+
+.graph-area {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.line-chart-svg {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  overflow: visible;
+}
+
+.dashed-line {
+  stroke: #d1d5db;
+  stroke-width: 2;
+  stroke-dasharray: 6, 6;
+  fill: none;
+}
+
+.area-fill {
+  fill: rgba(46, 204, 113, 0.08);
+}
+
+.solid-line {
+  stroke: #2ecc71;
+  stroke-width: 3;
+  fill: none;
+}
+
+.data-point {
+  fill: #2ecc71;
+}
+
+.x-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+/* Sección Progreso Total */
+.total-progress-section {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 20px;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.progress-title {
+  color: #888;
+}
+
+.progress-percent {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+.progress-bar-bg {
+  background-color: #f3f4f6;
+  height: 8px;
+  border-radius: 4px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  background-color: #2ecc71;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
