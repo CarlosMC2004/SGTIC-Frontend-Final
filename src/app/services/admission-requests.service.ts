@@ -34,7 +34,7 @@ export class AdmissionRequestsService {
   }
 
   rechazarSolicitud(idSolicitud: number, motivo: string): Observable<any> {
-    const body = { motivo: motivo }; // Armamos el JSON con el motivo
+    const body = { motivo: motivo };
     return this.http.put(`http://localhost:8080/api/solicitudes/rechazar/${idSolicitud}`, body);
   }
 }

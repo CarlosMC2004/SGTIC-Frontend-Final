@@ -15,7 +15,7 @@ export class RequestsTable implements OnInit {
   solicitudSeleccionadaId: number = 0;
   requestsList: AdmissionRequest[] = [];
   allRequests: AdmissionRequest[] = [];
-  idCarreraDelCoordinador: number = 4;
+  idCarreraDelCoordinador: number = 1;
   totalPendientes: number = 0;
   totalAprobadas: number = 0;
   totalRechazadas: number = 0;
@@ -87,7 +87,7 @@ export class RequestsTable implements OnInit {
       this.admissionService.aprobarSolicitud(id).subscribe({
         next: (respuesta) => {
           console.log(respuesta.mensaje);
-          this.cargarSolicitudes(); // 👈 ¡Magia! Recarga la tabla y las tarjetas solas
+          this.cargarSolicitudes();
         },
         error: (err) => {
           alert('Error al aprobar: ' + (err.error?.error || 'Error desconocido'));
@@ -102,17 +102,17 @@ export class RequestsTable implements OnInit {
   }
 
   confirmarRechazo(motivo: string) {
+    this.closeModal();
     this.admissionService.rechazarSolicitud(this.solicitudSeleccionadaId, motivo).subscribe({
       next: (respuesta) => {
-        console.log(respuesta.mensaje);
-        this.closeModal(); // Cerramos el modal
-        this.cargarSolicitudes(); // Recargamos la tabla y tarjetas
+        console.log('Respuesta del servidor:', respuesta.mensaje);
+        this.cargarSolicitudes();
       },
       error: (err) => {
-        alert('Error al rechazar: ' + (err.error?.error || 'Error desconocido'));
+        console.error('Error del servidor:', err);
+        alert('Hubo un error al procesar el rechazo o enviar el correo.');
       }
     });
   }
-
   closeModal() { this.showModal = false; }
 }

@@ -1,1 +1,166 @@
-<p>assignments works!</p>
+<link rel="stylesheet" href="assignments.css">
+
+<div class="layout-container">
+
+  <app-sidebar></app-sidebar>
+
+  <main class="main-area">
+
+    <app-header></app-header>
+
+    <div class="content-body">
+
+      <section class="card project-info">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-green">info</span>
+          <h3>Información del Proyecto</h3>
+        </div>
+        <div class="info-grid">
+          <div class="info-item full-width">
+            <label>Título del Proyecto</label>
+            <p>Implementación de IA para la optimización de procesos logísticos en pymes del sector alimentario</p>
+          </div>
+          <div class="info-item">
+            <label>Estudiante</label>
+            <p>Juan Pérez</p>
+          </div>
+          <div class="info-item">
+            <label>Carrera</label>
+            <p>Software</p>
+          </div>
+          <div class="info-item">
+            <label>Periodo</label>
+            <p>2023 - II</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card assignment-section">
+        <div class="card-header">
+          <span class="material-symbols-outlined icon-green">person_add</span>
+          <h3>Asignación de Director</h3>
+        </div>
+
+        <div class="subsection-header">
+          <h4>Sugerencias del Sistema (IA)</h4>
+          <span>Basado en perfil académico y carga horaria</span>
+        </div>
+
+        <div class="suggestions-grid">
+          <div class="suggestion-card">
+            <div class="avatar-circle">
+              <span class="material-symbols-outlined">person</span>
+            </div>
+            <h5>Dr. Roberto Gómez</h5>
+            <p class="specialty">Especialista en IA & Big Data</p>
+            <div class="match-badge">98% Coincidencia</div>
+            <button class="btn-select">Seleccionar</button>
+          </div>
+
+          <div class="suggestion-card">
+            <div class="avatar-circle">
+              <span class="material-symbols-outlined">person</span>
+            </div>
+            <h5>Mgs. Elena Martínez</h5>
+            <p class="specialty">Gestión de Operaciones</p>
+            <div class="match-badge">95% Coincidencia</div>
+            <button class="btn-select">Seleccionar</button>
+          </div>
+
+          <div class="suggestion-card">
+            <div class="avatar-circle">
+              <span class="material-symbols-outlined">person</span>
+            </div>
+            <h5>Dr. Carlos Ruiz</h5>
+            <p class="specialty">Sistemas Expertos</p>
+            <div class="match-badge">92% Coincidencia</div>
+            <button class="btn-select">Seleccionar</button>
+          </div>
+        </div>
+
+        <div class="manual-search-section">
+          <h4>Búsqueda Manual</h4>
+          <div class="search-controls">
+            <div class="search-input">
+              <span class="material-symbols-outlined">search</span>
+              <input type="text" placeholder="Buscar por nombre o área...">
+            </div>
+            <select class="filter-select">
+              <option>Todas las Facultades</option>
+              <option>Ciencias de la Ingeniería</option>
+              <option>Sistemas y Computación</option>
+            </select>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+              <tr>
+                <th>Docente</th>
+                <th>Facultad</th>
+                <th>Disponibilidad</th>
+                <th class="text-right">Acción</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td class="font-medium">Ana Lucía Torres</td>
+                <td class="text-gray">Sistemas</td>
+                <td>
+                  <div class="progress-container">
+                    <div class="progress-bar-bg">
+                      <div class="progress-fill green" style="width: 80%"></div>
+                    </div>
+                    <span class="progress-text">4/5 cupos</span>
+                  </div>
+                </td>
+                <td class="text-right">
+                  <button class="btn-assign">Asignar</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-medium">Mario Villagómez</td>
+                <td class="text-gray">Ingeniería</td>
+                <td>
+                  <div class="progress-container">
+                    <div class="progress-bar-bg">
+                      <div class="progress-fill green" style="width: 20%"></div>
+                    </div>
+                    <span class="progress-text">1/5 cupos</span>
+                  </div>
+                </td>
+                <td class="text-right">
+                  <button class="btn-assign">Asignar</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-medium">Paola Sánchez</td>
+                <td class="text-gray">Software</td>
+                <td>
+                  <div class="progress-container">
+                    <div class="progress-bar-bg">
+                      <div class="progress-fill red" style="width: 100%"></div>
+                    </div>
+                    <span class="progress-text">5/5 cupos</span>
+                  </div>
+                </td>
+                <td class="text-right">
+                  <button class="btn-assign disabled" disabled>Asignar</button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <a href="#">
+          ¿No encuentra docente? Solicitar Especialista Externo
+          <span class="material-symbols-outlined">open_in_new</span>
+        </a>
+      </footer>
+
+    </div>
+  </main>
+</div>
