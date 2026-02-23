@@ -6,6 +6,7 @@ import { ModalManagementStructureComponent, FacultadSimple, CarreraSimple } from
 import { FacultyDashboardAdmin, FacultyDashboardDTO} from '../../../services/faculty-dashboard-admin/faculty-dashboard-admin';
 import { FacultyCreate, FacultyCreateDTO } from '../../../services/faculty-create/faculty-create';
 import { CareerCreate, CareerCreateDTO } from '../../../services/career-create/career-create';
+import {HeaderComponent} from '../../../components/header/header';
 
 interface CareerDisplay {
   id: number;
@@ -28,7 +29,7 @@ interface FacultyDisplay {
 @Component({
   selector: 'app-institutional-structure',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent],
+  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent, HeaderComponent],
   templateUrl: './institutional-structure.html',
   styleUrls: ['./institutional-structure.css']
 })

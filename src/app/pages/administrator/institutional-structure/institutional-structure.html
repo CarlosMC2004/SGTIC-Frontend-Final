@@ -2,10 +2,6 @@
 
   <app-sidebar role="admin"></app-sidebar>
 
-  <div class="main-wrapper">
-    <app-header></app-header>
-
-    <main class="main-content">
   <main class="main-content">
 
     <header class="top-bar">
@@ -45,9 +41,9 @@
       <div class="faculty-card" *ngFor="let faculty of faculties">
         <div class="card-top">
           <div class="faculty-header">
-             <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
-               <span class="material-symbols-outlined">{{ faculty.icon }}</span>
-             </div>
+            <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
+              <span class="material-symbols-outlined">{{ faculty.icon }}</span>
+            </div>
           </div>
 
           <div class="faculty-title-row">

@@ -20,4 +20,14 @@ import { StatusCardComponent } from '../../../components/status-card/status-card
 })
 export class StudentRequests {
 
+  numPendientes: number = 0;
+  numAprobadas: number = 0;
+  numRechazadas: number = 0;
+
+  recibirEstadisticas(stats: any) {
+    this.numPendientes = stats.pendientes;
+    this.numAprobadas = stats.aprobadas;
+    this.numRechazadas = stats.rechazadas;
+  }
+
 }

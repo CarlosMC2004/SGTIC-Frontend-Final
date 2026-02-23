@@ -10,13 +10,14 @@
 
     <div class="modal-body">
       <p class="modal-description">
-        Indique las razones específicas por las cuales esta solicitud no cumple con los requisitos del programa. Este mensaje será enviado al estudiante.
+        Indique las razones específicas por las cuales esta solicitud no cumple con los requisitos. Este mensaje será enviado al estudiante.
       </p>
 
       <div class="form-group">
         <label for="rejection-reason">Motivo del rechazo</label>
         <textarea
           id="rejection-reason"
+          [(ngModel)]="motivoRechazo"
           placeholder="Escriba aquí las razones por las cuales se rechaza la propuesta de tesis..."
           rows="5"></textarea>
       </div>
@@ -24,8 +25,7 @@
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="onClose()">Cancelar</button>
-
-      <button class="btn-confirm-reject">
+      <button class="btn-confirm-reject" (click)="onConfirm()" [disabled]="!motivoRechazo.trim()">
         <span class="material-symbols-outlined">cancel</span>
         Confirmar Rechazo
       </button>

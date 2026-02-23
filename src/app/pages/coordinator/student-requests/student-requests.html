@@ -12,12 +12,12 @@
         </p>
       </div>
 
-      <app-requests-table></app-requests-table>
+      <app-requests-table (estadisticasCalculadas)="recibirEstadisticas($event)"></app-requests-table>
 
       <div class="cards-grid">
-        <app-status-card title="Pendientes" [count]="12" icon="pending_actions" colorType="blue"></app-status-card>
-        <app-status-card title="Aprobadas" [count]="45" icon="check_circle" colorType="green"></app-status-card>
-        <app-status-card title="Rechazadas" [count]="3" icon="cancel" colorType="red"></app-status-card>
+        <app-status-card title="Pendientes" [count]="numPendientes" icon="pending_actions" colorType="blue"></app-status-card>
+        <app-status-card title="Aprobadas" [count]="numAprobadas" icon="check_circle" colorType="green"></app-status-card>
+        <app-status-card title="Rechazadas" [count]="numRechazadas" icon="cancel" colorType="red"></app-status-card>
       </div>
     </div>
   </main>

@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-// Asegúrate de que la ruta de importación sea correcta según tu estructura
 import { AuthLayoutComponent } from '../../../components/auth-layout/auth-layout';
 
 @Component({
@@ -14,7 +13,7 @@ import { AuthLayoutComponent } from '../../../components/auth-layout/auth-layout
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  showPassword = false; // Para el ojito de ver contraseña
+  showPassword = false;
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
@@ -30,9 +29,11 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.valid) {
       console.log('Datos enviados:', this.loginForm.value);
-      // Aquí llamarás a tu AuthService más adelante
     } else {
-      this.loginForm.markAllAsTouched(); // Marca los errores si el usuario intenta enviar vacío
+      this.loginForm.markAllAsTouched();
     }
   }
+}
+
+export class Login {
 }

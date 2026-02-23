@@ -3,12 +3,15 @@
   <div class="table-actions">
     <div class="search-box">
       <span class="material-symbols-outlined search-icon">search</span>
-      <input type="text" placeholder="Buscar estudiante...">
+      <input type="text" placeholder="Buscar estudiante..." (input)="onSearch($event)">
     </div>
-    <button class="btn-filter">
-      <span class="material-symbols-outlined">filter_list</span>
-      Filtrar
-    </button>
+
+    <select class="btn-filtrar" (change)="onFilterChange($event)">
+      <option value="todas">Mostrar Todas</option>
+      <option value="pendiente">Ver Pendientes</option>
+      <option value="aprobada">Ver Aprobadas</option>
+      <option value="rechazada">Ver Rechazadas</option>
+    </select>
   </div>
 
   <div class="table-wrapper">
@@ -26,30 +29,32 @@
 
       <tbody>
       <tr *ngFor="let req of requestsList">
-        <td>{{ req.identification }}</td>
+        <td>{{ req.identificacion }}</td>
+
         <td>
           <div class="student-info">
-            <span class="name">{{ req.firstName }} {{req.lastName}}</span>
-            <span class="career">{{ req.career.name}}</span>
+            <span class="name">{{ req.nombres }} {{ req.apellidos }}</span>
+            <span class="career">{{ req.carrera }}</span>
           </div>
         </td>
-        <td class="email">{{ req.email }}</td>
 
-        <td class="center-text">{{ req.sentDate | date:'shortDate' }}</td>
+        <td class="email">{{ req.correo }}</td>
+
+        <td class="center-text">{{ req.fechaEnvio | date:'shortDate' }}</td>
 
         <td class="center-text">
-          <span class="status-badge" [ngClass]="req.status">
-            {{ req.status | titlecase }}
+          <span class="status-badge" [ngClass]="req.estado?.toLowerCase()">
+            {{ req.estado | titlecase }}
           </span>
         </td>
 
         <td class="right-text">
-          <ng-container *ngIf="req.status === 'pendiente'">
-            <button class="btn-approve">Aprobar</button>
-            <button class="btn-reject" (click)="openModal()">Rechazar</button>
+          <ng-container *ngIf="req.estado?.toLowerCase() === 'pendiente'">
+            <button class="btn-approve" (click)="aprobar(req.idSolicitud)">Aprobar</button>
+            <button class="btn-reject" (click)="openModal(req.idSolicitud)">Rechazar</button>
           </ng-container>
-
-          <span *ngIf="req.status !== 'pendiente'" style="color: gray; font-size: 0.9em; font-style: italic;">
+          <span *ngIf="req.estado?.toLowerCase() !== 'pendiente'"
+                style="color: gray; font-size: 0.9em; font-style: italic;">
             Ya procesada
           </span>
         </td>
@@ -59,7 +64,7 @@
   </div>
 
   <div class="pagination-bar">
-    <span class="page-info">Mostrando 1 a {{requestsList.length}} de {{requestsList.length}} solicitudes</span>
+    <span class="page-info">Mostrando 1 a {{ requestsList.length }} de {{ requestsList.length }} solicitudes</span>
     <div class="pagination-controls">
       <button class="page-btn"><span class="material-symbols-outlined">chevron_left</span></button>
       <button class="page-btn active">1</button>
@@ -67,6 +72,9 @@
     </div>
   </div>
 
-  <app-modal-rechazo *ngIf="showModal" (close)="closeModal()"></app-modal-rechazo>
-
+  <app-modal-rechazo
+    *ngIf="showModal"
+    (close)="closeModal()"
+    (confirm)="confirmarRechazo($event)">
+  </app-modal-rechazo>
 </div>
