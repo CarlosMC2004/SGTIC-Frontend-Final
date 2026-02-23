@@ -10,4 +10,16 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrls: ['./sidebar.css']
 })
 export class SidebarComponent {
-  @Input() role: 'coordinador' | 'estudiante' | 'admin' = 'coordinador';}
+  @Input() role: 'coordinador' | 'estudiante' | 'admin' = 'coordinador';
+  
+  // Estado para controlar el sidebar en móviles
+  isOpen: boolean = false;
+
+  toggleSidebar() {
+    this.isOpen = !this.isOpen;
+  }
+
+  closeSidebar() {
+    this.isOpen = false;
+  }
+}

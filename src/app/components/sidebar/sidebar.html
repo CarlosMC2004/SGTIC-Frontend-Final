@@ -1,42 +1,34 @@
-<aside class="sidebar">
+<button class="mobile-toggle" (click)="toggleSidebar()" [class.hidden]="isOpen">
+  <span class="material-symbols-outlined">menu</span>
+</button>
+
+<div class="sidebar-overlay" *ngIf="isOpen" (click)="closeSidebar()"></div>
+
+<aside class="sidebar" [class.open]="isOpen">
   <div class="logo-section">
     <div class="icon-box">
       <span class="material-symbols-outlined">school</span>
     </div>
     <h1>SGTT</h1>
+    <button class="close-btn" (click)="closeSidebar()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
   </div>
 
   <nav class="menu">
-
     <ng-container *ngIf="role === 'coordinador'">
-      <a class="menu-item" routerLink="/inicio-coordinador" routerLinkActive="active">
+      <a class="menu-item" routerLink="/inicio-coordinador" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">home</span>
         <span>Home</span>
       </a>
-      <a class="menu-item" routerLink="/revision-requisitos" routerLinkActive="active">
-        <span class="material-symbols-outlined">description</span>
-        <span>Requests</span>
-      </a>
-      <a class="menu-item" routerLink="/banco-temas" routerLinkActive="active">
-        <span class="material-symbols-outlined">library_books</span>
-        <span>Topic Bank</span>
-      </a>
-      <a class="menu-item" routerLink="/asignaciones" routerLinkActive="active">
-        <span class="material-symbols-outlined">assignment_ind</span>
-        <span>Assignments</span>
-      </a>
-      <a class="menu-item" routerLink="/docentes" routerLinkActive="active">
-        <span class="material-symbols-outlined">group</span>
-        <span>Teachers</span>
-      </a>
-    </ng-container>
+      </ng-container>
 
     <ng-container *ngIf="role === 'estudiante'">
-      <a class="menu-item" routerLink="/inicio-estudiante" routerLinkActive="active">
+      <a class="menu-item" routerLink="/inicio-estudiante" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">home</span>
         <span>My Home</span>
       </a>
-      <a class="menu-item" routerLink="/mis-proyectos" routerLinkActive="active">
+      <a class="menu-item" routerLink="/mis-proyectos" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">folder_shared</span>
         <span>My Project</span>
       </a>
@@ -45,23 +37,26 @@
     <ng-container *ngIf="role === 'admin'">
       <a class="menu-item" routerLink="/main-menu" routerLinkActive="active">
         <span class="material-symbols-outlined">dashboard</span>
-        <span>Dashboard</span>
+        <span>Panel Principal</span>
       </a>
-      <a class="menu-item" routerLink="/users" routerLinkActive="active">
+
+      <a class="menu-item" routerLink="/user-management" routerLinkActive="active">
         <span class="material-symbols-outlined">people</span>
-        <span>Users</span>
+        <span>Gestión de Usuarios</span>
       </a>
+
       <a class="menu-item" routerLink="/institutional-structure" routerLinkActive="active">
         <span class="material-symbols-outlined">domain</span>
-        <span>Institutional Structure</span>
+        <span>Estructura Institucional</span>
       </a>
+
       <a class="menu-item" routerLink="/academic-configuration" routerLinkActive="active">
         <span class="material-symbols-outlined">settings</span>
-        <span>Configuration</span>
+        <span>Configuración Académica</span>
       </a>
     </ng-container>
-
-  </nav>
+    
+    </nav>
 
   <div class="logout">
     <button>

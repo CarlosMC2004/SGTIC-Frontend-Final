@@ -9,7 +9,6 @@ export interface FacultyDashboardDTO {
   careersCount: number;
   careers: string[];
 
-  // Datos visuales opcionales
   icon?: string;
   iconBg?: string;
   iconColor?: string;

@@ -7,13 +7,15 @@
   flex-direction: column;
   flex-shrink: 0;
   box-shadow: 4px 0 10px rgba(0,0,0,0.1);
-  z-index: 100;
+  z-index: 1000;
   box-sizing: border-box;
+  transition: transform 0.3s ease-in-out;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 24px;
 }
@@ -31,12 +33,15 @@
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.5px;
+  margin: 0;
 }
 
 .menu {
   flex: 1;
   margin-top: 10px;
   padding: 10px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .menu-item {
@@ -56,6 +61,12 @@
   color: white;
 }
 
+.menu-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-left-color: #4ade80;
+  font-weight: 600;
+  color: white;
+}
 
 .logout {
   padding: 20px;
@@ -73,13 +84,77 @@
   padding: 10px;
   cursor: pointer;
   opacity: 0.8;
+  font-size: 16px;
 }
 
-.menu-item.active {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-left-color: #4ade80;
-  font-weight: 600;
+.logout button:hover { 
+  opacity: 1; 
+}
+
+
+.mobile-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background-color: #1a5d43;
   color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  z-index: 900;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.logout button:hover { opacity: 1; }
+.close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  opacity: 0.8;
+  padding: 4px;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-toggle.hidden {
+    display: none !important;
+  }
+
+  .close-btn {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%); 
+  }
+
+  .sidebar.open {
+    transform: translateX(0); 
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999; 
+  }
+}

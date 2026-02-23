@@ -4,6 +4,7 @@ import { MenuPrincipalAdminComponent } from './pages/administrator/main-menu/mai
 import {AcademicConfiguration} from './pages/administrator/academic-configuration/academic-configuration';
 import { InstitutionalStructureComponent } from './pages/administrator/institutional-structure/institutional-structure';
 import { UserManagementComponent } from './pages/administrator/user-management/user-management';
+import { StudentDashboardComponent } from './pages/student/dashboard-student/dashboard-student'
 
 export const routes: Routes = [
     //RUTA PARA EL LOGIN
@@ -16,4 +17,6 @@ export const routes: Routes = [
     { path: 'academic-configuration', component: AcademicConfiguration},
     //RUTA DE GESTION DE USUARIOS
     { path: 'user-management', component: UserManagementComponent},
+    //RUTA DEL DASHBOARD DEL ESTUDIANTE
+    { path: 'student-dashboard', component: StudentDashboardComponent},
 ];

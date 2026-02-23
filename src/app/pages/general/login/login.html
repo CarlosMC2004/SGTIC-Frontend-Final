@@ -15,9 +15,10 @@
             placeholder="ej. estudiante@uteq.edu.ec"
             [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
           >
-          <span class="icon">✉️</span> </div>
+          <span class="icon">✉️</span> 
+        </div>
         <div *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched" class="error-msg">
-          Correo requerido
+          Correo requerido o formato inválido
         </div>
       </div>
 
@@ -40,14 +41,20 @@
         <a routerLink="/auth/forgot-password">¿Olvidó su contraseña?</a>
       </div>
 
-      <button type="submit" class="btn-login">
+      <button type="submit" class="btn-login" [disabled]="loginForm.invalid">
         Iniciar Sesión
       </button>
 
     </form>
 
     <div class="footer-links">
-      <p>Inicia tu proceso de titulación <a href="#">Solicita acceso</a></p>
+      <p>Inicia tu proceso de titulación <a href="#" (click)="abrirModal($event)">Solicita acceso</a></p>
     </div>
   </div>
+
+  <app-modal-solicitar-acceso 
+  *ngIf="mostrarModalSolicitud" 
+  (onCerrar)="cerrarModal()" 
+  (onEnviarDatos)="procesarSolicitudAcceso($event)"> </app-modal-solicitar-acceso>
+
 </app-auth-layout>
