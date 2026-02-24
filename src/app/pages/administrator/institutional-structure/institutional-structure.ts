@@ -29,12 +29,12 @@ interface FacultyDisplay {
 @Component({
   selector: 'app-institutional-structure',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent],
+  imports: [CommonModule, ModalManagementStructureComponent],
   templateUrl: './institutional-structure.html',
   styleUrls: ['./institutional-structure.css']
 })
 export class InstitutionalStructureComponent implements OnInit {
-  
+
   private updateCareerServices = inject(ManageCareer);
   private writeCareerService = inject(CareerCreate)
   private writeFacultyService = inject(FacultyCreate);
@@ -106,7 +106,7 @@ export class InstitutionalStructureComponent implements OnInit {
       siglas: f.acronym
     }));
   }
-  
+
   openModal(type: 'facultad' | 'carrera', facultyId?: number) {
     this.isEditMode = false;
     this.dataToEdit = null;
@@ -145,7 +145,7 @@ export class InstitutionalStructureComponent implements OnInit {
       console.log('Actualizando facultad...', newFac)
       return;
     }
-    
+
     const dto: FacultyCreateDTO = {
       name: newFac.nombre,
       acronym: newFac.siglas
@@ -170,12 +170,12 @@ export class InstitutionalStructureComponent implements OnInit {
 
 
   handleSaveCarrera(newFac: CarreraSimple) {
-    
+
     if (!newFac.id_facultad) {
       alert('Por favor, selecciona una facultad antes de guardar.');
       return;
     }
-    
+
     if (this.isEditMode && newFac.id_carrera) {
       const updateDto = {
         idCareer: newFac.id_carrera,

@@ -1,0 +1,96 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { LoginRequest, LoginResponse, CurrentUser, UserContext } from '../models/user.model';
+import { Router } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly USER_KEY = 'current_user';
+
+  private currentUserSubject = new BehaviorSubject<CurrentUser | null>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
+  private userContext: UserContext | null = null;
+
+  constructor(private http: HttpClient, private router: Router) {
+    this.loadStoredUser();
+  }
+
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials)
+      .pipe(
+        tap(response => {
+          this.setSession(response);
+        })
+      );
+  }
+
+  private setSession(authResult: LoginResponse): void {
+    // Almacenar en sessionStorage (más seguro que localStorage contra XSS persistente)
+    sessionStorage.setItem(this.TOKEN_KEY, authResult.token);
+
+    const user: CurrentUser = {
+      email: authResult.email,
+      fullName: authResult.fullName,
+      roles: authResult.roles,
+      context: authResult.context
+    };
+
+    sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    this.currentUserSubject.next(user);
+    this.userContext = authResult.context;
+  }
+
+  private loadStoredUser(): void {
+    const userStr = sessionStorage.getItem(this.USER_KEY);
+    if (userStr) {
+      const user: CurrentUser = JSON.parse(userStr);
+      this.currentUserSubject.next(user);
+      this.userContext = user.context;
+    }
+  }
+
+  logout(): void {
+    sessionStorage.removeItem(this.TOKEN_KEY);
+    sessionStorage.removeItem(this.USER_KEY);
+    this.currentUserSubject.next(null);
+    this.userContext = null;
+    this.router.navigate(['/login']);
+  }
+
+  getToken(): string | null {
+    return sessionStorage.getItem(this.TOKEN_KEY);
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  hasRole(role: string): boolean {
+    const user = this.currentUserSubject.value;
+    return user ? user.roles.includes(role) : false;
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const user = this.currentUserSubject.value;
+    return user ? user.roles.some(role => roles.includes(role)) : false;
+  }
+
+  getUserContext(): UserContext | null {
+    return this.userContext;
+  }
+
+  // Obtener claims específicos para filtrar queries
+  getFacultyId(): number | null {
+    return this.userContext?.idFaculty || null;
+  }
+
+  getCareerId(): number | null {
+    return this.userContext?.idCareer || null;
+  }
+}
