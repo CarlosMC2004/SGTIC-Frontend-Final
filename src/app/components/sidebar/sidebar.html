@@ -8,61 +8,81 @@
 
   <nav class="menu">
 
-    <ng-container *ngIf="role === 'coordinador'">
-      <a class="menu-item" routerLink="/inicio-coordinador" routerLinkActive="active">
-        <span class="material-symbols-outlined">home</span>
-        <span>Home</span>
-      </a>
-      <a class="menu-item" routerLink="/revision-requisitos" routerLinkActive="active">
-        <span class="material-symbols-outlined">description</span>
-        <span>Requests</span>
-      </a>
-      <a class="menu-item" routerLink="/banco-temas" routerLinkActive="active">
-        <span class="material-symbols-outlined">library_books</span>
-        <span>Topic Bank</span>
-      </a>
-      <a class="menu-item" routerLink="/asignaciones" routerLinkActive="active">
-        <span class="material-symbols-outlined">assignment_ind</span>
-        <span>Assignments</span>
-      </a>
-      <a class="menu-item" routerLink="/docentes" routerLinkActive="active">
-        <span class="material-symbols-outlined">group</span>
-        <span>Teachers</span>
-      </a>
-    </ng-container>
-
-    <ng-container *ngIf="role === 'estudiante'">
-      <a class="menu-item" routerLink="/inicio-estudiante" routerLinkActive="active">
-        <span class="material-symbols-outlined">home</span>
-        <span>My Home</span>
-      </a>
-      <a class="menu-item" routerLink="/mis-proyectos" routerLinkActive="active">
-        <span class="material-symbols-outlined">folder_shared</span>
-        <span>My Project</span>
-      </a>
-    </ng-container>
-
+    <!-- Administrador -->
     <ng-container *ngIf="role === 'admin'">
-      <a class="menu-item" routerLink="/admin/main-menu" routerLinkActive="active">
+      <a class="menu-item" routerLink="/admin/dashboard" routerLinkActive="active">
         <span class="material-symbols-outlined">dashboard</span>
-        <span>Dashboard</span>
+        <span>Panel de Control</span>
       </a>
+
       <a class="menu-item" routerLink="/admin/users" routerLinkActive="active">
         <span class="material-symbols-outlined">people</span>
-        <span>Users</span>
+        <span>Gestión de Usuarios</span>
       </a>
+
+      <a class="menu-item" routerLink="/admin/roles" routerLinkActive="active">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        <span>Gestión de Roles</span>
+      </a>
+
+      <a class="menu-item" routerLink="/admin/catalogs" routerLinkActive="active">
+        <span class="material-symbols-outlined">folder_open</span>
+        <span>Catálogos</span>
+      </a>
+
+      <a class="menu-item" routerLink="/admin/structure" routerLinkActive="active">
+        <span class="material-symbols-outlined">domain</span>
+        <span>Estructura Institucional</span>
+      </a>
+
       <a class="menu-item" routerLink="/admin/configuration" routerLinkActive="active">
         <span class="material-symbols-outlined">settings</span>
-        <span>Configuration</span>
+        <span>Configuración Académica</span>
+      </a>
+    </ng-container>
+
+    <!-- Coordinador -->
+    <ng-container *ngIf="role === 'coordinador'">
+      <a class="menu-item" routerLink="/coordinator/dashboard" routerLinkActive="active">
+        <span class="material-symbols-outlined">home</span>
+        <span>Inicio</span>
+      </a>
+      <a class="menu-item" routerLink="/coordinator/requests" routerLinkActive="active">
+        <span class="material-symbols-outlined">description</span>
+        <span>Solicitudes</span>
+      </a>
+      <a class="menu-item" routerLink="/coordinator/topics" routerLinkActive="active">
+        <span class="material-symbols-outlined">library_books</span>
+        <span>Banco de Temas</span>
+      </a>
+      <a class="menu-item" routerLink="/coordinator/assignments" routerLinkActive="active">
+        <span class="material-symbols-outlined">assignment_ind</span>
+        <span>Asignaciones</span>
+      </a>
+      <a class="menu-item" routerLink="/coordinator/teachers" routerLinkActive="active">
+        <span class="material-symbols-outlined">group</span>
+        <span>Docentes</span>
+      </a>
+    </ng-container>
+
+    <!-- Estudiante -->
+    <ng-container *ngIf="role === 'estudiante'">
+      <a class="menu-item" routerLink="/student/dashboard" routerLinkActive="active">
+        <span class="material-symbols-outlined">home</span>
+        <span>Mi Inicio</span>
+      </a>
+      <a class="menu-item" routerLink="/student/project" routerLinkActive="active">
+        <span class="material-symbols-outlined">folder_shared</span>
+        <span>Mi Proyecto</span>
       </a>
     </ng-container>
 
   </nav>
 
   <div class="logout">
-    <button>
+    <button (click)="logout()">
       <span class="material-symbols-outlined">logout</span>
-      <span>Logout</span>
+      <span>Cerrar Sesión</span>
     </button>
   </div>
 </aside>
