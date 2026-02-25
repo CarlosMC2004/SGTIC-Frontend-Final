@@ -13,7 +13,6 @@
 
     <div class="modal-body">
 
-      <!-- Mensaje de error -->
       <div class="alert-error" *ngIf="errorMessage">
         <span class="material-symbols-outlined">error</span>
         {{ errorMessage }}
@@ -106,6 +105,46 @@
             <div class="role-info">
               <span class="role-name">{{ role.name }}</span>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="student-section" *ngIf="isStudentSelected">
+        <h3>Información Académica</h3>
+
+        <div class="student-fields">
+          <div class="form-group">
+            <label for="career">
+              Carrera <span class="required">*</span>
+              <span class="hint-optional">(Requerido para estudiantes)</span>
+            </label>
+            <select
+              id="career"
+              [(ngModel)]="userData.idCareer"
+              name="career"
+              [class.error]="!userData.idCareer && errorMessage">
+              <option [ngValue]="null">Seleccione una carrera...</option>
+              <option *ngFor="let career of availableCareers" [ngValue]="career.idCareer">
+                {{ career.name }} <ng-container *ngIf="career.facultyName">({{ career.facultyName }})</ng-container>
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="period">
+              Período Académico <span class="required">*</span>
+              <span class="hint-optional">(Ciclo de ingreso)</span>
+            </label>
+            <select
+              id="period"
+              [(ngModel)]="userData.idPeriod"
+              name="period"
+              [class.error]="!userData.idPeriod && errorMessage">
+              <option [ngValue]="null">Seleccione un período...</option>
+              <option *ngFor="let period of availablePeriods" [ngValue]="period.idPeriod">
+                {{ period.name }}
+              </option>
+            </select>
           </div>
         </div>
       </div>
