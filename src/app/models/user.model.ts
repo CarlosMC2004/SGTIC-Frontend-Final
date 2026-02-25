@@ -40,6 +40,19 @@ export interface RoleDTO {
   name: string;
 }
 
+export interface CareerDTO {
+  idCareer: number;
+  name: string;
+  facultyName?: string;
+}
+
+export interface AcademicPeriodDTO {
+  idPeriod: number;
+  name: string;
+  startDate: string; // ISO date string
+  endDate: string;
+}
+
 export interface CreateUserRequest {
   identification: string;
   firstName: string;
