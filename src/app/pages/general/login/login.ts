@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-// Asegúrate de que la ruta de importación sea correcta según tu estructura
+import { AuthService } from '../../../services/auth.service';
 import { AuthLayoutComponent } from '../../../components/auth-layout/auth-layout';
 
 @Component({
@@ -14,11 +14,18 @@ import { AuthLayoutComponent } from '../../../components/auth-layout/auth-layout
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  showPassword = false; // Para el ojito de ver contraseña
+  showPassword = false;
+  isLoading = false;
+  errorMessage = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService
+  ) {
+    // CAMBIO: 'username' -> 'email' para coincidir con el backend
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.email]], // Validación básica
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
@@ -28,11 +35,46 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    if (this.loginForm.valid) {
-      console.log('Datos enviados:', this.loginForm.value);
-      // Aquí llamarás a tu AuthService más adelante
-    } else {
-      this.loginForm.markAllAsTouched(); // Marca los errores si el usuario intenta enviar vacío
+    this.errorMessage = '';
+
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
     }
+
+    this.isLoading = true;
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+
+        // Redirección basada en roles
+        const roles = response.roles;
+
+        if (roles.includes('administrador_sgtic')) {
+          this.router.navigate(['/admin/dashboard']);
+        } else if (roles.includes('coordinador_facultad')) {
+          this.router.navigate(['/coordinator/faculty']);
+        } else if (roles.includes('coordinador_carrera')) {
+          this.router.navigate(['/coordinator/career']);
+        } else if (roles.includes('docente') || roles.includes('director_trabajo_titulacion')) {
+          this.router.navigate(['/teacher/dashboard']);
+        } else if (roles.includes('estudiante')) {
+          this.router.navigate(['/student/dashboard']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        if (error.status === 401 || error.status === 403) {
+          this.errorMessage = 'Credenciales incorrectas o usuario inactivo';
+        } else if (error.status === 0) {
+          this.errorMessage = 'No se puede conectar con el servidor. Verifica tu conexión.';
+        } else {
+          this.errorMessage = 'Error al iniciar sesión. Intente nuevamente.';
+        }
+      }
+    });
   }
 }

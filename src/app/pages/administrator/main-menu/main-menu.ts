@@ -1,84 +1,88 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
-interface User {
+interface UserData {
   name: string;
   email: string;
-  role: 'STUDENT' | 'TEACHER' | 'ADMIN';
-  status: 'Active' | 'Inactive';
+  role: 'ESTUDIANTE' | 'DOCENTE' | 'ADMIN';
+  status: 'Activo' | 'Inactivo';
   lastLogin: string;
-  avatarColor: string; // Para simular el avatar
+  avatarColor: string;
 }
 
-interface MasterConfig {
+interface MasterData {
   title: string;
-  description: string;
   icon: string;
+  description: string;
   actionText: string;
+  route: string;
 }
 
 @Component({
-  selector: 'app-admin-dashboard',
+  selector: 'app-main-menu',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './main-menu.html',
   styleUrls: ['./main-menu.css']
 })
-export class MenuPrincipalAdminComponent {
-  
-  // Datos simulados para la tabla de usuarios
-  recentUsers: User[] = [
+export class MainMenuComponent {
+
+  recentUsers: UserData[] = [
     {
-      name: 'Ana Martinez',
-      email: 'ana.m@university.edu',
-      role: 'STUDENT',
-      status: 'Active',
-      lastLogin: '2 hours ago',
-      avatarColor: '#FF8A65'
+      name: 'Ana Martínez',
+      email: 'ana.m@uteq.edu.ec',
+      role: 'ESTUDIANTE',
+      status: 'Activo',
+      lastLogin: 'Hace 2 horas',
+      avatarColor: '#ff8a65'
     },
     {
-      name: 'Dr. Robert Chen',
-      email: 'r.chen@university.edu',
-      role: 'TEACHER',
-      status: 'Active',
-      lastLogin: '1 day ago',
-      avatarColor: '#BA68C8'
+      name: 'Dr. Roberto Chen',
+      email: 'r.chen@uteq.edu.ec',
+      role: 'DOCENTE',
+      status: 'Activo',
+      lastLogin: 'Hace 1 día',
+      avatarColor: '#ba68c8'
     },
     {
       name: 'Marco Polo',
-      email: 'marco.p@university.edu',
+      email: 'marco.p@uteq.edu.ec',
       role: 'ADMIN',
-      status: 'Inactive',
-      lastLogin: '5 days ago',
-      avatarColor: '#90A4AE'
+      status: 'Inactivo',
+      lastLogin: 'Hace 5 días',
+      avatarColor: '#90a4ae'
     }
   ];
 
-  // Datos para las tarjetas de configuración
-  masterConfigs: MasterConfig[] = [
+  masterConfigs: MasterData[] = [
     {
-      title: 'Faculties',
-      description: 'Manage university departments and institutional structures.',
-      icon: 'fa-solid fa-university',
-      actionText: 'Manage Records'
+      title: 'Facultades',
+      description: 'Gestiona las facultades y estructuras institucionales de la universidad.',
+      icon: 'domain',
+      actionText: 'Gestionar Facultades',
+      route: '/admin/structure' // Ruta a estructura institucional
     },
     {
-      title: 'Careers',
-      description: 'Define and configure degree programs and academic requirements.',
-      icon: 'fa-solid fa-graduation-cap',
-      actionText: 'Manage Careers'
+      title: 'Carreras',
+      description: 'Configura las carreras, programas y requisitos académicos.',
+      icon: 'school',
+      actionText: 'Gestionar Carreras',
+      route: '/admin/configuration'
     },
     {
-      title: 'Periods',
-      description: 'Set up academic semesters, years, and active timeframes.',
-      icon: 'fa-regular fa-calendar-check',
-      actionText: 'Config Periods'
+      title: 'Períodos Académicos',
+      description: 'Administra semestres, años académicos y períodos activos.',
+      icon: 'calendar_month',
+      actionText: 'Configurar Períodos',
+      route: '/admin/configuration'
     },
     {
-      title: 'Modes',
-      description: 'Define thesis titulation formats and graduation pathways.',
-      icon: 'fa-solid fa-book-open',
-      actionText: 'Define Modes'
+      title: 'Opciones de Titulación',
+      description: 'Define las modalidades y vías de titulación disponibles.',
+      icon: 'description',
+      actionText: 'Definir Modos',
+      route: '/admin/configuration'
     }
   ];
 

@@ -1,0 +1,177 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div>
+        <h2>{{ isEditing ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+        <p class="subtitle">{{ isEditing ? 'Modifica los datos del usuario' : 'Completa los datos para crear un nuevo usuario' }}</p>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="alert-error" *ngIf="errorMessage">
+        <span class="material-symbols-outlined">error</span>
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-section">
+        <h3>Información Personal</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Identificación <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="userData.identification"
+              placeholder="Ej: 1234567890"
+              [disabled]="isEditing">
+          </div>
+          <div class="form-group">
+            <label>Correo Institucional <span class="required">*</span></label>
+            <input
+              type="email"
+              [(ngModel)]="userData.email"
+              placeholder="usuario@uteq.edu.ec">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombres <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="userData.firstName"
+              placeholder="Ej: Juan"
+              (blur)="generateUsername()">
+          </div>
+          <div class="form-group">
+            <label>Apellidos <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="userData.lastName"
+              placeholder="Ej: Pérez"
+              (blur)="generateUsername()">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Credenciales de Acceso</h3>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre de Usuario <span class="required">*</span></label>
+            <input
+              type="text"
+              [(ngModel)]="userData.username"
+              placeholder="jperez">
+            <small class="hint">Se genera automáticamente desde los nombres</small>
+          </div>
+          <div class="form-group">
+            <label>Contraseña <span class="required" *ngIf="!isEditing">*</span></label>
+            <div class="input-with-icon">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                [(ngModel)]="userData.password"
+                placeholder="Mínimo 6 caracteres">
+              <button type="button" class="btn-toggle-password" (click)="togglePasswordVisibility()">
+                <span class="material-symbols-outlined">
+                  {{ showPassword ? 'visibility_off' : 'visibility' }}
+                </span>
+              </button>
+            </div>
+            <small class="hint" *ngIf="isEditing">Dejar en blanco para mantener la actual</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Roles del Sistema <span class="required">*</span></h3>
+        <p class="section-desc">Selecciona uno o más roles para este usuario</p>
+
+        <div class="roles-grid">
+          <div
+            *ngFor="let role of availableRoles"
+            class="role-card"
+            [class.selected]="isRoleSelected(role.id)"
+            (click)="toggleRole(role.id)">
+            <div class="role-checkbox">
+              <span class="material-symbols-outlined" *ngIf="isRoleSelected(role.id)">check</span>
+            </div>
+            <div class="role-info">
+              <span class="role-name">{{ role.name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="student-section" *ngIf="isStudentSelected">
+        <h3>Información Académica</h3>
+
+        <div class="student-fields">
+          <div class="form-group">
+            <label for="career">
+              Carrera <span class="required">*</span>
+              <span class="hint-optional">(Requerido para estudiantes)</span>
+            </label>
+            <select
+              id="career"
+              [(ngModel)]="userData.idCareer"
+              name="career"
+              [class.error]="!userData.idCareer && errorMessage">
+              <option [ngValue]="null">Seleccione una carrera...</option>
+              <option *ngFor="let career of availableCareers" [ngValue]="career.idCareer">
+                {{ career.name }} <ng-container *ngIf="career.facultyName">({{ career.facultyName }})</ng-container>
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="period">
+              Período Académico <span class="required">*</span>
+              <span class="hint-optional">(Ciclo de ingreso)</span>
+            </label>
+            <select
+              id="period"
+              [(ngModel)]="userData.idPeriod"
+              name="period"
+              [class.error]="!userData.idPeriod && errorMessage">
+              <option [ngValue]="null">Seleccione un período...</option>
+              <option *ngFor="let period of availablePeriods" [ngValue]="period.idPeriod">
+                {{ period.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section form-section-inline">
+        <label class="toggle-label">Estado del Usuario</label>
+        <div class="toggle-wrapper">
+          <span class="toggle-text" [class.active]="userData.active">Activo</span>
+          <div class="toggle-switch" [class.active]="userData.active" (click)="userData.active = !userData.active">
+            <div class="toggle-circle"></div>
+          </div>
+          <span class="toggle-text" [class.inactive]="!userData.active">Inactivo</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="onClose()" [disabled]="loading">Cancelar</button>
+      <button class="btn-primary" (click)="onSave()" [disabled]="loading">
+        <span *ngIf="loading" class="spinner">⟳</span>
+        <span *ngIf="!loading">
+          <span class="material-symbols-outlined">save</span>
+          {{ isEditing ? 'Guardar Cambios' : 'Crear Usuario' }}
+        </span>
+      </button>
+    </div>
+
+  </div>
+</div>
