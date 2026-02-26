@@ -7,6 +7,7 @@ import { FacultyDashboardAdmin, FacultyDashboardDTO} from '../../../services/fac
 import { FacultyCreate, FacultyCreateDTO } from '../../../services/faculty-create/faculty-create';
 import { CareerCreate, CareerCreateDTO } from '../../../services/career-create/career-create';
 import { ManageCareer } from '../../../services/manage-career/manage-career';
+import {HeaderComponent} from '../../../components/header/header';
 
 interface CareerDisplay {
   id: number;
@@ -29,13 +30,14 @@ interface FacultyDisplay {
 @Component({
   selector: 'app-institutional-structure',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent],
+  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent, HeaderComponent],
   templateUrl: './institutional-structure.html',
   styleUrls: ['./institutional-structure.css']
 })
 export class InstitutionalStructureComponent implements OnInit {
   
   private updateCareerServices = inject(ManageCareer);
+
   private writeCareerService = inject(CareerCreate)
   private writeFacultyService = inject(FacultyCreate);
   private facultyServices = inject(FacultyDashboardAdmin);
@@ -106,7 +108,7 @@ export class InstitutionalStructureComponent implements OnInit {
       siglas: f.acronym
     }));
   }
-  
+
   openModal(type: 'facultad' | 'carrera', facultyId?: number) {
     this.isEditMode = false;
     this.dataToEdit = null;
@@ -145,7 +147,7 @@ export class InstitutionalStructureComponent implements OnInit {
       console.log('Actualizando facultad...', newFac)
       return;
     }
-    
+
     const dto: FacultyCreateDTO = {
       name: newFac.nombre,
       acronym: newFac.siglas
@@ -170,7 +172,7 @@ export class InstitutionalStructureComponent implements OnInit {
 
 
   handleSaveCarrera(newFac: CarreraSimple) {
-    
+
     if (!newFac.id_facultad) {
       alert('Por favor, selecciona una facultad antes de guardar.');
       return;

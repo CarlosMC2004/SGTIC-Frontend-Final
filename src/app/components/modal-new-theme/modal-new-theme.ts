@@ -1,14 +1,16 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+
 @Component({
-  selector: 'app-modal-nuevo-tema',
+  selector: 'app-modal-new-theme',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './modal-nuevo-tema.html',
-  styleUrl: './modal-nuevo-tema.css'
+  templateUrl: './modal-new-theme.html',
+  styleUrl: './modal-new-theme.css',
 })
-export class ModalNuevoTema {
+
+export class ModalNewTheme {
 
   @Output() close = new EventEmitter<void>();
 

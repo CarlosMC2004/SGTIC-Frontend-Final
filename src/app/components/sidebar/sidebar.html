@@ -19,18 +19,37 @@
     <ng-container *ngIf="role === 'coordinador'">
       <a class="menu-item" routerLink="/inicio-coordinador" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">home</span>
-        <span>Home</span>
+        <span>Inicio</span>
       </a>
       </ng-container>
 
+      <a class="menu-item" routerLink="/student-requests" routerLinkActive="active">
+        <span class="material-symbols-outlined">description</span>
+        <span>Solicitudes de Estudiantes</span>
+      </a>
+
+      <a class="menu-item" routerLink="/bankt-themes" routerLinkActive="active">
+        <span class="material-symbols-outlined">library_books</span>
+        <span>Banco de Temas</span>
+      </a>
+
+      <a class="menu-item" routerLink="/Assignments" routerLinkActive="active">
+        <span class="material-symbols-outlined">assignment_ind</span>
+        <span>Asignaciones</span>
+      </a>
+
+      <a class="menu-item" routerLink="/docentes" routerLinkActive="active">
+        <span class="material-symbols-outlined">group</span>
+        <span>Docentes</span>
+      </a>
     <ng-container *ngIf="role === 'estudiante'">
       <a class="menu-item" routerLink="/inicio-estudiante" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">home</span>
-        <span>My Home</span>
+        <span>Mi Inicio</span>
       </a>
       <a class="menu-item" routerLink="/mis-proyectos" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">folder_shared</span>
-        <span>My Project</span>
+        <span>Mi Proyecto</span>
       </a>
     </ng-container>
 
@@ -44,24 +63,22 @@
         <span class="material-symbols-outlined">people</span>
         <span>Gestión de Usuarios</span>
       </a>
-
       <a class="menu-item" routerLink="/institutional-structure" routerLinkActive="active">
         <span class="material-symbols-outlined">domain</span>
         <span>Estructura Institucional</span>
       </a>
-
       <a class="menu-item" routerLink="/academic-configuration" routerLinkActive="active">
         <span class="material-symbols-outlined">settings</span>
         <span>Configuración Académica</span>
       </a>
     </ng-container>
-    
+
     </nav>
 
   <div class="logout">
     <button>
-      <span class="material-symbols-outlined">logout</span>
-      <span>Logout</span>
+      <span class="material-symbols-outlined" routerLink="/login" routerLinkActive="active">logout</span>
+      <span>Cerrar Sesión</span>
     </button>
   </div>
 </aside>

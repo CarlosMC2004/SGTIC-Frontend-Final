@@ -5,6 +5,9 @@ import {AcademicConfiguration} from './pages/administrator/academic-configuratio
 import { InstitutionalStructureComponent } from './pages/administrator/institutional-structure/institutional-structure';
 import { UserManagementComponent } from './pages/administrator/user-management/user-management';
 import { StudentDashboardComponent } from './pages/student/dashboard-student/dashboard-student'
+import {StudentRequests} from './pages/coordinator/student-requests/student-requests';
+import {BankThemes} from './pages/coordinator/bank-themes/bank-themes';
+import {Assignments} from './pages/coordinator/assignments/assignments';
 
 export const routes: Routes = [
     //RUTA PARA EL LOGIN
@@ -19,4 +22,10 @@ export const routes: Routes = [
     { path: 'user-management', component: UserManagementComponent},
     //RUTA DEL DASHBOARD DEL ESTUDIANTE
     { path: 'student-dashboard', component: StudentDashboardComponent},
+    //RUTA GESTION DE SOLICITUDES DE ESTUDIANTES (COORDINADOR)
+    {path: 'student-requests', component: StudentRequests},
+    //RUTA GESTION DE TEMAS (COORDINADOR)
+    {path: 'bankt-themes', component: BankThemes},
+    //RUTA GESTION DE ASIGANCIONES (COORDINADOR)
+    {path: 'Assignments', component: Assignments},
 ];

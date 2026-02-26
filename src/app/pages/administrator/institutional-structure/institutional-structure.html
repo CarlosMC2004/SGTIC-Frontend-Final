@@ -1,13 +1,13 @@
 <div class="layout-wrapper">
-  
+
   <app-sidebar role="admin"></app-sidebar>
 
   <main class="main-content">
-    
+
     <header class="top-bar">
       <div class="breadcrumbs">
-        <span class="text-muted">Dashboard</span> 
-        <span class="separator">›</span> 
+        <span class="text-muted">Dashboard</span>
+        <span class="separator">›</span>
         <span class="current">Estructura Institucional</span>
       </div>
     </header>
@@ -17,10 +17,10 @@
         <h1>Estructura Institucional</h1>
         <p>Administra las facultades y sus respectivas carreras profesionales.</p>
       </div>
-      
+
       <button class="btn-primary" (click)="openModal('facultad')">
         <span class="material-symbols-outlined">add</span>
-        Nueva Facultad 
+        Nueva Facultad
       </button>
     </section>
 
@@ -37,15 +37,15 @@
     </section>
 
     <section class="faculties-grid">
-      
+
       <div class="faculty-card" *ngFor="let faculty of faculties">
         <div class="card-top">
           <div class="faculty-header">
-             <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
-               <span class="material-symbols-outlined">{{ faculty.icon }}</span>
-             </div>
+            <div class="icon-wrapper" [style.background-color]="faculty.iconBg" [style.color]="faculty.iconColor">
+              <span class="material-symbols-outlined">{{ faculty.icon }}</span>
+            </div>
           </div>
-          
+
           <div class="faculty-title-row">
             <h3>{{ faculty.name }}</h3>
             <span class="badge">{{ faculty.careersCount }} CARRERAS</span>
@@ -55,14 +55,14 @@
 
         <ul class="career-list">
           <li *ngFor="let career of faculty.careers" class="career-item">
-            
+
             <div class="career-info">
-              <span class="status-dot" 
-                    [class.active]="career.active" 
+              <span class="status-dot"
+                    [class.active]="career.active"
                     [class.inactive]="!career.active"
                     [title]="career.active ? 'Activa' : 'Desactivada'">
               </span>
-              
+
               <span class="career-name" [class.text-muted]="!career.active">
                 {{ career.name }}
               </span>
@@ -73,8 +73,8 @@
                 <span class="material-symbols-outlined">edit</span>
               </button>
 
-              <button class="action-btn toggle" 
-                      (click)="toggleCareerStatus(career)" 
+              <button class="action-btn toggle"
+                      (click)="toggleCareerStatus(career)"
                       [title]="career.active ? 'Desactivar' : 'Activar'">
                 <span class="material-symbols-outlined">
                   {{ career.active ? 'toggle_on' : 'toggle_off' }}

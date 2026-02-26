@@ -1,24 +1,14 @@
 <div class="layout-wrapper">
-  
+
   <app-sidebar role="admin"></app-sidebar>
+<div class = "main-wrapper">
+  <app-header></app-header>
 
   <main class="main-content">
-    
-    <header class="top-bar">
-      <div class="breadcrumbs">
-        <span class="text-muted">Dashboard</span> 
-        <span class="separator">›</span> 
-        <span class="current">People & Access</span>
-      </div>
-      <div class="user-profile">
-        <span>Admin User</span>
-        <img src="https://i.pravatar.cc/150?u=admin" alt="Profile">
-      </div>
-    </header>
 
     <section class="page-header">
       <div class="header-text">
-        <h1>People Management</h1>
+        <h1>User Management</h1>
         <p>Manage users, credentials and system access roles.</p>
       </div>
       <button class="btn-primary" (click)="openModal()">
@@ -54,63 +44,66 @@
 
       <table>
         <thead>
-          <tr>
-            <th>User Info</th>
-            <th>ID / Email</th>
-            <th>Roles Assigned</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
+        <tr>
+          <th>User Info</th>
+          <th>ID / Email</th>
+          <th>Roles Assigned</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let u of filteredUsers">
-            <td>
-              <div class="user-cell">
-                <div class="avatar-circle">{{ u.nombres.charAt(0) }}{{ u.apellidos.charAt(0) }}</div>
-                <div>
-                  <div class="font-bold">{{ u.nombres }} {{ u.apellidos }}</div>
-                  <div class="text-small text-muted">@{{ u.username }}</div>
-                </div>
+        <tr *ngFor="let u of filteredUsers">
+          <td>
+            <div class="user-cell">
+              <div class="avatar-circle">{{ u.nombres.charAt(0) }}{{ u.apellidos.charAt(0) }}</div>
+              <div>
+                <div class="font-bold">{{ u.nombres }} {{ u.apellidos }}</div>
+                <div class="text-small text-muted">@{{ u.username }}</div>
               </div>
-            </td>
-            <td>
-              <div class="text-small">{{ u.identificacion }}</div>
-              <div class="text-small text-muted">{{ u.correo }}</div>
-            </td>
-            <td>
-              <div class="role-tags">
+            </div>
+          </td>
+          <td>
+            <div class="text-small">{{ u.identificacion }}</div>
+            <div class="text-small text-muted">{{ u.correo }}</div>
+          </td>
+          <td>
+            <div class="role-tags">
                 <span *ngFor="let role of u.roles" class="role-badge" [ngClass]="role.toLowerCase()">
                   {{ role }}
                 </span>
-                <span *ngIf="u.roles.length === 0" class="text-muted text-small">No roles</span>
-              </div>
-            </td>
-            <td>
+              <span *ngIf="u.roles.length === 0" class="text-muted text-small">No roles</span>
+            </div>
+          </td>
+          <td>
               <span class="status-badge" [class.active]="u.activo" [class.inactive]="!u.activo">
                 {{ u.activo ? 'Active' : 'Inactive' }}
               </span>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button class="btn-icon" (click)="openModal(u)" title="Edit">
-                  <span class="material-symbols-outlined">edit</span>
-                </button>
-                <button class="btn-icon delete" title="Deactivate">
-                  <span class="material-symbols-outlined">block</span>
-                </button>
-              </div>
-            </td>
-          </tr>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon" (click)="openModal(u)" title="Edit">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="btn-icon delete" title="Deactivate">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+            </div>
+          </td>
+        </tr>
         </tbody>
       </table>
     </div>
 
   </main>
 
-  <app-user-modal 
-    *ngIf="showModal" 
-    [user]="selectedUser" 
-    (close)="closeModal()" 
+</div>
+
+
+  <app-user-modal
+    *ngIf="showModal"
+    [user]="selectedUser"
+    (close)="closeModal()"
     (save)="handleSave($event)">
   </app-user-modal>
 
