@@ -68,7 +68,7 @@ export class AcademicConfiguration {
     this.isModalOpen = false;
   }
 
-  saveNewModality(data: {name: string, status: boolean}) {
+  saveNewModality(data: { name: string, status: boolean }) {
     this.degreeOptions.push({
       id: Date.now(),
       title: data.name,

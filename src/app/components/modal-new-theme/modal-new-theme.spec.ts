@@ -1,17 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LoginComponent } from './login';
 
-describe('Login', () => {
-  let component: LoginComponent;
-  let fixture: ComponentFixture<LoginComponent>;
+import { ModalNewTheme } from './modal-new-theme';
+
+describe('ModalNewTheme', () => {
+  let component: ModalNewTheme;
+  let fixture: ComponentFixture<ModalNewTheme>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginComponent]
+      imports: [ModalNewTheme]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(LoginComponent);
+    fixture = TestBed.createComponent(ModalNewTheme);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -1,0 +1,67 @@
+<div class="chart-card">
+  <div class="chart-header">
+    <div class="header-titles">
+      <h3>Progreso del Proyecto</h3>
+      <p class="subtitle">Avance semanal vs objetivo planificado</p>
+    </div>
+    <div class="chart-legend">
+      <div class="legend-item">
+        <span class="dot real-progress-dot"></span> Progreso real
+      </div>
+      <div class="legend-item">
+        <span class="dot target-progress-dot"></span> Objetivo
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-body">
+    <div class="y-axis">
+      <span>100%</span>
+      <span>75%</span>
+      <span>50%</span>
+      <span>25%</span>
+      <span>0%</span>
+    </div>
+
+    <div class="graph-area">
+      <svg viewBox="0 0 900 300" class="line-chart-svg" preserveAspectRatio="none">
+        <line x1="0" y1="270" x2="900" y2="30" class="dashed-line"></line>
+
+        <polygon points="0,285 100,255 200,235 300,200 400,175 500,135 600,105 600,300 0,300" class="area-fill"></polygon>
+
+        <polyline points="0,285 100,255 200,235 300,200 400,175 500,135 600,105" class="solid-line"></polyline>
+
+        <circle cx="0" cy="285" r="5" class="data-point"></circle>
+        <circle cx="100" cy="255" r="5" class="data-point"></circle>
+        <circle cx="200" cy="235" r="5" class="data-point"></circle>
+        <circle cx="300" cy="200" r="5" class="data-point"></circle>
+        <circle cx="400" cy="175" r="5" class="data-point"></circle>
+        <circle cx="500" cy="135" r="5" class="data-point"></circle>
+        <circle cx="600" cy="105" r="5" class="data-point"></circle>
+      </svg>
+
+      <div class="x-axis">
+        <span>Sem 1</span>
+        <span>Sem 3</span>
+        <span>Sem 5</span>
+        <span>Sem 7</span>
+        <span>Sem 9</span>
+        <span>Sem 11</span>
+        <span>Sem 13</span>
+        <span>Sem 15</span>
+        <span>Sem 17</span>
+        <span>Sem 20</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="total-progress-section">
+    <div class="progress-labels">
+      <span class="progress-title">Progreso total</span>
+      <span class="progress-percent">65%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" style="width: 65%;"></div>
+    </div>
+  </div>
+</div>
