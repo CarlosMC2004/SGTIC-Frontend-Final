@@ -1,0 +1,127 @@
+<header class="page-header-bar">
+  <div class="breadcrumbs">
+    <span class="text-muted">Panel de Control</span>
+    <span class="separator">›</span>
+    <span class="current">Catálogos del Sistema</span>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="header-text">
+    <h1>Catálogos Maestros</h1>
+    <p>Gestión de períodos académicos y roles del sistema.</p>
+  </div>
+</div>
+
+<div class="tabs-container">
+  <button class="tab-btn" [class.active]="activeTab === 'periodos'" (click)="activeTab = 'periodos'">
+    <span class="material-symbols-outlined">calendar_month</span>
+    Períodos Académicos
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 'roles'" (click)="activeTab = 'roles'">
+    <span class="material-symbols-outlined">admin_panel_settings</span>
+    Roles del Sistema
+  </button>
+</div>
+
+<!-- TAB: Períodos Académicos -->
+<div class="tab-content" *ngIf="activeTab === 'periodos'">
+
+  <div class="form-inline">
+    <input type="text" placeholder="Nombre del período (ej: 2025-2026)" [(ngModel)]="newPeriodo.nombre">
+    <input type="date" placeholder="Fecha inicio" [(ngModel)]="newPeriodo.fechaInicio">
+    <input type="date" placeholder="Fecha fin" [(ngModel)]="newPeriodo.fechaFin">
+    <button class="btn-primary" (click)="createPeriodo()" [disabled]="!newPeriodo.nombre || !newPeriodo.fechaInicio || !newPeriodo.fechaFin">
+      <span class="material-symbols-outlined">add</span>
+      Crear Período
+    </button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Período Académico</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let periodo of periodos">
+        <td>
+          <div class="font-bold">{{ periodo.nombre }}</div>
+        </td>
+        <td>{{ periodo.fechaInicio | date:'dd/MM/yyyy' }}</td>
+        <td>{{ periodo.fechaFin | date:'dd/MM/yyyy' }}</td>
+        <td>
+            <span class="status-badge" [class.active]="periodo.activo">
+              {{ periodo.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn-icon" title="Editar">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            <div class="toggle-switch" [class.active]="periodo.activo" (click)="togglePeriodoStatus(periodo.id)">
+              <div class="toggle-circle"></div>
+            </div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAB: Roles del Sistema -->
+<div class="tab-content" *ngIf="activeTab === 'roles'">
+
+  <div class="info-box">
+    <span class="material-symbols-outlined">info</span>
+    <p>Los roles marcados como "Sistema" son roles base y no deben eliminarse. Puedes crear roles adicionales desde la sección "Gestión de Roles".</p>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+      <tr>
+        <th>Rol</th>
+        <th>Descripción</th>
+        <th>Fecha Creación</th>
+        <th>Tipo</th>
+        <th>Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let role of roles">
+        <td>
+          <div class="role-name">
+            <span class="material-symbols-outlined">badge</span>
+            <span class="font-bold">{{ role.nombre }}</span>
+          </div>
+        </td>
+        <td>{{ role.descripcion }}</td>
+        <td>{{ role.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+        <td>
+            <span class="badge" [class.system]="role.sistema">
+              {{ role.sistema ? 'Sistema' : 'Personalizado' }}
+            </span>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn-icon" title="Ver permisos">
+              <span class="material-symbols-outlined">visibility</span>
+            </button>
+            <button class="btn-icon" *ngIf="!role.sistema" (click)="deleteRole(role.id)" title="Eliminar">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

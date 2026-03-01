@@ -1,64 +1,32 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router'; // Importar Router
-
-import { SolicitudIngresoModalComponent } from '../../../components/components-studients/modal-solicitar-acceso/modal-solicitar-acceso';
-import { AuthLayoutComponent } from '../../../components/auth-layout/auth-layout'
-import { RequestAccess, RequestAccessDTO } from '../../../services/request-access/request-access'
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
+import { AuthLayoutComponent } from '../../../components/auth-layout/auth-layout';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, SolicitudIngresoModalComponent, AuthLayoutComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, AuthLayoutComponent],
   templateUrl: './login.html',
-  styleUrls: ['./login.css'] // Asumo que tienes tus estilos aquí
+  styleUrl: './login.css'
 })
-
 export class LoginComponent {
-  //Inicio solicitar acceso --------------------------
-
-  private requestAccessService = inject(RequestAccess);
-
-  // 2. Variable para manejar el estado de carga
-  estaCargando = false;
-
-  procesarSolicitudAcceso(datosSolicitud: RequestAccessDTO) {
-    this.estaCargando = true;
-
-    this.requestAccessService.enviarSolicitud(datosSolicitud).subscribe({
-      next: (respuesta) => {
-        this.estaCargando = false;
-        this.cerrarModal();
-        alert('¡Éxito! ' + respuesta.message);
-      },
-      error: (errorRespuesta) => {
-        this.estaCargando = false;
-        const mensajeError = errorRespuesta.error?.error || 'Ocurrió un error inesperado al conectar con el servidor.';
-        alert('Error: ' + mensajeError);
-      }
-    });
-  }
-
-  cerrarModal() {
-    this.mostrarModalSolicitud = false;
-  }
-
-
-
-
-  //Final solicitar acceso---------------------------
-
   loginForm: FormGroup;
   showPassword = false;
+  isLoading = false;
+  errorMessage = '';
 
-  mostrarModalSolicitud = false;
-
-  // Inyectamos el Router y el FormBuilder
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService
+  ) {
+    // CAMBIO: 'username' -> 'email' para coincidir con el backend
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.email, Validators.pattern('^[a-zA-Z0-9._%+-]+@uteq\\.edu\\.ec$')]],
-      password: ['', Validators.required]
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -66,26 +34,47 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  abrirModal(event: Event) {
-    event.preventDefault(); // Evita que el enlace recargue la página
-    this.mostrarModalSolicitud = true;
-  }
-
   onSubmit() {
-    if (this.loginForm.valid) {
-      const credenciales = this.loginForm.value;
-      console.log('Intentando iniciar sesión con:', credenciales.username);
+    this.errorMessage = '';
 
-      // Simulamos que el backend nos responde que todo está OK
-      const loginExitoso = true;
-
-      if (loginExitoso) {
-        // Redirigimos a la ruta del dashboard del estudiante que configuraste antes
-        this.router.navigate(['/inicio-estudiante']);
-      }
-
-    } else {
+    if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+      return;
     }
+
+    this.isLoading = true;
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+
+        // Redirección basada en roles
+        const roles = response.roles;
+
+        if (roles.includes('administrador_sgtic')) {
+          this.router.navigate(['/admin/dashboard']);
+        } else if (roles.includes('coordinador_facultad')) {
+          this.router.navigate(['/coordinator/faculty']);
+        } else if (roles.includes('coordinador_carrera')) {
+          this.router.navigate(['/coordinator/career']);
+        } else if (roles.includes('docente') || roles.includes('director_trabajo_titulacion')) {
+          this.router.navigate(['/teacher/dashboard']);
+        } else if (roles.includes('estudiante')) {
+          this.router.navigate(['/student/dashboard']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        if (error.status === 401 || error.status === 403) {
+          this.errorMessage = 'Credenciales incorrectas o usuario inactivo';
+        } else if (error.status === 0) {
+          this.errorMessage = 'No se puede conectar con el servidor. Verifica tu conexión.';
+        } else {
+          this.errorMessage = 'Error al iniciar sesión. Intente nuevamente.';
+        }
+      }
+    });
   }
 }

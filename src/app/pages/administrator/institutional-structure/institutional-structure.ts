@@ -6,7 +6,6 @@ import { ModalManagementStructureComponent, FacultadSimple, CarreraSimple } from
 import { FacultyDashboardAdmin, FacultyDashboardDTO} from '../../../services/faculty-dashboard-admin/faculty-dashboard-admin';
 import { FacultyCreate, FacultyCreateDTO } from '../../../services/faculty-create/faculty-create';
 import { CareerCreate, CareerCreateDTO } from '../../../services/career-create/career-create';
-import {HeaderComponent} from '../../../components/header/header';
 import { ManageCareer } from '../../../services/manage-career/manage-career';
 
 interface CareerDisplay {
@@ -30,7 +29,7 @@ interface FacultyDisplay {
 @Component({
   selector: 'app-institutional-structure',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, ModalManagementStructureComponent, HeaderComponent],
+  imports: [CommonModule, ModalManagementStructureComponent],
   templateUrl: './institutional-structure.html',
   styleUrls: ['./institutional-structure.css']
 })
@@ -217,6 +216,7 @@ export class InstitutionalStructureComponent implements OnInit {
 
   toggleCareerStatus(career: CareerDisplay) {
     const action = career.active ? 'desactivar' : 'activar';
+
     if(confirm(`¿Estás seguro de que deseas ${action} la carrera ${career.name}?`)) {
       this.updateCareerServices.toggleCareerStatus(career.id).subscribe({
         next: (response) => {

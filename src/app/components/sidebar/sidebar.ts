@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,15 +12,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class SidebarComponent {
   @Input() role: 'coordinador' | 'estudiante' | 'admin' = 'coordinador';
-  
-  // Estado para controlar el sidebar en móviles
-  isOpen: boolean = false;
 
-  toggleSidebar() {
-    this.isOpen = !this.isOpen;
-  }
+  constructor(private authService: AuthService, private router: Router) {}
 
-  closeSidebar() {
-    this.isOpen = false;
+  logout() {
+    this.authService.logout();
   }
 }

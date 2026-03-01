@@ -9,7 +9,7 @@ import { ModalAddAreaComponent } from '../../../components/modal-add-area/modal-
 @Component({
   selector: 'app-academic-configuration',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ModalNewModalityComponent, ModalAddAreaComponent],
+  imports: [CommonModule, FormsModule, ModalNewModalityComponent, ModalAddAreaComponent],
   templateUrl: './academic-configuration.html',
   styleUrl: './academic-configuration.css',
 })
