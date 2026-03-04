@@ -7,6 +7,16 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/general/login/login').then(m => m.LoginComponent)
   },
+  {
+    path: 'hoja-de-vida',
+    canActivate: [authGuard], // Opcional, pero recomendado para que no entren sin sesión
+    loadComponent: () => import('./components/modal-resume/modal-resume').then(m => m.ResumeModal)
+  },
+  {
+    path: 'change-password',
+    canActivate: [authGuard], // Opcional, pero recomendado para que no entren sin sesión
+    loadComponent: () => import('./components/modal-change-password/modal-change-password').then(m => m.ChangePasswordModal)
+  },
   // Rutas de Administrador
   {
     path: 'admin',
@@ -72,7 +82,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {path: 'dashboard',
-      loadComponent: () => import('./pages/student/studient-dashboard/student-dashboard').then(m => m.StudentDashboard)},
+      loadComponent: () => import('./pages/student/studient-dashboard/student-dashboard').then(m => m.StudentDashboardd)},
       {
         path: 'process-setup',
         loadComponent: () => import('./pages/student/process-setup/process-setup').then(m => m.ProcessSetup)}

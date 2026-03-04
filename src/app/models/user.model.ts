@@ -11,6 +11,7 @@ export interface LoginResponse {
   fullName: string;
   roles: string[];
   context: UserContext;
+  primerIngreso: boolean;
 }
 
 export interface LoginRequest {
@@ -23,6 +24,7 @@ export interface CurrentUser {
   fullName: string;
   roles: string[];
   context: UserContext;
+  primerIngreso: boolean;
 }
 export interface User {
   id?: number;

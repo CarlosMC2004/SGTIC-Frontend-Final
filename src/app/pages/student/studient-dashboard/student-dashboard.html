@@ -6,7 +6,12 @@
     
     <app-topbar></app-topbar>
 
-    <div class="dashboard-container">
+    <div *ngIf="isLoading" style="text-align: center; padding: 50px;">
+      <span class="material-symbols-outlined" style="font-size: 40px; animation: spin 1s linear infinite;">autorenew</span>
+      <p>Cargando información de tu proceso...</p>
+    </div>
+
+    <div class="dashboard-container" *ngIf="!isLoading && status">
       
       <section class="page-header">
         <h1>Mi Trabajo de Titulación</h1>
@@ -16,38 +21,50 @@
       <section class="stepper-card">
         <div class="stepper">
           
-          <div class="step completed">
-            <div class="step-icon"><span class="material-symbols-outlined">check</span></div>
+          <div class="step" [ngClass]="status.temaSeleccionado ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">{{ status.temaSeleccionado ? 'check' : 'radio_button_unchecked' }}</span>
+            </div>
             <div class="step-label">SELECCIÓN DEL<br>TIPO/TEMA TITULACIÓN</div>
           </div>
-          <div class="step-line completed-line"></div>
+          <div class="step-line" [ngClass]="status.directorAsignado ? 'completed-line' : 'pending-line'"></div>
           
-          <div class="step completed">
-            <div class="step-icon"><span class="material-symbols-outlined">check</span></div>
+          <div class="step" [ngClass]="status.directorAsignado ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">{{ status.directorAsignado ? 'check' : 'person_search' }}</span>
+            </div>
             <div class="step-label">ASIGNACIÓN<br>DE DIRECTOR</div>
           </div>
-          <div class="step-line completed-line"></div>
+          <div class="step-line" [ngClass]="status.procesoIniciado ? 'completed-line' : 'pending-line'"></div>
           
-          <div class="step active">
-            <div class="step-icon"><span class="material-symbols-outlined">play_arrow</span></div>
+          <div class="step" [ngClass]="status.procesoIniciado ? 'completed' : (status.directorAsignado ? 'active' : 'pending')">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">{{ status.procesoIniciado ? 'check' : 'play_arrow' }}</span>
+            </div>
             <div class="step-label">PROCESO</div>
           </div>
-          <div class="step-line pending-line"></div>
+          <div class="step-line" [ngClass]="status.tribunalAsignado ? 'completed-line' : 'pending-line'"></div>
           
-          <div class="step pending">
-            <div class="step-icon"><span class="material-symbols-outlined">schedule</span></div>
+          <div class="step" [ngClass]="status.tribunalAsignado ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">{{ status.tribunalAsignado ? 'check' : 'schedule' }}</span>
+            </div>
             <div class="step-label">PRESENTACIÓN<br>ANTE TRIBUNAL</div>
           </div>
-          <div class="step-line pending-line"></div>
+          <div class="step-line" [ngClass]="status.actaEntregada ? 'completed-line' : 'pending-line'"></div>
           
-          <div class="step pending">
-            <div class="step-icon"><span class="material-symbols-outlined">description</span></div>
+          <div class="step" [ngClass]="status.actaEntregada ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">{{ status.actaEntregada ? 'check' : 'description' }}</span>
+            </div>
             <div class="step-label">ENTREGA DE<br>ACTA</div>
           </div>
-          <div class="step-line pending-line"></div>
+          <div class="step-line" [ngClass]="status.finalizado ? 'completed-line' : 'pending-line'"></div>
 
-          <div class="step pending">
-            <div class="step-icon"><span class="material-symbols-outlined">flag</span></div>
+          <div class="step" [ngClass]="status.finalizado ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">{{ status.finalizado ? 'check' : 'flag' }}</span>
+            </div>
             <div class="step-label">FINALIZADO</div>
           </div>
 
@@ -59,7 +76,7 @@
           <div class="card-icon"><span class="material-symbols-outlined">menu_book</span></div>
           <div class="card-content">
             <span class="card-subtitle">MODALIDAD DE TITULACIÓN</span>
-            <span class="card-title">Investigación Científica</span>
+            <span class="card-title">{{ status.nombreTema || 'Aún no asignada' }}</span>
           </div>
         </div>
         
@@ -67,9 +84,9 @@
           <div class="card-icon"><span class="material-symbols-outlined">account_circle</span></div>
           <div class="card-content flex-grow">
             <span class="card-subtitle">DIRECTOR ASIGNADO</span>
-            <span class="card-title">Dr. Roberto Pérez</span>
+            <span class="card-title">{{ status.nombreDirector || 'Por asignar' }}</span>
           </div>
-          <button class="btn-outline-green">CONTACTAR</button>
+          <button class="btn-outline-green" [disabled]="!status.directorAsignado">CONTACTAR</button>
         </div>
       </section>
 
@@ -80,7 +97,7 @@
           <div class="section-header">
             <div class="title-with-icon">
               <span class="material-symbols-outlined">forum</span>
-              <h2>Últimas Observaciones</h2>
+              <h2>Últimos Mensajes Recibidos</h2>
             </div>
             <a href="#" class="link-green">Ver Historial</a>
           </div>

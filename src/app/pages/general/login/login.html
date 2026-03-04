@@ -2,8 +2,6 @@
   <div class="login-container">
 
     <p class="subtitle">Ingrese sus credenciales institucionales para continuar.</p>
-
-    <!-- Mensaje de error del servidor -->
     @if (errorMessage) {
       <div class="server-error">
         {{ errorMessage }}
@@ -13,10 +11,8 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
 
       <div class="form-group">
-        <!-- Cambiado: for="username" -> for="email" -->
         <label for="email">Correo Institucional</label>
         <div class="input-wrapper">
-          <!-- Cambiado: id, formControlName y validación -->
           <input
             type="email"
             id="email"
@@ -24,9 +20,7 @@
             placeholder="ej. estudiante@uteq.edu.ec"
             [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
           >
-          <span class="icon">✉️</span>
         </div>
-        <!-- Cambiado: validación de username a email -->
         @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
           <div class="error-msg">
             @if (loginForm.get('email')?.errors?.['required']) {
@@ -46,10 +40,10 @@
             [type]="showPassword ? 'text' : 'password'"
             id="password"
             formControlName="password"
-            placeholder="••••••••"
+            placeholder="••••••••••••••"
           >
-          <span class="icon clickable" (click)="togglePassword()">
-            {{ showPassword ? '👁️' : '🚫' }}
+          <span class="icon clickable material-symbols-outlined" (click)="togglePassword()">
+            {{ showPassword ? 'visibility' : 'visibility_off' }}
           </span>
         </div>
         @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
@@ -63,7 +57,6 @@
         <a routerLink="/auth/forgot-password">¿Olvidó su contraseña?</a>
       </div>
 
-      <!-- Agregado: [disabled] para evitar doble envío -->
       <button type="submit" class="btn-login" [disabled]="isLoading">
         @if (isLoading) {
           <span class="spinner">⟳</span> Cargando...
@@ -75,7 +68,14 @@
     </form>
 
     <div class="footer-links">
-      <p>Inicia tu proceso de titulación <a href="#">Solicita acceso</a></p>
+      <p>Inicia tu proceso de titulación <a href="#" (click)="openModal($event)">Solicita acceso</a></p>
     </div>
+
+    @if (isModalOpen){
+      <app-modal-solicitar-acceso
+        (onCerrar)="closeModal()"
+        (onEnviarDatos)="handleRequestAccessSubmission($event)">
+      </app-modal-solicitar-acceso>
+    }
   </div>
 </app-auth-layout>
