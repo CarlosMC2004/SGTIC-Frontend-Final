@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ModalNuevoTema } from './modal-nuevo-tema';
+import { ProgressChart } from './progress-chart';
 
-describe('ModalNuevoTema', () => {
-  let component: ModalNuevoTema;
-  let fixture: ComponentFixture<ModalNuevoTema>;
+describe('ProgressChart', () => {
+  let component: ProgressChart;
+  let fixture: ComponentFixture<ProgressChart>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalNuevoTema]
+      imports: [ProgressChart]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ModalNuevoTema);
+    fixture = TestBed.createComponent(ProgressChart);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

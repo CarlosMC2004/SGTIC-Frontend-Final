@@ -2,7 +2,10 @@
   background-color: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .table-actions {
@@ -53,16 +56,28 @@
   font-size: 14px;
 }
 
+
 .table-wrapper {
+  width: 100%;
+  max-height: 420px;
+  overflow-y: auto;
   overflow-x: auto;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
 }
+
 
 table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 900px;
 }
 
 th {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
   text-align: left;
   font-size: 11px;
   color: #6b7280;
@@ -70,7 +85,7 @@ th {
   text-transform: uppercase;
   padding: 16px 10px;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 2px solid #f3f4f6;
 }
 
 td {
@@ -79,6 +94,11 @@ td {
   vertical-align: middle;
   font-size: 14px;
   color: #1f2937;
+}
+
+th, td {
+  padding: 16px 10px;
+  white-space: nowrap;
 }
 
 .student-info {
@@ -95,9 +115,13 @@ td {
 .student-info .career {
   font-size: 12px;
   color: #6b7280;
+  white-space: normal;
 }
 
-.email { color: #4b5563; }
+
+.email {
+  color: #4b5563;
+}
 
 .credits {
   font-weight: 700;
@@ -113,12 +137,17 @@ td {
   font-weight: 700;
 }
 
+.center-text {
+  text-align: center;
+}
 
-.center-text { text-align: center; }
-.right-text { text-align: right; }
+.right-text {
+  text-align: right;
+}
+
 
 .btn-approve {
-  background-color: #1a5d43; /* Verde Oscuro */
+  background-color: #1a5d43;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -131,7 +160,7 @@ td {
 
 .btn-reject {
   background-color: white;
-  color: #ef4444; /* Rojo */
+  color: #ef4444;
   border: 1px solid #ef4444;
   padding: 8px 16px;
   border-radius: 6px;
@@ -139,6 +168,7 @@ td {
   font-size: 12px;
   cursor: pointer;
 }
+
 
 .pagination-bar {
   display: flex;
@@ -155,10 +185,12 @@ td {
   font-weight: 500;
 }
 
+
 .pagination-controls {
   display: flex;
   gap: 6px;
 }
+
 
 .page-btn {
   width: 32px;
@@ -175,10 +207,63 @@ td {
   font-weight: 600;
 }
 
-.page-btn span { font-size: 16px; }
+
+.page-btn span {
+  font-size: 16px;
+}
+
 
 .page-btn.active {
   background-color: #1a5d43;
   color: white;
   border-color: #1a5d43;
+}
+
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pendiente {
+  background-color: #fef08a;
+  color: #854d0e;
+}
+
+.aprobada {
+  background-color: #bbf7d0;
+  color: #166534;
+}
+
+.rechazada {
+  background-color: #fecaca;
+  color: #991b1b;
+}
+
+
+.btn-filtrar {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background-color: white;
+  font-weight: bold;
+  color: #333;
+  margin-left: auto;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+
+.btn-filtrar:hover {
+  border-color: #1a5632;
+}
+
+
+.btn-filtrar:focus {
+  outline: none;
+  border-color: #1a5632;
+  box-shadow: 0 0 0 2px rgba(26, 86, 50, 0.2);
 }

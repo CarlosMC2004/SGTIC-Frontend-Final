@@ -1,0 +1,39 @@
+<div class="layout-wrapper">
+
+  <app-sidebar role="estudiante"></app-sidebar>
+
+  <main class="main-content">
+
+    <header class="top-bar">
+      <div class="breadcrumbs">
+        <span class="text-muted">Dashboard</span>
+        <span class="separator">›</span>
+        <span class="current">Resumen General</span>
+      </div>
+    </header>
+
+    <section class="page-header">
+      <div class="header-text">
+        <h1>Mi Trabajo de Titulación</h1>
+        <p>Sistema de Gestión de Trabajos de Titulación · Período 2025–2026</p>
+      </div>
+    </section>
+
+    <div class="dashboard-content-grid">
+
+      <section class="chart-section">
+        <app-progress-chart></app-progress-chart>
+      </section>
+
+      <section class="bottom-panels-grid">
+        <div class="panel-wrapper">
+          <app-upcoming-deliveries [deliveries]="upcomingDeliveries"></app-upcoming-deliveries>
+        </div>
+        <div class="panel-wrapper">
+          <app-pending-meetings [meetings]="pendingMeetings"></app-pending-meetings>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>

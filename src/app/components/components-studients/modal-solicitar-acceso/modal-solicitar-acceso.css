@@ -1,0 +1,207 @@
+/* Fondo oscuro con difuminado (Blur) */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px); /* Este es el efecto que difumina lo que está detrás */
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Contenedor principal del modal */
+.modal-container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 550px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden; /* Importante para que el header verde respete los bordes redondeados */
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Header Verde */
+.modal-header {
+  background-color: #1a5d43;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  color: white;
+}
+
+.header-titles h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.header-titles .subtitle {
+  font-size: 11px;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  margin-top: 4px;
+  display: block;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  padding: 0;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* Cuerpo del formulario */
+.modal-body {
+  padding: 32px;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #495057;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 8px;
+}
+
+.margin-top {
+  margin-top: 32px;
+}
+
+/* Sistema de Grid para inputs */
+.form-row {
+  margin-bottom: 16px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #343a40;
+}
+
+/* Estilos de los inputs y selects */
+input, select {
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #495057;
+  transition: all 0.2s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #1a5d43;
+  box-shadow: 0 0 0 3px rgba(26, 93, 67, 0.1);
+}
+
+select:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Wrapper para inputs con iconos */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper .icon {
+  position: absolute;
+  left: 12px;
+  color: #adb5bd;
+  font-size: 20px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-left: 40px;
+  box-sizing: border-box;
+}
+
+.error-msg {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Footer y Botones */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.btn-cancel {
+  background: none;
+  border: none;
+  color: #1a5d43;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 10px 16px;
+}
+
+.btn-submit {
+  background-color: #1a5d43;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-submit .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: #134532;
+}
+
+/* Estado deshabilitado muy notorio */
+.btn-submit:disabled {
+  background-color: #a5d0be;
+  cursor: not-allowed;
+}

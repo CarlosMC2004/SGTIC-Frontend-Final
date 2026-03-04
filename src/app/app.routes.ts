@@ -43,13 +43,29 @@ export const routes: Routes = [
     ]
   },
   // Rutas de Coordinador (ejemplo para futuro)
-  /*{
+  {
     path: 'coordinator',
     canActivate: [authGuard],
     children: [
-      { path: 'dashboard', loadComponent: () => import('./pages/coordinator/dashboard').then(m => m.DashboardComponent) }
+      //{ path: 'dashboard', loadComponent: () => import('./pages/coordinator/dashboard').then(m => m.DashboardComponent) }
+      {
+        path: 'StudentRequests',
+        loadComponent: () => import('./pages/coordinator/student-requests/student-requests').then(m => m.StudentRequests)
+      },
+      {
+        path: 'BankThemes',
+        loadComponent: () => import('./pages/coordinator/bank-themes/bank-themes').then(m => m.BankThemes)
+      },
+      {
+        path: 'Assignments',
+        loadComponent: () =>import('./pages/coordinator/assignments/assignments').then(m => m.Assignments)
+      },
+      {
+        path: 'Teachers',
+        loadComponent: () => import('./pages/coordinator/teachers/teachers').then(m => m.Teachers)
+      }
     ]
-  }, */
+  },
 
   {
     path: 'student',
