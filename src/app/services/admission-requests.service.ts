@@ -20,21 +20,22 @@ export interface AdmissionRequest {
 @Injectable({
   providedIn: 'root'
 })
-
 export class AdmissionRequestsService {
 
   private apiUrl = 'http://localhost:8080/api/solicitudes';
+
   constructor(private http: HttpClient) { }
-  getRequestsByCareer(idCareer: number): Observable<AdmissionRequest[]> {
-    return this.http.get<AdmissionRequest[]>(`http://localhost:8080/api/solicitudes/coordinador/carrera/${idCareer}`);
+
+  getRequestsByFaculty(idFaculty: number): Observable<AdmissionRequest[]> {
+    return this.http.get<AdmissionRequest[]>(`${this.apiUrl}/coordinador/facultad/${idFaculty}`);
   }
 
   aprobarSolicitud(idSolicitud: number): Observable<any> {
-    return this.http.put(`http://localhost:8080/api/solicitudes/aprobar/${idSolicitud}`, {});
+    return this.http.put(`${this.apiUrl}/aprobar/${idSolicitud}`, {});
   }
 
   rechazarSolicitud(idSolicitud: number, motivo: string): Observable<any> {
-    const body = { motivo: motivo };
-    return this.http.put(`http://localhost:8080/api/solicitudes/rechazar/${idSolicitud}`, body);
+    // Enviamos el motivo en el cuerpo para que el sp_ lo guarde en 'observaciones'
+    return this.http.put(`${this.apiUrl}/rechazar/${idSolicitud}`, { motivo: motivo });
   }
 }

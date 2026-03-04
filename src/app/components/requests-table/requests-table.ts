@@ -15,7 +15,7 @@ export class RequestsTable implements OnInit {
   solicitudSeleccionadaId: number = 0;
   requestsList: AdmissionRequest[] = [];
   allRequests: AdmissionRequest[] = [];
-  idCarreraDelCoordinador: number = 1;
+  idFacultadDelCoordinador: number = 1;
   totalPendientes: number = 0;
   totalAprobadas: number = 0;
   totalRechazadas: number = 0;
@@ -31,7 +31,7 @@ export class RequestsTable implements OnInit {
   }
 
   cargarSolicitudes() {
-    this.admissionService.getRequestsByCareer(this.idCarreraDelCoordinador).subscribe({
+    this.admissionService.getRequestsByFaculty(this.idFacultadDelCoordinador).subscribe({
       next: (datos) => {
         this.allRequests = datos;
         this.calcularEstadisticas();
@@ -114,5 +114,6 @@ export class RequestsTable implements OnInit {
       }
     });
   }
+
   closeModal() { this.showModal = false; }
 }

@@ -1,24 +1,27 @@
 .layout-container {
   display: flex;
+  width: 100%;
   min-height: 100vh;
   background-color: #f8fafc;
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
 
 .main-area {
   flex: 1;
   display: flex;
   flex-direction: column;
+  margin-left: 260px;
+  width: calc(100% - 260px);
 }
 
 .content-body {
   padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
+  margin: 0;
   width: 100%;
+  box-sizing: border-box;
 }
 
-/* Buscador y Botón */
 .toolbar {
   background-color: white;
   padding: 16px;
@@ -100,11 +103,10 @@
 
 .topics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 24px;
 }
 
-/* estilo de cada tarjeta */
 .topic-card {
   background: white;
   border: 1px solid #e2e8f0;
@@ -137,7 +139,6 @@
   font-size: 14px;
   color: #475569;
   line-height: 1.5;
-  /* Truncar texto a 3 líneas */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -164,9 +165,20 @@
   letter-spacing: 0.05em;
 }
 
-.badge.software { background: #e0f2fe; color: #0284c7; }
-.badge.computer { background: #dcfce7; color: #16a34a; }
-.badge.ai       { background: #f3e8ff; color: #9333ea; }
+.badge.software {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.badge.computer {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.badge.ai {
+  background: #f3e8ff;
+  color: #9333ea;
+}
 
 .btn-icon {
   background: white;
@@ -212,7 +224,9 @@
   color: #64748b;
 }
 
-.pagination button:last-child { border-right: none; }
+.pagination button:last-child {
+  border-right: none;
+}
 
 .page-num.active {
   background-color: #1a5d43;
