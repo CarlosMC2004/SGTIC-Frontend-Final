@@ -7,6 +7,11 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/general/login/login').then(m => m.LoginComponent)
   },
+  {
+    path: 'hoja-de-vida',
+    canActivate: [authGuard], // Opcional, pero recomendado para que no entren sin sesión
+    loadComponent: () => import('./components/modal-resume/modal-resume').then(m => m.ResumeModal)
+  },
   // Rutas de Administrador
   {
     path: 'admin',

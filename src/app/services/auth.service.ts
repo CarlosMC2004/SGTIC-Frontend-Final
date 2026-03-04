@@ -38,7 +38,8 @@ export class AuthService {
       email: authResult.email,
       fullName: authResult.fullName,
       roles: authResult.roles,
-      context: authResult.context
+      context: authResult.context,
+      primerIngreso: authResult.primerIngreso
     };
 
     sessionStorage.setItem(this.USER_KEY, JSON.stringify(user));

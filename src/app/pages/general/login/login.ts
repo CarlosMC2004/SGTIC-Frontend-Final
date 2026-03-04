@@ -37,18 +37,30 @@ export class LoginComponent {
   onSubmit() {
     this.errorMessage = '';
 
+    // 1. Validación del formulario
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
+    // 2. Activamos el estado de carga
     this.isLoading = true;
 
+    // 3. Petición al backend
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         this.isLoading = false;
 
-        // Redirección basada en roles
+        // ---> VALIDACIÓN DE PRIMER INGRESO <---
+        if (response.primerIngreso === false) {
+          this.router.navigate(['/hoja-de-vida']).catch(err => {
+            console.error('Error de enrutamiento: ¿Ya registraste /hoja-de-vida en tus rutas?', err);
+            this.errorMessage = 'Error interno: La ruta de destino no existe.';
+          });
+          return; // Detiene la ejecución aquí
+        }
+
+        // ---> REDIRECCIÓN BASADA EN ROLES <---
         const roles = response.roles;
 
         if (roles.includes('administrador_sgtic')) {
@@ -66,7 +78,9 @@ export class LoginComponent {
         }
       },
       error: (error) => {
+        // 4. Manejo de errores
         this.isLoading = false;
+        
         if (error.status === 401 || error.status === 403) {
           this.errorMessage = 'Credenciales incorrectas o usuario inactivo';
         } else if (error.status === 0) {
