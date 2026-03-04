@@ -1,0 +1,139 @@
+<div class="layout-wrapper">
+  
+  <app-sidebar role="estudiante"></app-sidebar>
+
+  <main class="main-content">
+    
+    <app-topbar></app-topbar>
+
+    <div class="page-container">
+      
+      <div class="page-header">
+        <h1>Configuración de Titulación</h1>
+        <p>Selecciona tu modalidad y define el tema para tu proyecto de grado.</p>
+      </div>
+
+      <section class="config-section">
+        <h2 class="section-title"><span class="step-number">1</span> Modalidad de Titulación</h2>
+        
+        <div class="modality-grid">
+          
+          <div class="modality-card" 
+               *ngFor="let option of modalityOptions"
+               [class.active]="selectedModalityId === option.idOption" 
+               (click)="selectModality(option.idOption)">
+            
+            <div class="card-header">
+              <div class="icon-wrapper">
+                <span class="material-symbols-outlined">{{ getIconForOption(option.name) }}</span>
+              </div>
+              
+              <span class="material-symbols-outlined check-icon" *ngIf="selectedModalityId === option.idOption">check_circle</span>
+              <span class="material-symbols-outlined empty-icon" *ngIf="selectedModalityId !== option.idOption">radio_button_unchecked</span>
+            </div>
+            
+            <h3>{{ option.name }}</h3>
+            <p>{{ option.description }}</p>
+            
+          </div>
+          
+        </div>
+      </section>
+
+      <section class="config-section">
+        <h2 class="section-title"><span class="step-number">2</span> Selección de Tema</h2>
+        
+        <div class="tabs-container">
+          <div class="tabs-header">
+            <button class="tab-btn" [class.active]="activeTab === 'banco'" (click)="switchTab('banco')">
+              <span class="material-symbols-outlined">library_books</span> Banco de Temas
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'proponer'" (click)="switchTab('proponer')">
+              <span class="material-symbols-outlined">edit_document</span> Proponer Nuevo Tema
+            </button>
+          </div>
+
+          <div class="tab-content">
+            
+            <div *ngIf="activeTab === 'banco'" class="banco-temas-view">
+              <div class="search-bar">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Buscar por palabra clave, profesor o área...">
+              </div>
+
+              <div class="topics-list">
+                <div class="topic-card" *ngFor="let tema of bancoTemas" [class.selected]="selectedTopicId === tema.id">
+                  <div class="topic-info">
+                    <div class="topic-tags">
+                      <span class="tag tag-blue">{{ tema.tags[0] }}</span>
+                      <span class="tag tag-gray"><span class="material-symbols-outlined icon-tiny">schedule</span> {{ tema.tags[1] }}</span>
+                    </div>
+                    <h4>{{ tema.titulo }}</h4>
+                    <p>{{ tema.descripcion }}</p>
+                    <span class="profesor"><span class="material-symbols-outlined icon-tiny">person</span> Propuesto por: {{ tema.profesor }}</span>
+                  </div>
+                  <div class="topic-action">
+                    <button class="btn-select-topic" 
+                            *ngIf="selectedTopicId !== tema.id" 
+                            (click)="selectTopic(tema.id)">
+                      Seleccionar
+                    </button>
+                    <button class="btn-topic-selected" 
+                            *ngIf="selectedTopicId === tema.id" 
+                            (click)="selectTopic(tema.id)">
+                      <span class="material-symbols-outlined">check</span> Seleccionado
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'proponer'" class="proponer-tema-view">
+              <form [formGroup]="proposeForm" class="form-propose">
+                <div class="form-group">
+                  <label>Título de la propuesta <span class="text-danger">*</span></label>
+                  <input type="text" formControlName="titulo" placeholder="Ej. Implementación de una red neuronal para...">
+                </div>
+                
+                <div class="form-group">
+                  <label>Tipo de proyecto <span class="text-danger">*</span></label>
+                  <select formControlName="tipoProyecto">
+                    <option value="" disabled selected>Seleccione el enfoque...</option>
+                    <option value="implementacion">Implementación de Software</option>
+                    <option value="investigacion">Investigación Pura</option>
+                    <option value="infraestructura">Infraestructura y Redes</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Breve descripción o justificación <span class="text-danger">*</span></label>
+                  <textarea formControlName="descripcion" rows="4" placeholder="Describe brevemente el problema a resolver y tu enfoque..."></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Documento de propuesta (PDF)</label>
+                  <div class="upload-zone" (click)="fileInput.click()">
+                    <span class="material-symbols-outlined upload-icon">cloud_upload</span>
+                    <p>Arrastra tu documento aquí o <strong>haz clic para buscar</strong></p>
+                    <span class="upload-hint">Tamaño máximo: 5MB (Solo PDF)</span>
+                    <input type="file" #fileInput style="display: none" accept=".pdf" (change)="onFileSelected($event)">
+                    <p *ngIf="selectedFileName" class="file-selected-name">Archivo: {{ selectedFileName }}</p>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <div class="action-bar">
+        <button class="btn-cancel" (click)="cancelar()">Cancelar</button>
+        <button class="btn-save" (click)="guardar()">
+          Guardar Configuración <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+</div>

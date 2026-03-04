@@ -50,6 +50,20 @@ export const routes: Routes = [
       { path: 'dashboard', loadComponent: () => import('./pages/coordinator/dashboard').then(m => m.DashboardComponent) }
     ]
   }, */
+
+  {
+    path: 'student',
+    canActivate: [authGuard],
+    children: [
+      {path: 'dashboard',
+      loadComponent: () => import('./pages/student/studient-dashboard/student-dashboard').then(m => m.StudentDashboard)},
+      {
+        path: 'process-setup',
+        loadComponent: () => import('./pages/student/process-setup/process-setup').then(m => m.ProcessSetup)}
+    ]
+  },
+
+
   // Redirecciones por defecto
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }

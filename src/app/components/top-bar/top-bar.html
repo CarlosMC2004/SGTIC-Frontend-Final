@@ -1,0 +1,58 @@
+<header class="topbar">
+  <div class="topbar-left"></div>
+
+  <div class="topbar-right">
+    
+    <div class="period-selector" (click)="togglePeriodMenu($event)">
+      <span class="material-symbols-outlined icon-small">calendar_month</span>
+      <span class="period-text">REGULAR 2025-2026 SPA</span>
+      <span class="material-symbols-outlined icon-small">expand_more</span>
+      
+      <div class="dropdown-menu period-menu" *ngIf="isPeriodMenuOpen" (click)="$event.stopPropagation()">
+        <ul>
+          <li class="active">REGULAR 2025-2026 SPA</li>
+          <li>REGULAR 2024-2025 SPA</li>
+        </ul>
+      </div>
+    </div>
+
+    <button class="notification-btn">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="badge">5</span>
+    </button>
+
+    <div class="user-profile" (click)="toggleProfileMenu($event)">
+      <div class="user-info hide-on-mobile">
+        <span class="user-name">Juan Pérez</span>
+        <span class="user-role">Estudiante</span>
+      </div>
+      <img src="https://ui-avatars.com/api/?name=Juan+Perez&background=e9ecef&color=1a5d43" alt="Avatar" class="avatar">
+      <span class="material-symbols-outlined icon-small hide-on-mobile">expand_more</span>
+
+      <div class="dropdown-menu profile-menu" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
+        
+        <div class="menu-section-title">
+          <span class="material-symbols-outlined icon-tiny">person</span> PERFILES DISPONIBLES
+        </div>
+        <ul>
+          <li class="active"><span class="material-symbols-outlined icon-small">check</span> ESTUDIANTE</li>
+        </ul>
+        <hr>
+        <ul>
+          <li><span class="material-symbols-outlined icon-small">person_outline</span> Mi perfil</li>
+          <li class="flex-between">
+            <div class="flex-center"><span class="material-symbols-outlined icon-small">computer</span> Mis dispositivos</div>
+            <span class="badge-new">NUEVO</span>
+          </li>
+          <li><span class="material-symbols-outlined icon-small">image</span> Cambio de foto</li>
+          <li><span class="material-symbols-outlined icon-small">lock</span> Cambio de clave</li>
+        </ul>
+        <hr>
+        <ul class="logout-menu">
+          <li class="logout-item"><span class="material-symbols-outlined icon-small">logout</span> Cerrar sesión</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</header>
