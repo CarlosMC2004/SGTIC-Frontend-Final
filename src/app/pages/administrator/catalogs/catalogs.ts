@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ModalPeriodoComponent } from '../../../components/modal-periodo/modal-periodo.component';
+import { PeriodoService } from '../../../services/modelo-service/periodo.service';
 
 interface PeriodoAcademico {
   id: number;
@@ -15,36 +17,27 @@ interface CatalogRole {
   nombre: string;
   descripcion: string;
   fechaCreacion: string;
-  sistema: boolean; // Si es un rol del sistema (no se puede eliminar)
+  sistema: boolean;
 }
 
 @Component({
   selector: 'app-catalogs',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ModalPeriodoComponent],
   templateUrl: './catalogs.html',
   styleUrls: ['./catalogs.css']
 })
-export class CatalogsComponent {
+export class CatalogsComponent implements OnInit {
+  @ViewChild(ModalPeriodoComponent) modalComponent!: ModalPeriodoComponent;
+  
   activeTab: 'periodos' | 'roles' = 'periodos';
 
-  periodos: PeriodoAcademico[] = [
-    {
-      id: 1,
-      nombre: '2024-2025',
-      fechaInicio: '2024-09-01',
-      fechaFin: '2025-02-28',
-      activo: true
-    },
-    {
-      id: 2,
-      nombre: '2024-2025 (Intensivo)',
-      fechaInicio: '2024-11-01',
-      fechaFin: '2025-01-31',
-      activo: false
-    }
-  ];
+  showPeriodoModal = false;
+  selectedPeriodo: any = null;
+  isModalSaving = false;
 
+  periodos: PeriodoAcademico[] = [];
+  
   roles: CatalogRole[] = [
     {
       id: 1,
@@ -83,36 +76,123 @@ export class CatalogsComponent {
     }
   ];
 
-  newPeriodo = {
-    nombre: '',
-    fechaInicio: '',
-    fechaFin: ''
-  };
+  constructor(private periodoService: PeriodoService) {}
 
-  togglePeriodoStatus(id: number) {
-    const periodo = this.periodos.find(p => p.id === id);
+  ngOnInit() {
+    this.loadPeriodos();
+  }
+
+  loadPeriodos() {
+    console.log('Cargando períodos...');
+    this.periodoService.getPeriodos().subscribe({
+      next: (data) => {
+        console.log('Períodos cargados:', data);
+        this.periodos = data.map((p: any) => ({
+          id: p.idPeriod,
+          nombre: p.name,
+          fechaInicio: p.startDate,
+          fechaFin: p.endDate,
+          activo: p.active
+        }));
+      },
+      error: (err) => {
+        console.error('Error cargando períodos:', err);
+      }
+    });
+  }
+
+  openPeriodoModal(periodo?: any) {
     if (periodo) {
-      periodo.activo = !periodo.activo;
+      this.selectedPeriodo = {
+        id: periodo.id,
+        name: periodo.nombre,
+        startDate: periodo.fechaInicio,
+        endDate: periodo.fechaFin,
+        active: periodo.activo
+      };
+    } else {
+      this.selectedPeriodo = null;
+    }
+    this.showPeriodoModal = true;
+  }
+
+  closePeriodoModal() {
+    if (!this.isModalSaving) {
+      this.showPeriodoModal = false;
+      this.selectedPeriodo = null;
     }
   }
 
-  createPeriodo() {
-    if (this.newPeriodo.nombre && this.newPeriodo.fechaInicio && this.newPeriodo.fechaFin) {
-      this.periodos.push({
-        id: this.periodos.length + 1,
-        ...this.newPeriodo,
-        activo: true
-      });
+  onModalSaving(saving: boolean) {
+    this.isModalSaving = saving;
+  }
 
-      this.newPeriodo = {
-        nombre: '',
-        fechaInicio: '',
-        fechaFin: ''
+  handlePeriodoSave(periodoData: any) {
+    console.log('Datos recibidos del modal:', periodoData);
+    
+    const periodoBackend = {
+      name: periodoData.name,
+      startDate: periodoData.startDate,
+      endDate: periodoData.endDate,
+      active: periodoData.id ? periodoData.active : true,
+      enrollmentDeadline: periodoData.startDate
+    };
+
+    console.log('Enviando al backend:', periodoBackend);
+    
+    const request = periodoData.id 
+      ? this.periodoService.updatePeriodo(periodoData.id, periodoBackend)
+      : this.periodoService.createPeriodo(periodoBackend);
+
+    request.subscribe({
+      next: (response) => {
+        console.log('Operación exitosa:', response);
+        this.loadPeriodos();
+        setTimeout(() => {
+          if (this.modalComponent) {
+            this.modalComponent.resetSavingState();
+          }
+          this.showPeriodoModal = false;
+          this.selectedPeriodo = null;
+        }, 300);
+      },
+      error: (err) => {
+        console.error('Error:', err);
+        alert('Error al guardar el período: ' + (err.error?.message || 'Error desconocido'));
+        if (this.modalComponent) {
+          this.modalComponent.resetSavingState();
+        }
+      }
+    });
+  }
+
+  togglePeriodoStatus(id: number) {
+    const periodo = this.periodos.find(p => p.id === id);
+    if (periodo && !this.isModalSaving) {
+      const estadoAnterior = periodo.activo;
+      periodo.activo = !periodo.activo;
+      
+      const periodoActualizado = {
+        name: periodo.nombre,
+        startDate: periodo.fechaInicio,
+        endDate: periodo.fechaFin,
+        active: periodo.activo,
+        enrollmentDeadline: periodo.fechaInicio
       };
+      
+      this.periodoService.updatePeriodo(id, periodoActualizado).subscribe({
+        error: (err) => {
+          console.error('Error actualizando estado:', err);
+          periodo.activo = estadoAnterior;
+          alert('Error al actualizar el estado');
+        }
+      });
     }
   }
 
   deleteRole(id: number) {
-    this.roles = this.roles.filter(r => r.id !== id);
+    if(confirm('¿Estás seguro que quieres eliminar este rol?')) {
+      this.roles = this.roles.filter(r => r.id !== id);
+    }
   }
 }

@@ -28,14 +28,19 @@
 <div class="tab-content" *ngIf="activeTab === 'periodos'">
 
   <div class="form-inline">
-    <input type="text" placeholder="Nombre del período (ej: 2025-2026)" [(ngModel)]="newPeriodo.nombre">
-    <input type="date" placeholder="Fecha inicio" [(ngModel)]="newPeriodo.fechaInicio">
-    <input type="date" placeholder="Fecha fin" [(ngModel)]="newPeriodo.fechaFin">
-    <button class="btn-primary" (click)="createPeriodo()" [disabled]="!newPeriodo.nombre || !newPeriodo.fechaInicio || !newPeriodo.fechaFin">
+    <button class="btn-primary" (click)="openPeriodoModal()" [disabled]="isModalSaving">
       <span class="material-symbols-outlined">add</span>
       Crear Período
     </button>
   </div>
+
+  <app-modal-periodo
+    *ngIf="showPeriodoModal"
+    [periodo]="selectedPeriodo"
+    (close)="closePeriodoModal()"
+    (save)="handlePeriodoSave($event)"
+    (saving)="onModalSaving($event)">
+  </app-modal-periodo>
 
   <div class="table-container">
     <table>
@@ -62,10 +67,13 @@
         </td>
         <td>
           <div class="action-buttons">
-            <button class="btn-icon" title="Editar">
+            <button class="btn-icon" (click)="openPeriodoModal(periodo)" title="Editar" [disabled]="isModalSaving">
               <span class="material-symbols-outlined">edit</span>
             </button>
-            <div class="toggle-switch" [class.active]="periodo.activo" (click)="togglePeriodoStatus(periodo.id)">
+            <div class="toggle-switch" 
+                 [class.active]="periodo.activo" 
+                 (click)="!isModalSaving && togglePeriodoStatus(periodo.id)"
+                 [class.disabled]="isModalSaving">
               <div class="toggle-circle"></div>
             </div>
           </div>
