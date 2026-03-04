@@ -72,6 +72,10 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  getCurrentUser() {
+    return this.currentUserSubject.value;
+  }
+
   hasRole(role: string): boolean {
     const user = this.currentUserSubject.value;
     return user ? user.roles.includes(role) : false;
@@ -93,5 +97,19 @@ export class AuthService {
 
   getCareerId(): number | null {
     return this.userContext?.idCareer || null;
+  }
+
+  changeFirstPassword(newPassword: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/change-password`, { newPassword })
+      .pipe(
+        tap(() => {
+          const currentUser = this.currentUserSubject.value;
+          if (currentUser) {
+            currentUser.primerIngreso = true;
+            sessionStorage.setItem(this.USER_KEY, JSON.stringify(currentUser));
+            this.currentUserSubject.next(currentUser);
+          }
+        })
+      );
   }
 }

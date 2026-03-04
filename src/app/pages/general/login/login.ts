@@ -53,7 +53,7 @@ export class LoginComponent {
 
         // ---> VALIDACIÓN DE PRIMER INGRESO <---
         if (response.primerIngreso === false) {
-          this.router.navigate(['/hoja-de-vida']).catch(err => {
+          this.router.navigate(['/change-password']).catch(err => {
             console.error('Error de enrutamiento: ¿Ya registraste /hoja-de-vida en tus rutas?', err);
             this.errorMessage = 'Error interno: La ruta de destino no existe.';
           });
