@@ -29,7 +29,7 @@ input {
 }
 
 input::placeholder {
-  color: var(--text-muted);
+  color: rgba(140,140,140,0.68);
   font-size: var(--font-size-sm);
 }
 
