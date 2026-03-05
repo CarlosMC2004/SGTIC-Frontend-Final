@@ -1,0 +1,69 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ periodo?.id ? 'Editar Período' : 'Nuevo Período' }}</h2>
+      <button class="btn-icon" (click)="closeModal()" [disabled]="isSaving">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Nombre del período *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formData.name" 
+          placeholder="ej: 2025-2026" 
+          name="name"
+          [disabled]="isSaving">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha Inicio *</label>
+          <input 
+            type="date" 
+            [(ngModel)]="formData.startDate" 
+            name="startDate"
+            [disabled]="isSaving">
+        </div>
+        <div class="form-group">
+          <label>Fecha Fin *</label>
+          <input 
+            type="date" 
+            [(ngModel)]="formData.endDate" 
+            name="endDate"
+            [disabled]="isSaving">
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="periodo?.id">
+        <label>Estado</label>
+        <div class="toggle-switch" 
+             [class.active]="formData.active" 
+             (click)="!isSaving && (formData.active = !formData.active)"
+             [class.disabled]="isSaving">
+          <div class="toggle-circle"></div>
+          <span>{{ formData.active ? 'Activo' : 'Inactivo' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        class="btn-secondary" 
+        (click)="closeModal()" 
+        [disabled]="isSaving">
+        Cancelar
+      </button>
+      <button 
+        class="btn-primary" 
+        (click)="savePeriodo()" 
+        [disabled]="!isValid() || isSaving">
+        <span class="material-symbols-outlined" *ngIf="!isSaving">save</span>
+        <span class="spinner" *ngIf="isSaving"></span>
+        <span>{{ isSaving ? 'Guardando...' : (periodo?.id ? 'Actualizar' : 'Crear') }} Período</span>
+      </button>
+    </div>
+  </div>
+</div>

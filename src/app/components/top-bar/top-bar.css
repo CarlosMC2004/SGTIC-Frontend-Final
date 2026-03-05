@@ -13,7 +13,13 @@
   /* Márgenes negativos para que ocupe el 100% del contenedor sin importar el padding del padre */
   margin: -24px -32px 32px -32px; 
 }
-
+.empty-message {
+  padding: 16px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 13px;
+  font-style: italic;
+}
 .topbar-right {
   display: flex;
   align-items: center;
