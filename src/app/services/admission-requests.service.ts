@@ -26,16 +26,14 @@ export class AdmissionRequestsService {
 
   constructor(private http: HttpClient) { }
 
-  getRequestsByFaculty(idFaculty: number): Observable<AdmissionRequest[]> {
-    return this.http.get<AdmissionRequest[]>(`${this.apiUrl}/coordinador/facultad/${idFaculty}`);
+  getRequestsByCoordinator(idUser: number): Observable<AdmissionRequest[]> {
+    return this.http.get<AdmissionRequest[]>(`${this.apiUrl}/coordinador/${idUser}`);
   }
-
   aprobarSolicitud(idSolicitud: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/aprobar/${idSolicitud}`, {});
   }
 
   rechazarSolicitud(idSolicitud: number, motivo: string): Observable<any> {
-    // Enviamos el motivo en el cuerpo para que el sp_ lo guarde en 'observaciones'
     return this.http.put(`${this.apiUrl}/rechazar/${idSolicitud}`, { motivo: motivo });
   }
 }

@@ -15,7 +15,7 @@ export class RequestsTable implements OnInit {
   solicitudSeleccionadaId: number = 0;
   requestsList: AdmissionRequest[] = [];
   allRequests: AdmissionRequest[] = [];
-  idFacultadDelCoordinador: number = 1;
+  idUser: number = 18;
   totalPendientes: number = 0;
   totalAprobadas: number = 0;
   totalRechazadas: number = 0;
@@ -31,7 +31,7 @@ export class RequestsTable implements OnInit {
   }
 
   cargarSolicitudes() {
-    this.admissionService.getRequestsByFaculty(this.idFacultadDelCoordinador).subscribe({
+    this.admissionService.getRequestsByCoordinator(this.idUser).subscribe({
       next: (datos) => {
         this.allRequests = datos;
         this.calcularEstadisticas();
