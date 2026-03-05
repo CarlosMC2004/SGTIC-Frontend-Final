@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalPeriodoComponent } from '../../../components/modal-periodo/modal-periodo.component';
 import { PeriodoService } from '../../../services/modelo-service/periodo.service';
+import { ToastMensajeComponent } from '../../../components/Toast/toast-mensaje.component';
 
 interface PeriodoAcademico {
   id: number;
@@ -23,12 +24,13 @@ interface CatalogRole {
 @Component({
   selector: 'app-catalogs',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalPeriodoComponent],
+  imports: [CommonModule, FormsModule, ModalPeriodoComponent, ToastMensajeComponent],
   templateUrl: './catalogs.html',
   styleUrls: ['./catalogs.css']
 })
 export class CatalogsComponent implements OnInit {
   @ViewChild(ModalPeriodoComponent) modalComponent!: ModalPeriodoComponent;
+  @ViewChild('toast') toast!: ToastMensajeComponent;
   
   activeTab: 'periodos' | 'roles' = 'periodos';
 
@@ -38,49 +40,32 @@ export class CatalogsComponent implements OnInit {
 
   periodos: PeriodoAcademico[] = [];
   
-  roles: CatalogRole[] = [
-    {
-      id: 1,
-      nombre: 'administrador_sgtic',
-      descripcion: 'Administrador del Sistema de Gestión de Trabajos de Titulación',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 2,
-      nombre: 'coordinador_facultad',
-      descripcion: 'Coordinador académico a nivel de facultad',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 3,
-      nombre: 'coordinador_carrera',
-      descripcion: 'Coordinador académico a nivel de carrera',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 4,
-      nombre: 'docente',
-      descripcion: 'Personal docente y tutores',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 5,
-      nombre: 'estudiante',
-      descripcion: 'Estudiantes en proceso de titulación',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    }
-  ];
+  roles: CatalogRole[] = [ /* ... */ ];
+  
+  // 👇 AGREGAR ESTAS PROPIEDADES COMPUTADAS AQUÍ
+  get periodosActivos(): number {
+    return this.periodos.filter(p => p.activo).length;
+  }
+
+  get periodosInactivos(): number {
+    return this.periodos.filter(p => !p.activo).length;
+  }
 
   constructor(private periodoService: PeriodoService) {}
 
   ngOnInit() {
     this.loadPeriodos();
   }
+
+  
+// NUEVO MÉTODO PARA MOSTRAR TOAST DE FORMA SEGURA
+mostrarToast(mensaje: string, tipo: 'exito' | 'error' = 'exito') {
+  setTimeout(() => {
+    if (this.toast) {
+      this.toast.mostrarToast(mensaje, tipo);  // AHORA LLAMA A mostrarToast
+    }
+  });
+}
 
   loadPeriodos() {
     console.log('Cargando períodos...');
@@ -97,6 +82,7 @@ export class CatalogsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error cargando períodos:', err);
+        this.mostrarToast('❌ Error al cargar los períodos', 'error');
       }
     });
   }
@@ -128,43 +114,52 @@ export class CatalogsComponent implements OnInit {
   }
 
   handlePeriodoSave(periodoData: any) {
-    console.log('Datos recibidos del modal:', periodoData);
-    
-    const periodoBackend = {
-      name: periodoData.name,
-      startDate: periodoData.startDate,
-      endDate: periodoData.endDate,
-      active: periodoData.id ? periodoData.active : true,
-      enrollmentDeadline: periodoData.startDate
-    };
+  console.log('Datos recibidos del modal:', periodoData);
+  
+  const periodoBackend = {
+    name: periodoData.name,
+    startDate: periodoData.startDate,
+    endDate: periodoData.endDate,
+    active: periodoData.id ? periodoData.active : true,
+    enrollmentDeadline: periodoData.startDate
+  };
 
-    console.log('Enviando al backend:', periodoBackend);
-    
-    const request = periodoData.id 
-      ? this.periodoService.updatePeriodo(periodoData.id, periodoBackend)
-      : this.periodoService.createPeriodo(periodoBackend);
+  console.log('Enviando al backend:', periodoBackend);
+  
+  const request = periodoData.id 
+    ? this.periodoService.updatePeriodo(periodoData.id, periodoBackend)
+    : this.periodoService.createPeriodo(periodoBackend);
 
-    request.subscribe({
-      next: (response) => {
-        console.log('Operación exitosa:', response);
-        this.loadPeriodos();
-        setTimeout(() => {
-          if (this.modalComponent) {
-            this.modalComponent.resetSavingState();
-          }
-          this.showPeriodoModal = false;
-          this.selectedPeriodo = null;
-        }, 300);
-      },
-      error: (err) => {
-        console.error('Error:', err);
-        alert('Error al guardar el período: ' + (err.error?.message || 'Error desconocido'));
+  request.subscribe({
+    next: (response) => {
+      console.log('Operación exitosa:', response);
+      this.loadPeriodos();
+      
+      // 👇 MOSTRAR MENSAJE ANTES DE CERRAR EL MODAL
+      const mensaje = periodoData.id 
+        ? 'Período actualizado correctamente' 
+        : 'PERIODO ACADEMICO CREADO CORRECTAMENTE';
+      this.mostrarToast(mensaje);
+      
+      // 👇 AUMENTAR TIEMPO PARA CERRAR EL MODAL
+      setTimeout(() => {
         if (this.modalComponent) {
           this.modalComponent.resetSavingState();
         }
+        this.showPeriodoModal = false;
+        this.selectedPeriodo = null;
+      }, 1000); // 👈 AUMENTADO DE 300ms a 500ms
+    },
+    error: (err) => {
+      console.error('Error:', err);
+      this.mostrarToast(' Error al guardar el período', 'error');
+      
+      if (this.modalComponent) {
+        this.modalComponent.resetSavingState();
       }
-    });
-  }
+    }
+  });
+}
 
   togglePeriodoStatus(id: number) {
     const periodo = this.periodos.find(p => p.id === id);
@@ -181,10 +176,15 @@ export class CatalogsComponent implements OnInit {
       };
       
       this.periodoService.updatePeriodo(id, periodoActualizado).subscribe({
+        next: () => {
+          this.mostrarToast(
+            periodo.activo ?  ' PERIODO DESACTIVADO' : ' PERIODO ACTIVADO' 
+          );
+        },
         error: (err) => {
           console.error('Error actualizando estado:', err);
           periodo.activo = estadoAnterior;
-          alert('Error al actualizar el estado');
+          this.mostrarToast(' Error al actualizar el estado', 'error');
         }
       });
     }
@@ -193,6 +193,7 @@ export class CatalogsComponent implements OnInit {
   deleteRole(id: number) {
     if(confirm('¿Estás seguro que quieres eliminar este rol?')) {
       this.roles = this.roles.filter(r => r.id !== id);
+      this.mostrarToast(' Rol eliminado correctamente');
     }
   }
 }

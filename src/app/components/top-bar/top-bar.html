@@ -9,18 +9,18 @@
       <span class="period-text">{{ periodoSeleccionado?.name || 'Seleccionar período' }}</span>
       <span class="material-symbols-outlined icon-small">expand_more</span>
       
-      <!-- Menú desplegable de períodos -->
+      <!-- Menú desplegable de períodos (SOLO ACTIVOS) -->
       <div class="dropdown-menu period-menu" *ngIf="isPeriodMenuOpen" (click)="$event.stopPropagation()">
         <ul>
-          <li *ngFor="let periodo of periodos" 
-              [class.active]="periodoSeleccionado?.id === periodo.id"
+          <li *ngFor="let periodo of periodosActivos" 
+              [class.active]="periodoSeleccionado?.idPeriod === periodo.idPeriod"
               (click)="seleccionarPeriodo(periodo)">
             {{ periodo.name }}
           </li>
         </ul>
-        <!-- Mensaje si no hay períodos -->
-        <div class="empty-message" *ngIf="periodos.length === 0" style="padding: 16px; text-align: center; color: #666;">
-          No hay períodos disponibles
+        <!-- Mensaje si no hay períodos activos -->
+        <div class="empty-message" *ngIf="periodosActivos.length === 0" style="padding: 16px; text-align: center; color: #666;">
+          No hay períodos activos disponibles
         </div>
       </div>
     </div>

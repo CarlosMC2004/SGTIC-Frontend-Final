@@ -27,6 +27,39 @@
 <!-- TAB: Períodos Académicos -->
 <div class="tab-content" *ngIf="activeTab === 'periodos'">
 
+  <!-- TARJETAS DE ESTADÍSTICAS (AGREGADO) -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">event</span>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">{{ periodos.length }}</div>
+        <div class="stat-label">Total de períodos</div>
+      </div>
+    </div>
+    
+    <div class="stat-card active-card">
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">check_circle</span>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">{{ periodosActivos }}</div>
+        <div class="stat-label">Períodos activos</div>
+      </div>
+    </div>
+    
+    <div class="stat-card inactive-card">
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">cancel</span>
+      </div>
+      <div class="stat-content">
+        <div class="stat-number">{{ periodosInactivos }}</div>
+        <div class="stat-label">Períodos inactivos</div>
+      </div>
+    </div>
+  </div>
+
   <div class="form-inline">
     <button class="btn-primary" (click)="openPeriodoModal()" [disabled]="isModalSaving">
       <span class="material-symbols-outlined">add</span>
@@ -133,3 +166,5 @@
     </table>
   </div>
 </div>
+
+<app-toast-mensaje #toast></app-toast-mensaje>

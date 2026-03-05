@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PeriodoService } from '../../services/modelo-service/periodo.service';
 
@@ -11,54 +11,44 @@ import { PeriodoService } from '../../services/modelo-service/periodo.service';
 })
 export class Topbar implements OnInit {
   periodos: any[] = [];
+  periodosActivos: any[] = [];
   periodoSeleccionado: any = null;
   
   isProfileMenuOpen = false;
   isPeriodMenuOpen = false;
 
-  constructor(
-    private periodoService: PeriodoService,
-    private cdr: ChangeDetectorRef
-  ) {
-    console.log('✅ Constructor ejecutado');
-  }
+  constructor(private periodoService: PeriodoService) {}
 
   ngOnInit() {
-    console.log('✅ ngOnInit ejecutado');
     this.cargarPeriodos();
   }
 
   cargarPeriodos() {
-    console.log('📡 Cargando períodos...');
+    console.log('Cargando períodos...');
     this.periodoService.getPeriodos().subscribe({
       next: (data) => {
-        console.log('📦 Datos recibidos:', data);
-        console.log('📦 Tipo de datos:', typeof data);
-        console.log('📦 ¿Es array?', Array.isArray(data));
-        console.log('📦 Longitud:', data.length);
-        
+        console.log('Datos recibidos:', data);
         this.periodos = data;
-        console.log('📦 periodos después de asignar:', this.periodos);
         
-        if (this.periodos.length > 0) {
-          console.log('🎯 Primer período:', this.periodos[0]);
-          this.periodoSeleccionado = this.periodos[0];
-          console.log('🎯 periodoSeleccionado asignado:', this.periodoSeleccionado);
-          
-          // FORZAR DETECCIÓN DE CAMBIOS
-          this.cdr.detectChanges();
-          console.log('🔄 detectChanges ejecutado');
-          
-          // Verificar después de detectChanges
-          setTimeout(() => {
-            console.log('⏱️ Verificación retardada - periodoSeleccionado:', this.periodoSeleccionado);
-          }, 1000);
-        } else {
-          console.log('⚠️ No hay períodos en el array');
+        // Filtrar solo los activos (active = true)
+        this.periodosActivos = this.periodos.filter(p => p.active === true);
+        
+        console.log('Períodos activos:', this.periodosActivos);
+        
+        // Seleccionar el primer período activo por defecto
+        if (this.periodosActivos.length > 0) {
+          this.periodoSeleccionado = this.periodosActivos[0];
+          console.log('Período seleccionado:', this.periodoSeleccionado);
         }
       },
       error: (error) => {
-        console.error('❌ Error:', error);
+        console.error('Error al cargar períodos:', error);
+        // Datos de ejemplo para pruebas si el backend falla
+        this.periodosActivos = [
+          { idPeriod: 1, name: 'REGULAR 2025-2026 SPA', active: true },
+          { idPeriod: 2, name: 'REGULAR 2024-2025 SPA', active: true }
+        ];
+        this.periodoSeleccionado = this.periodosActivos[0];
       }
     });
   }
@@ -76,10 +66,9 @@ export class Topbar implements OnInit {
   }
 
   seleccionarPeriodo(periodo: any) {
-    console.log('👆 Seleccionando período:', periodo);
+    console.log('Período seleccionado:', periodo);
     this.periodoSeleccionado = periodo;
     this.isPeriodMenuOpen = false;
-    this.cdr.detectChanges();
   }
 
   @HostListener('document:click')
