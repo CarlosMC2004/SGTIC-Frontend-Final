@@ -15,7 +15,7 @@ export class RequestsTable implements OnInit {
   solicitudSeleccionadaId: number = 0;
   requestsList: AdmissionRequest[] = [];
   allRequests: AdmissionRequest[] = [];
-  idFacultadDelCoordinador: number = 1;
+  idFacultadDelCoordinador: number = 18;
   totalPendientes: number = 0;
   totalAprobadas: number = 0;
   totalRechazadas: number = 0;
