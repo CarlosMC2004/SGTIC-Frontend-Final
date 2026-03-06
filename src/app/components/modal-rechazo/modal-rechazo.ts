@@ -12,18 +12,19 @@ import { FormsModule } from '@angular/forms';
 export class ModalRechazo {
 
   motivoRechazo: string = '';
-  @Output() close = new EventEmitter<void>();
-  @Output() confirm = new EventEmitter<string>();
+
+  @Output() cerrar = new EventEmitter<void>();
+  @Output() confirmar = new EventEmitter<string>();
 
   onClose() {
-    this.close.emit();
+    this.cerrar.emit();
   }
 
   onConfirm() {
-    if (this.motivoRechazo.trim().length > 0) {
-      this.confirm.emit(this.motivoRechazo);
+    if (this.motivoRechazo.trim().length > 5) {
+      this.confirmar.emit(this.motivoRechazo);
     } else {
-      alert('Por favor, escriba un motivo antes de rechazar.');
+      alert('Por favor, escriba un motivo detallado antes de rechazar.');
     }
   }
 }

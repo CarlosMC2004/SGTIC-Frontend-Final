@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface AdmissionRequest {
-  idSolicitud: number;
+  id_solicitud: number;
   identificacion: string;
   nombres: string;
   apellidos: string;
@@ -11,17 +11,12 @@ export interface AdmissionRequest {
   carrera: string;
   facultad: string;
   periodo: string;
-  fechaEnvio: string;
+  fecha_envio: string;
   estado: string;
-  observaciones: string;
-  fechaRespuesta: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AdmissionRequestsService {
-
   private apiUrl = 'http://localhost:8080/api/solicitudes';
 
   constructor(private http: HttpClient) { }
@@ -29,11 +24,12 @@ export class AdmissionRequestsService {
   getRequestsByCoordinator(idUser: number): Observable<AdmissionRequest[]> {
     return this.http.get<AdmissionRequest[]>(`${this.apiUrl}/coordinador/${idUser}`);
   }
-  aprobarSolicitud(idSolicitud: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/aprobar/${idSolicitud}`, {});
+
+  aprobarSolicitud(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/aprobar/${id}`, null);
   }
 
-  rechazarSolicitud(idSolicitud: number, motivo: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/rechazar/${idSolicitud}`, { motivo: motivo });
+  rechazarSolicitud(id: number, motivo: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/rechazar/${id}`, { motivo });
   }
 }

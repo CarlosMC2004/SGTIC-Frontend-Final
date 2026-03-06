@@ -11,14 +11,12 @@
           Revise y gestione las solicitudes de proyectos de tesis de los estudiantes para el periodo académico actual.
         </p>
       </div>
-
-      <app-requests-table (estadisticasCalculadas)="recibirEstadisticas($event)"></app-requests-table>
-
       <div class="cards-grid">
         <app-status-card title="Pendientes" [count]="numPendientes" icon="pending_actions" colorType="blue"></app-status-card>
         <app-status-card title="Aprobadas" [count]="numAprobadas" icon="check_circle" colorType="green"></app-status-card>
         <app-status-card title="Rechazadas" [count]="numRechazadas" icon="cancel" colorType="red"></app-status-card>
       </div>
+      <app-requests-table (estadisticasCalculadas)="recibirEstadisticas($event)"></app-requests-table>
     </div>
   </main>
 </div>

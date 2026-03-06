@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalRechazo } from '../modal-rechazo/modal-rechazo';
 import { AdmissionRequestsService, AdmissionRequest } from '../../services/admission-requests.service';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-requests-table',
@@ -12,33 +13,47 @@ import { AdmissionRequestsService, AdmissionRequest } from '../../services/admis
 })
 export class RequestsTable implements OnInit {
   showModal = false;
-  solicitudSeleccionadaId: number = 0;
+  solicitudSeleccionadaId: number | null = null;
   requestsList: AdmissionRequest[] = [];
   allRequests: AdmissionRequest[] = [];
-  idUser: number = 18;
+  idUser: number | null = null;
   totalPendientes: number = 0;
   totalAprobadas: number = 0;
   totalRechazadas: number = 0;
+
   estadoActual: string = 'todas';
   terminoBusqueda: string = '';
 
   @Output() estadisticasCalculadas = new EventEmitter<any>();
 
-  constructor(private admissionService: AdmissionRequestsService) {}
+  constructor(
+    private admissionService: AdmissionRequestsService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    this.cargarSolicitudes();
+    const idReal = this.authService.getUserId();
+    console.log(idReal);
+    if (idReal) {
+      this.idUser = idReal;
+      this.cargarSolicitudes();
+    } else {
+      console.warn('Usuario no identificado');
+      this.authService.logout();
+    }
   }
 
   cargarSolicitudes() {
-    this.admissionService.getRequestsByCoordinator(this.idUser).subscribe({
-      next: (datos) => {
-        this.allRequests = datos;
-        this.calcularEstadisticas();
-        this.aplicarFiltros();
-      },
-      error: (err) => console.error('Error al cargar:', err)
-    });
+    if (this.idUser !== null) {
+      this.admissionService.getRequestsByCoordinator(this.idUser).subscribe({
+        next: (datos) => {
+          this.allRequests = datos;
+          this.calcularEstadisticas();
+          this.aplicarFiltros();
+        },
+        error: (err) => console.error('Error al cargar:', err)
+      });
+    }
   }
 
   aplicarFiltros() {
@@ -83,14 +98,15 @@ export class RequestsTable implements OnInit {
   }
 
   aprobar(id: number) {
-    if(confirm('¿Estás seguro de aprobar esta solicitud?')) {
+    if(confirm('¿Estás seguro de aprobar esta solicitud? Se generarán credenciales de acceso para el estudiante.')) {
       this.admissionService.aprobarSolicitud(id).subscribe({
         next: (respuesta) => {
-          console.log(respuesta.mensaje);
+          alert(respuesta.mensaje);
           this.cargarSolicitudes();
         },
         error: (err) => {
-          alert('Error al aprobar: ' + (err.error?.error || 'Error desconocido'));
+          console.error('Error al aprobar:', err);
+          alert('Error: ' + (err.error?.error || 'No se pudo procesar la solicitud'));
         }
       });
     }
@@ -102,18 +118,20 @@ export class RequestsTable implements OnInit {
   }
 
   confirmarRechazo(motivo: string) {
-    this.closeModal();
+    if (!this.solicitudSeleccionadaId || !motivo.trim()) return;
     this.admissionService.rechazarSolicitud(this.solicitudSeleccionadaId, motivo).subscribe({
       next: (respuesta) => {
-        console.log('Respuesta del servidor:', respuesta.mensaje);
+        this.closeModal();
         this.cargarSolicitudes();
       },
       error: (err) => {
-        console.error('Error del servidor:', err);
-        alert('Hubo un error al procesar el rechazo o enviar el correo.');
+        console.error('Error al rechazar:', err);
       }
     });
   }
 
-  closeModal() { this.showModal = false; }
+  closeModal() {
+    this.showModal = false;
+    this.solicitudSeleccionadaId = null;
+  }
 }

@@ -40,23 +40,23 @@
 
         <td class="email">{{ req.correo }}</td>
 
-        <td class="center-text">{{ req.fechaEnvio | date:'shortDate' }}</td>
+        <td class="center-text">{{ req.fecha_envio | date:'dd/MM/yyyy' }}</td>
 
         <td class="center-text">
-          <span class="status-badge" [ngClass]="req.estado.toLowerCase()">
-            {{ req.estado | titlecase }}
-          </span>
+            <span class="status-badge" [ngClass]="req.estado.toLowerCase()">
+              {{ req.estado | titlecase }}
+            </span>
         </td>
 
         <td class="right-text">
           <ng-container *ngIf="req.estado.toLowerCase() === 'pendiente'">
-            <button class="btn-approve" (click)="aprobar(req.idSolicitud)">Aprobar</button>
-            <button class="btn-reject" (click)="openModal(req.idSolicitud)">Rechazar</button>
+            <button class="btn-approve" (click)="aprobar(req.id_solicitud)">Aprobar</button>
+            <button class="btn-reject" (click)="openModal(req.id_solicitud)">Rechazar</button>
           </ng-container>
           <span *ngIf="req.estado.toLowerCase() !== 'pendiente'"
                 style="color: gray; font-size: 0.9em; font-style: italic;">
-            Ya procesada
-          </span>
+              Ya procesada
+            </span>
         </td>
       </tr>
       </tbody>
@@ -69,7 +69,7 @@
 
   <app-modal-rechazo
     *ngIf="showModal"
-    (close)="closeModal()"
-    (confirm)="confirmarRechazo($event)">
+    (cerrar)="closeModal()"
+    (confirmar)="confirmarRechazo($event)">
   </app-modal-rechazo>
 </div>
