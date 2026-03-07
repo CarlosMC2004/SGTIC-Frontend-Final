@@ -29,7 +29,17 @@ export class ModalPeriodoComponent implements OnInit {
 
   ngOnInit() {
     if (this.periodo) {
-      this.formData = { ...this.periodo };
+      // CORREGIDO: Mapear explícitamente cada campo
+      this.formData = {
+        id: this.periodo.id,                    // ← ESTO ES LO QUE FALTABA
+        name: this.periodo.name || this.periodo.nombre,
+        startDate: this.periodo.startDate,
+        endDate: this.periodo.endDate,
+        active: this.periodo.active !== undefined ? this.periodo.active : true
+      };
+      console.log('EDITANDO - FormData cargado:', this.formData);
+    } else {
+      console.log('CREANDO NUEVO - FormData inicializado');
     }
   }
 
@@ -48,18 +58,31 @@ export class ModalPeriodoComponent implements OnInit {
       return;
     }
 
+    // Validar fechas
+    if (this.formData.startDate && this.formData.endDate && 
+        this.formData.startDate > this.formData.endDate) {
+      this.mostrarToast('La fecha de inicio debe ser anterior a la fecha de fin', 'error');
+      return;
+    }
+
     this.isSaving = true;
     this.saving.emit(true);
 
-    const periodoCompleto = {
+    // Construir objeto asegurando que el ID se incluya
+    const periodoCompleto: any = {
       name: this.formData.name,
       startDate: this.formData.startDate,
       endDate: this.formData.endDate,
       active: this.formData.active,
       enrollmentDeadline: this.formData.startDate
     };
+
+    // SOLO agregar el ID si existe (para edición)
+    if (this.formData.id) {
+      periodoCompleto.id = this.formData.id;
+    }
     
-    console.log('Guardando período:', periodoCompleto);
+    console.log('Enviando al padre:', periodoCompleto);
     this.save.emit(periodoCompleto);
   }
 
