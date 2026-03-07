@@ -73,6 +73,10 @@ export const routes: Routes = [
       {
         path: 'Teachers',
         loadComponent: () => import('./pages/coordinator/teachers/teachers').then(m => m.Teachers)
+      },
+      {
+        path: 'DegreeOptions',
+        loadComponent: () => import('./pages/coordinator/degree-options/degree-options').then(m => m.DegreeOptions)
       }
     ]
   },

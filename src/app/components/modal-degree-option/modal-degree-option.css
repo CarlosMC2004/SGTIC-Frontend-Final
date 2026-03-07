@@ -1,0 +1,96 @@
+/* CAPA OSCURA DE FONDO (OVERLAY) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Oscurece el fondo */
+  backdrop-filter: blur(4px); /* Efecto de desenfoque profesional */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centra el modal en la pantalla */
+  z-index: 2000; /* Por encima de sidebar y contenido */
+}
+
+/* TARJETA DEL MODAL */
+.modal-card {
+  background-color: white;
+  width: 100%;
+  max-width: 500px; /* Ancho similar a tu ejemplo */
+  padding: 30px;
+  border-radius: 20px; /* Bordes redondeados modernos */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease-out; /* Animación de entrada */
+}
+
+/* Estilos de Formulario para evitar el texto plano */
+.modal-header {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a5d43;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: #1a5d43;
+  box-shadow: 0 0 0 3px rgba(26, 93, 67, 0.1);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn-save {
+  background-color: #1a5d43; /* Verde institucional */
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

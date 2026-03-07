@@ -2,6 +2,7 @@
   display: flex;
   min-height: 100vh;
   background-color: #f8fafc;
+  font-family: "Public Sans", sans-serif;
 }
 
 
@@ -24,12 +25,13 @@ app-sidebar {
   width: 100%;
 }
 
-.page-heading { margin-bottom: 30px; }
+.page-heading {
+  margin-bottom: 30px;
+}
 
 .page-title {
   font-size: 26px;
   font-weight: 800;
-  color: #1a5d43;
   margin-bottom: 8px;
 }
 
