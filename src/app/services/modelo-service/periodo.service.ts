@@ -32,11 +32,12 @@ export class PeriodoService {
     const headers = this.getHeaders();
     return this.http.post<any>(this.apiUrl, periodo, { headers });
   }
-
+ 
   updatePeriodo(id: number, periodo: any): Observable<any> {
-    const headers = this.getHeaders();
-    return this.http.put<any>(`${this.apiUrl}/${id}`, periodo, { headers });
-  }
+  const headers = this.getHeaders();
+  console.log('PUT a:', `${this.apiUrl}/${id}`, 'con datos:', periodo);
+  return this.http.put<any>(`${this.apiUrl}/${id}`, periodo, { headers });
+}
 
   deletePeriodo(id: number): Observable<any> {
     const headers = this.getHeaders();

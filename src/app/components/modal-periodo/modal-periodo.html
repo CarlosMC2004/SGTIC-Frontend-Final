@@ -57,13 +57,13 @@
         Cancelar
       </button>
       <button 
-        class="btn-primary" 
-        (click)="savePeriodo()" 
-        [disabled]="!isValid() || isSaving">
-        <span class="material-symbols-outlined" *ngIf="!isSaving">save</span>
-        <span class="spinner" *ngIf="isSaving"></span>
-        <span>{{ isSaving ? 'Guardando...' : (periodo?.id ? 'Actualizar' : 'Crear') }} Período</span>
-      </button>
+      class="btn-primary" 
+     (click)="savePeriodo()" 
+     [disabled]="!isValid() || isSaving">
+     <span class="material-symbols-outlined" *ngIf="!isSaving">save</span>
+      <span class="spinner" *ngIf="isSaving"></span>
+     <span>{{ isSaving ? 'Guardando...' : (periodo?.id ? 'Actualizar' : 'Crear') }} Período</span>
+    </button>
     </div>
   </div>
 </div>

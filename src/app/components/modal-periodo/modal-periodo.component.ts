@@ -87,9 +87,10 @@ export class ModalPeriodoComponent implements OnInit {
   }
 
   resetSavingState(): void {
-    this.isSaving = false;
-    this.saving.emit(false);
-  }
+  this.isSaving = false;
+  this.saving.emit(false);
+  console.log('Modal reset - isSaving:', this.isSaving);
+}
 
   // Método para mostrar mensajes desde el padre
   mostrarToast(mensaje: string, tipo: 'exito' | 'error' = 'exito'): void {

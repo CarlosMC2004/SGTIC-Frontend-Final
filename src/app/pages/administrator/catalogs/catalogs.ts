@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { ModalPeriodoComponent } from '../../../components/modal-periodo/modal-periodo.component';
 import { PeriodoService } from '../../../services/modelo-service/periodo.service';
 import { ToastMensajeComponent } from '../../../components/Toast/toast-mensaje.component';
@@ -31,50 +32,20 @@ interface CatalogRole {
 export class CatalogsComponent implements OnInit {
   @ViewChild(ModalPeriodoComponent) modalComponent!: ModalPeriodoComponent;
   @ViewChild('toast') toast!: ToastMensajeComponent;
-  
-  activeTab: 'periodos' | 'roles' = 'periodos';
 
+  activeTab: 'periodos' | 'roles' = 'periodos';
   showPeriodoModal = false;
   selectedPeriodo: any = null;
+  isModalSaving = false;
 
   periodos: PeriodoAcademico[] = [];
-  
+
   roles: CatalogRole[] = [
-    {
-      id: 1,
-      nombre: 'administrador_sgtic',
-      descripcion: 'Administrador del Sistema de Gestión de Trabajos de Titulación',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 2,
-      nombre: 'coordinador_facultad',
-      descripcion: 'Coordinador académico a nivel de facultad',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 3,
-      nombre: 'coordinador_carrera',
-      descripcion: 'Coordinador académico a nivel de carrera',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 4,
-      nombre: 'docente',
-      descripcion: 'Personal docente y tutores',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    },
-    {
-      id: 5,
-      nombre: 'estudiante',
-      descripcion: 'Estudiantes en proceso de titulación',
-      fechaCreacion: '2024-01-15',
-      sistema: true
-    }
+    { id: 1, nombre: 'administrador_sgtic', descripcion: 'Administrador del Sistema de Gestión de Trabajos de Titulación', fechaCreacion: '2024-01-15', sistema: true },
+    { id: 2, nombre: 'coordinador_facultad', descripcion: 'Coordinador académico a nivel de facultad', fechaCreacion: '2024-01-15', sistema: true },
+    { id: 3, nombre: 'coordinador_carrera', descripcion: 'Coordinador académico a nivel de carrera', fechaCreacion: '2024-01-15', sistema: true },
+    { id: 4, nombre: 'docente', descripcion: 'Personal docente y tutores', fechaCreacion: '2024-01-15', sistema: true },
+    { id: 5, nombre: 'estudiante', descripcion: 'Estudiantes en proceso de titulación', fechaCreacion: '2024-01-15', sistema: true }
   ];
 
   get periodosActivos(): number {
@@ -100,10 +71,8 @@ export class CatalogsComponent implements OnInit {
   }
 
   loadPeriodos() {
-    console.log('Cargando períodos...');
     this.periodoService.getPeriodos().subscribe({
       next: (data) => {
-        console.log('Períodos cargados:', data);
         this.periodos = data.map((p: any) => ({
           id: p.idPeriod,
           nombre: p.name,
@@ -114,7 +83,7 @@ export class CatalogsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error cargando períodos:', err);
-        this.mostrarToast('❌ Error al cargar los períodos', 'error');
+        this.mostrarToast('Error al cargar los períodos', 'error');
       }
     });
   }
@@ -128,146 +97,110 @@ export class CatalogsComponent implements OnInit {
         endDate: periodo.fechaFin,
         active: periodo.activo
       };
-      console.log('Editando período:', this.selectedPeriodo);
     } else {
       this.selectedPeriodo = null;
-      console.log('Creando nuevo período');
     }
     this.showPeriodoModal = true;
   }
 
   closePeriodoModal() {
-    this.showPeriodoModal = false;
-    this.selectedPeriodo = null;
+    if (!this.isModalSaving) {
+      this.showPeriodoModal = false;
+      this.selectedPeriodo = null;
+    }
+  }
+
+  onModalSaving(saving: boolean) {
+    this.isModalSaving = saving;
   }
 
   handlePeriodoSave(periodoData: any) {
-    console.log('Datos recibidos del modal:', periodoData);
-    
     const periodoBackend = {
       name: periodoData.name,
       startDate: periodoData.startDate,
       endDate: periodoData.endDate,
-      active: periodoData.id ? periodoData.active : true,
+      active: periodoData.id ? periodoData.active : true,  // ✅ 'active' no 'activo'
       enrollmentDeadline: periodoData.startDate
     };
 
-    const request = periodoData.id 
+    const request = periodoData.id
       ? this.periodoService.updatePeriodo(periodoData.id, periodoBackend)
       : this.periodoService.createPeriodo(periodoBackend);
 
     request.subscribe({
-      next: (response: any) => {
-        console.log('Operación exitosa:', response);
+      next: () => {
         this.loadPeriodos();
-        
-        const mensaje = periodoData.id 
-          ? '✅ Período actualizado correctamente' 
-          : '✅ PERIODO ACADEMICO CREADO CORRECTAMENTE';
+        const mensaje = periodoData.id ? 'Período actualizado correctamente' : 'Período creado correctamente';
         this.mostrarToast(mensaje);
-        
-        setTimeout(() => {
-          this.showPeriodoModal = false;
-          this.selectedPeriodo = null;
-          if (this.modalComponent) {
-            this.modalComponent.resetSavingState();
-          }
-        }, 1000);
+        if (this.modalComponent) this.modalComponent.resetSavingState();
+        this.showPeriodoModal = false;
+        this.selectedPeriodo = null;
       },
       error: (err) => {
         console.error('Error:', err);
-        this.mostrarToast('❌ Error al guardar el período', 'error');
-        if (this.modalComponent) {
-          this.modalComponent.resetSavingState();
-        }
+        this.mostrarToast('Error al guardar el período', 'error');
+        if (this.modalComponent) this.modalComponent.resetSavingState();
       }
     });
   }
 
-  togglePeriodoStatus(id: number) {
-    const periodo = this.periodos.find(p => p.id === id);
-    if (!periodo) return;
-    
-    const nuevoEstado = !periodo.activo;
-    
-    if (nuevoEstado) {
-      const periodoActivoActual = this.periodos.find(p => p.activo === true && p.id !== id);
-      
-      if (periodoActivoActual) {
-        this.periodoService.updatePeriodo(periodoActivoActual.id, {
-          name: periodoActivoActual.nombre,
-          startDate: periodoActivoActual.fechaInicio,
-          endDate: periodoActivoActual.fechaFin,
-          active: false,
-          enrollmentDeadline: periodoActivoActual.fechaInicio
-        }).subscribe({
-          next: () => {
-            periodoActivoActual.activo = false;
-            
-            this.periodoService.updatePeriodo(id, {
-              name: periodo.nombre,
-              startDate: periodo.fechaInicio,
-              endDate: periodo.fechaFin,
-              active: true,
-              enrollmentDeadline: periodo.fechaInicio
-            }).subscribe({
-              next: () => {
-                periodo.activo = true;
-                this.mostrarToast('✅ PERIODO ACTIVADO');
-              },
-              error: (err) => {
-                console.error('Error activando período:', err);
-                this.mostrarToast('❌ Error al activar', 'error');
-              }
-            });
-          },
-          error: (err) => {
-            console.error('Error desactivando período anterior:', err);
-            this.mostrarToast('❌ Error al desactivar período anterior', 'error');
-          }
-        });
-      } else {
-        this.periodoService.updatePeriodo(id, {
-          name: periodo.nombre,
-          startDate: periodo.fechaInicio,
-          endDate: periodo.fechaFin,
-          active: true,
-          enrollmentDeadline: periodo.fechaInicio
-        }).subscribe({
-          next: () => {
-            periodo.activo = true;
-            this.mostrarToast('✅ PERIODO ACTIVADO');
-          },
-          error: (err) => {
-            console.error('Error activando período:', err);
-            this.mostrarToast('❌ Error al activar', 'error');
-          }
-        });
-      }
-    } else {
-      this.periodoService.updatePeriodo(id, {
-        name: periodo.nombre,
-        startDate: periodo.fechaInicio,
-        endDate: periodo.fechaFin,
-        active: false,
-        enrollmentDeadline: periodo.fechaInicio
-      }).subscribe({
-        next: () => {
-          periodo.activo = false;
-          this.mostrarToast('✅ PERIODO DESACTIVADO');
-        },
-        error: (err) => {
-          console.error('Error desactivando período:', err);
-          this.mostrarToast('❌ Error al desactivar', 'error');
-        }
-      });
-    }
+togglePeriodoStatus(id: number) {
+  const periodo = this.periodos.find(p => p.id === id);
+  if (!periodo || this.isModalSaving) return;
+
+  const estadoActual = periodo.activo;
+  const nuevoEstado = !estadoActual;
+  this.isModalSaving = true;
+
+  // ✅ Guardar otros activos ANTES de cambiar estados
+  const otrosActivos = this.periodos.filter(p => p.id !== id && p.activo);
+
+  // Actualizar visualmente de inmediato
+  periodo.activo = nuevoEstado;
+
+  // ✅ Desactivar otros visualmente también
+  if (nuevoEstado) {
+    otrosActivos.forEach(p => p.activo = false);
   }
 
+  this.periodoService.updatePeriodo(id, {
+    name: periodo.nombre,
+    startDate: periodo.fechaInicio,
+    endDate: periodo.fechaFin,
+    active: nuevoEstado,
+    enrollmentDeadline: periodo.fechaInicio
+  }).subscribe({
+    next: () => {
+      if (nuevoEstado) {
+        otrosActivos.forEach(p => {
+          this.periodoService.updatePeriodo(p.id, {
+            name: p.nombre,
+            startDate: p.fechaInicio,
+            endDate: p.fechaFin,
+            active: false,
+            enrollmentDeadline: p.fechaInicio
+          }).subscribe();
+        });
+      }
+      this.mostrarToast(nuevoEstado ? 'Período activado' : 'Período desactivado');
+      this.isModalSaving = false;
+    },
+    error: () => {
+      // Revertir todo si falla
+      periodo.activo = estadoActual;
+      if (nuevoEstado) {
+        otrosActivos.forEach(p => p.activo = true);
+      }
+      this.mostrarToast('Error al actualizar el estado', 'error');
+      this.isModalSaving = false;
+    }
+  });
+}
+
   deleteRole(id: number) {
-    if(confirm('¿Estás seguro que quieres eliminar este rol?')) {
+    if (confirm('¿Estás seguro que quieres eliminar este rol?')) {
       this.roles = this.roles.filter(r => r.id !== id);
-      this.mostrarToast('✅ Rol eliminado correctamente');
+      this.mostrarToast('Rol eliminado correctamente');
     }
   }
 }
