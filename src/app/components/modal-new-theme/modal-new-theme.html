@@ -1,6 +1,5 @@
 <div class="modal-overlay">
   <div class="modal-card">
-
     <div class="modal-header">
       <h2 class="title">Registrar Nuevo Tema</h2>
       <button class="btn-close" (click)="onClose()">
@@ -9,40 +8,40 @@
     </div>
 
     <div class="modal-body">
+      <div class="form-group">
+        <label>Título del Tema</label>
+        <input type="text" [(ngModel)]="nuevoTema.titulo" placeholder="Ej. Implementación de IA en procesos...">
+      </div>
 
       <div class="form-group">
-        <label>Título</label>
-        <input type="text" placeholder="Ej. Implementación de IA en procesos de manufactura">
+        <label>Nombre de la Comisión</label>
+        <input type="text" [(ngModel)]="nuevoTema.nombreComision" placeholder="Ej. Comisión Revisora de Software">
       </div>
 
       <div class="form-group">
         <label>Descripción</label>
-        <textarea
-          placeholder="Resumen detallado del proyecto, objetivos principales y alcance esperado..."
-          rows="5"></textarea>
+        <textarea [(ngModel)]="nuevoTema.descripcion" placeholder="Resumen detallado..." rows="4"></textarea>
       </div>
 
       <div class="form-group">
         <label>Tipo de titulación</label>
         <div class="select-wrapper">
-          <select>
-            <option value="" disabled selected>Selecciona el tipo de titulación</option>
-            <option value="ing-sistemas">Proyecto investigativo</option>
-            <option value="ing-industrial">Proyecto tecnológico</option>
+          <select [(ngModel)]="nuevoTema.idOpcion" class="form-select">
+            <option [value]="0" disabled selected>Selecciona el tipo de titulación</option>
+            <option *ngFor="let opt of opcionesTitulacion" [value]="opt.id_opcion">
+              {{ opt.nombre }}
+            </option>
           </select>
           <span class="material-symbols-outlined arrow-icon">expand_more</span>
         </div>
       </div>
-
     </div>
 
     <div class="modal-footer">
       <button class="btn-cancel" (click)="onClose()">Cancelar</button>
-
-      <button class="btn-save">
+      <button class="btn-save" (click)="guardar()">
         Guardar Tema
       </button>
     </div>
-
   </div>
 </div>

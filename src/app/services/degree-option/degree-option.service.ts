@@ -12,20 +12,8 @@ export class DegreeOptionService {
   private readonly API_COORDINATOR_URL = 'http://localhost:8080/api/coordinator/degree-options';
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<DegreeOption[]> {
-    return this.http.get<DegreeOption[]>(this.API_URL);
-  }
-
   save(option: DegreeOption): Observable<DegreeOption> {
     return this.http.post<DegreeOption>(this.API_URL, option);
-  }
-
-  toggleStatus(id: number, status: boolean): Observable<void> {
-    return this.http.patch<void>(`${this.API_URL}/${id}/status`, status);
-  }
-
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
 
   getOptionsForCoordinator(idCarrera: number): Observable<OptionCareerModel[]> {

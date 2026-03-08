@@ -1,9 +1,46 @@
+/* --- Estructura del Encabezado (Corregido para mover resultados a la derecha) --- */
+.section-header {
+  display: flex;
+  justify-content: space-between; /* Empuja el contador a la derecha */
+  align-items: flex-start; /* Alinea el texto a la parte superior */
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0d1b15;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0;
+}
+
+.results-count {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  align-self: flex-start;
+  color: #64748b;
+}
+
 .layout-container {
   display: flex;
   width: 100%;
   min-height: 100vh;
   background-color: #f8fafc;
-  font-family: 'Inter', sans-serif;
+  font-family: "Public Sans", sans-serif;
   overflow-x: hidden;
 }
 
@@ -17,7 +54,6 @@
 
 .content-body {
   padding: 32px;
-  margin: 0;
   width: 100%;
   box-sizing: border-box;
 }
@@ -65,41 +101,16 @@
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 700;
-  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background 0.2s;
 }
 
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 24px;
+.btn-new-topic:hover {
+  background-color: #144632;
 }
-
-.page-title {
-  font-size: 24px;
-  font-weight: 800;
-  color: #1e293b;
-  margin: 0 0 4px 0;
-}
-
-.page-subtitle {
-  color: #64748b;
-  font-size: 14px;
-  margin: 0;
-}
-
-.results-count {
-  font-size: 14px;
-  color: #64748b;
-  font-weight: 500;
-}
-
 
 .topics-grid {
   display: grid;
@@ -111,15 +122,14 @@
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .topic-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
 }
 
 .card-body {
@@ -128,21 +138,16 @@
 }
 
 .topic-title {
-  color: #1a5d43;
+  color: #000000;
   font-size: 18px;
   font-weight: 700;
-  margin: 0 0 12px 0;
-  line-height: 1.4;
+  margin-bottom: 12px;
 }
 
 .topic-desc {
   font-size: 14px;
   color: #475569;
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .card-footer {
@@ -155,81 +160,35 @@
   align-items: center;
 }
 
-
 .badge {
-  padding: 4px 12px;
-  border-radius: 20px;
   font-size: 11px;
   font-weight: 800;
+  color: #0d1b15;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.badge.software {
-  background: #e0f2fe;
-  color: #0284c7;
-}
-
-.badge.computer {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.badge.ai {
-  background: #f3e8ff;
-  color: #9333ea;
+.card-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .btn-icon {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.btn-icon:hover {
-  color: #1a5d43;
-  border-color: #1a5d43;
+.btn-icon.edit:hover {
   background-color: #f0fdf4;
+  border-color: #1a5d43;
+  color: #1a5d43;
 }
 
-
-.pagination-wrapper {
-  margin-top: 48px;
-  display: flex;
-  justify-content: center;
-}
-
-.pagination {
-  display: flex;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.pagination button {
-  border: none;
-  background: white;
-  padding: 8px 16px;
-  border-right: 1px solid #e2e8f0;
-  cursor: pointer;
-  color: #64748b;
-}
-
-.pagination button:last-child {
-  border-right: none;
-}
-
-.page-num.active {
-  background-color: #1a5d43;
-  color: white;
-  font-weight: 700;
-}

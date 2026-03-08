@@ -1,6 +1,11 @@
+/* Reset general para que los paddings no ensanchen los cuadros */
+* {
+  box-sizing: border-box;
+}
+
 .modal-overlay {
   position: fixed;
-  inset: 0; /* top, right, bottom, left = 0 */
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   display: flex;
@@ -42,6 +47,7 @@
   color: #9ca3af;
   cursor: pointer;
   display: flex;
+  padding: 0;
 }
 .btn-close:hover { color: #4b5563; }
 
@@ -50,12 +56,14 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: 100%; /* Asegura que el cuerpo ocupe todo el ancho */
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%; /* Alinea todos los campos al mismo ancho */
 }
 
 .form-group label {
@@ -64,9 +72,10 @@
   color: #0d1b15;
 }
 
-input, textarea, select {
+/* --- Inputs y Textarea --- */
+input, textarea {
   width: 100%;
-  border: 1px solid #cfe7dc; /* Un verde muy pálido */
+  border: 1px solid #cfe7dc;
   border-radius: 8px;
   background-color: white;
   padding: 12px 16px;
@@ -77,32 +86,55 @@ input, textarea, select {
   font-family: inherit;
 }
 
-input:focus, textarea:focus, select:focus {
-  border-color: #1a5d43; /* Verde del tema */
+input:focus, textarea:focus {
+  border-color: #1a5d43;
   box-shadow: 0 0 0 3px rgba(26, 93, 67, 0.1);
 }
 
 input { height: 48px; }
 textarea { resize: none; min-height: 140px; }
 
+/* --- CORRECCIÓN DEFINITIVA DEL SELECT Y LA FLECHA --- */
 .select-wrapper {
   position: relative;
+  width: 100%; /* El contenedor debe ser del mismo ancho que los inputs */
+  display: block; /* Cambiado a block para evitar desalineaciones horizontales */
 }
 
 select {
-  appearance: none;
+  width: 100%; /* Ocupa el 100% del wrapper */
+  height: 48px;
+  border: 1px solid #cfe7dc;
+  border-radius: 8px;
+  background-color: white;
+  padding: 0 40px 0 16px; /* Padding derecho para la flecha */
+  font-size: 14px;
+  color: #0d1b15;
+  outline: none;
   cursor: pointer;
+  appearance: none; /* Elimina flecha del sistema */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select:focus {
+  border-color: #1a5d43;
+  box-shadow: 0 0 0 3px rgba(26, 93, 67, 0.1);
 }
 
 .arrow-icon {
   position: absolute;
   right: 12px;
   top: 50%;
-  transform: translateY(-50%);
-  color: #6b7280;
+  transform: translateY(-50%); /* Centrado vertical exacto dentro del cuadro */
+  color: #0d1b15; /* Flecha negra/verde oscuro según tu título */
   pointer-events: none;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
 }
 
+/* --- Footer --- */
 .modal-footer {
   background-color: #f9fafb;
   padding: 24px 32px;
@@ -125,10 +157,10 @@ select {
 .btn-cancel:hover { background-color: #e5e7eb; }
 
 .btn-save {
-  background-color: #26dc41; /* Rojo */
+  background-color: #1a5d43;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 24px;
   border-radius: 8px;
   font-weight: 700;
   font-size: 14px;
@@ -138,7 +170,6 @@ select {
   gap: 8px;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
-.btn-save:hover { background-color: #1cb91f; }
 
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }
