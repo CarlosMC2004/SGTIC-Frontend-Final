@@ -1,38 +1,45 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PeriodoService {
-  // URL CORRECTA según tu backend
   private apiUrl = 'http://localhost:8080/api/admin/catalog/periods';
 
   constructor(private http: HttpClient) { }
 
-  // Obtener todos los períodos
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('auth_token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  }
+
   getPeriodos(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    const headers = this.getHeaders();
+    return this.http.get<any[]>(this.apiUrl, { headers });
   }
 
-  // Obtener solo períodos activos
   getPeriodosActivos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/active`);
+    const headers = this.getHeaders();
+    return this.http.get<any[]>(`${this.apiUrl}/active`, { headers });
   }
 
-  // Crear un nuevo período
   createPeriodo(periodo: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, periodo);
+    const headers = this.getHeaders();
+    return this.http.post<any>(this.apiUrl, periodo, { headers });
   }
 
-  // Actualizar un período
   updatePeriodo(id: number, periodo: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, periodo);
+    const headers = this.getHeaders();
+    return this.http.put<any>(`${this.apiUrl}/${id}`, periodo, { headers });
   }
 
-  // Eliminar un período
   deletePeriodo(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+    const headers = this.getHeaders();
+    return this.http.delete<any>(`${this.apiUrl}/${id}`, { headers });
   }
 }

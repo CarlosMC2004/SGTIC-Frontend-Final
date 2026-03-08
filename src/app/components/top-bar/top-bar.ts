@@ -25,13 +25,12 @@ export class Topbar implements OnInit {
 
   cargarPeriodos() {
     console.log('Cargando períodos...');
-    this.periodoService.getPeriodos().subscribe({
+    // 👇 CAMBIA ESTO: usa getPeriodosActivos() en lugar de getPeriodos()
+    this.periodoService.getPeriodosActivos().subscribe({
       next: (data) => {
         console.log('Datos recibidos:', data);
-        this.periodos = data;
-        
-        // Filtrar solo los activos (active = true)
-        this.periodosActivos = this.periodos.filter(p => p.active === true);
+        this.periodos = data; // Todos son activos porque viene de /active
+        this.periodosActivos = data; // Todos son activos
         
         console.log('Períodos activos:', this.periodosActivos);
         

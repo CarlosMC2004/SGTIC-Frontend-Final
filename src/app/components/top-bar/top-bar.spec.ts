@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Topbar } from './top-bar';  // 👈 CORREGIDO: importación con llaves {}
 
-import { TopBar } from './top-bar';
-
-describe('TopBar', () => {
-  let component: TopBar;
-  let fixture: ComponentFixture<TopBar>;
+describe('Topbar', () => {
+  let component: Topbar;
+  let fixture: ComponentFixture<Topbar>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TopBar]
+      imports: [Topbar]  // El componente es standalone
     })
     .compileComponents();
-
-    fixture = TestBed.createComponent(TopBar);
+    
+    fixture = TestBed.createComponent(Topbar);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

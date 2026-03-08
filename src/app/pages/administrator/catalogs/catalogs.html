@@ -27,7 +27,6 @@
 <!-- TAB: Períodos Académicos -->
 <div class="tab-content" *ngIf="activeTab === 'periodos'">
 
-  <!-- TARJETAS DE ESTADÍSTICAS (AGREGADO) -->
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-icon">
@@ -61,7 +60,7 @@
   </div>
 
   <div class="form-inline">
-    <button class="btn-primary" (click)="openPeriodoModal()" [disabled]="isModalSaving">
+    <button class="btn-primary" (click)="openPeriodoModal()">
       <span class="material-symbols-outlined">add</span>
       Crear Período
     </button>
@@ -71,47 +70,48 @@
     *ngIf="showPeriodoModal"
     [periodo]="selectedPeriodo"
     (close)="closePeriodoModal()"
-    (save)="handlePeriodoSave($event)"
-    (saving)="onModalSaving($event)">
+    (save)="handlePeriodoSave($event)">
   </app-modal-periodo>
 
   <div class="table-container">
     <table>
       <thead>
-      <tr>
-        <th>Período Académico</th>
-        <th>Fecha Inicio</th>
-        <th>Fecha Fin</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
+        <tr>
+          <th>Período Académico</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let periodo of periodos">
-        <td>
-          <div class="font-bold">{{ periodo.nombre }}</div>
-        </td>
-        <td>{{ periodo.fechaInicio | date:'dd/MM/yyyy' }}</td>
-        <td>{{ periodo.fechaFin | date:'dd/MM/yyyy' }}</td>
-        <td>
+        <tr *ngFor="let periodo of periodos">
+          <td>
+            <div class="font-bold">{{ periodo.nombre }}</div>
+          </td>
+          <td>{{ periodo.fechaInicio | date:'dd/MM/yyyy' }}</td>
+          <td>{{ periodo.fechaFin | date:'dd/MM/yyyy' }}</td>
+          <td>
             <span class="status-badge" [class.active]="periodo.activo">
               {{ periodo.activo ? 'Activo' : 'Inactivo' }}
             </span>
-        </td>
-        <td>
-          <div class="action-buttons">
-            <button class="btn-icon" (click)="openPeriodoModal(periodo)" title="Editar" [disabled]="isModalSaving">
-              <span class="material-symbols-outlined">edit</span>
-            </button>
-            <div class="toggle-switch" 
-                 [class.active]="periodo.activo" 
-                 (click)="!isModalSaving && togglePeriodoStatus(periodo.id)"
-                 [class.disabled]="isModalSaving">
-              <div class="toggle-circle"></div>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon" 
+                      (click)="openPeriodoModal(periodo)" 
+                      title="Editar">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              
+              <div class="toggle-switch" 
+               [class.active]="periodo.activo" 
+               (click)="$event.stopPropagation(); togglePeriodoStatus(periodo.id)">
+                 <div class="toggle-circle"></div>
+              </div>
             </div>
-          </div>
-        </td>
-      </tr>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -119,7 +119,6 @@
 
 <!-- TAB: Roles del Sistema -->
 <div class="tab-content" *ngIf="activeTab === 'roles'">
-
   <div class="info-box">
     <span class="material-symbols-outlined">info</span>
     <p>Los roles marcados como "Sistema" son roles base y no deben eliminarse. Puedes crear roles adicionales desde la sección "Gestión de Roles".</p>
@@ -128,40 +127,43 @@
   <div class="table-container">
     <table>
       <thead>
-      <tr>
-        <th>Rol</th>
-        <th>Descripción</th>
-        <th>Fecha Creación</th>
-        <th>Tipo</th>
-        <th>Acciones</th>
-      </tr>
+        <tr>
+          <th>Rol</th>
+          <th>Descripción</th>
+          <th>Fecha Creación</th>
+          <th>Tipo</th>
+          <th>Acciones</th>
+        </tr>
       </thead>
       <tbody>
-      <tr *ngFor="let role of roles">
-        <td>
-          <div class="role-name">
-            <span class="material-symbols-outlined">badge</span>
-            <span class="font-bold">{{ role.nombre }}</span>
-          </div>
-        </td>
-        <td>{{ role.descripcion }}</td>
-        <td>{{ role.fechaCreacion | date:'dd/MM/yyyy' }}</td>
-        <td>
+        <tr *ngFor="let role of roles">
+          <td>
+            <div class="role-name">
+              <span class="material-symbols-outlined">badge</span>
+              <span class="font-bold">{{ role.nombre }}</span>
+            </div>
+          </td>
+          <td>{{ role.descripcion }}</td>
+          <td>{{ role.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+          <td>
             <span class="badge" [class.system]="role.sistema">
               {{ role.sistema ? 'Sistema' : 'Personalizado' }}
             </span>
-        </td>
-        <td>
-          <div class="action-buttons">
-            <button class="btn-icon" title="Ver permisos">
-              <span class="material-symbols-outlined">visibility</span>
-            </button>
-            <button class="btn-icon" *ngIf="!role.sistema" (click)="deleteRole(role.id)" title="Eliminar">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
-          </div>
-        </td>
-      </tr>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon" title="Ver permisos">
+                <span class="material-symbols-outlined">visibility</span>
+              </button>
+              <button class="btn-icon" 
+                      *ngIf="!role.sistema" 
+                      (click)="deleteRole(role.id)" 
+                      title="Eliminar">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
