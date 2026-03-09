@@ -5,15 +5,22 @@
     <app-header></app-header>
 
     <div class="content-body">
-      <div class="section-header">
-        <div class="text-group">
-          <h3 class="page-title">Banco de Temas</h3>
-          <p class="page-subtitle">Gestiona y supervisa los temas de investigación disponibles.</p>
-        </div>
-
-        <span class="results-count">Mostrando {{ temas.length }} resultados</span>
+      <div class="navigation-tabs">
+        <a routerLink="/coordinator/BankThemes" routerLinkActive="active" class="tab-link">
+          Banco Oficial de Temas
+        </a>
+        <a routerLink="/coordinator/PendingProposalComponent" routerLinkActive="active" class="tab-link">
+          Propuestas Pendientes
+          <span class="badge-count" *ngIf="pendientesCount > 0">{{ pendientesCount }}</span>
+        </a>
       </div>
 
+      <div class="section-header">
+        <div class="text-group">
+          <p class="page-subtitle">Gestiona y supervisa los temas de investigación disponibles.</p>
+        </div>
+        <span class="results-count">Mostrando {{ temas.length }} resultados</span>
+      </div>
 
       <div class="toolbar">
         <div class="search-wrapper">

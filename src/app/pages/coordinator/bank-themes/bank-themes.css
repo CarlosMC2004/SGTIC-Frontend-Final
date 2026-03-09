@@ -1,8 +1,57 @@
-/* --- Estructura del Encabezado (Corregido para mover resultados a la derecha) --- */
+.navigation-tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 32px;
+  padding-left: 4px;
+}
+
+.tab-link {
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 700;
+  padding: 12px 0;
+  font-size: 18px;
+  position: relative;
+  transition: color 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.tab-link.active {
+  color: #1a5d43;
+}
+
+.tab-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #1a5d43;
+  border-radius: 3px 3px 0 0;
+}
+
+.badge-count {
+  background-color: #ef4444;
+  color: white;
+  font-size: 13px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-left: 10px;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .section-header {
   display: flex;
-  justify-content: space-between; /* Empuja el contador a la derecha */
-  align-items: flex-start; /* Alinea el texto a la parte superior */
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 24px;
   width: 100%;
 }
@@ -29,10 +78,8 @@
 .results-count {
   font-size: 14px;
   font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 20px;
-  align-self: flex-start;
   color: #64748b;
+  padding: 6px 0;
 }
 
 .layout-container {
@@ -41,7 +88,6 @@
   min-height: 100vh;
   background-color: #f8fafc;
   font-family: "Public Sans", sans-serif;
-  overflow-x: hidden;
 }
 
 .main-area {
@@ -186,9 +232,18 @@
   transition: all 0.2s;
 }
 
+.btn-icon:hover {
+  background-color: #f1f5f9;
+}
+
 .btn-icon.edit:hover {
   background-color: #f0fdf4;
   border-color: #1a5d43;
   color: #1a5d43;
 }
 
+.btn-icon.delete:hover {
+  background-color: #fef2f2;
+  border-color: #ef4444;
+  color: #ef4444;
+}

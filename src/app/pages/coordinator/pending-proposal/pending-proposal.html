@@ -1,0 +1,76 @@
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-area">
+    <app-header></app-header>
+
+    <div class="content-body">
+      <div class="navigation-tabs">
+        <a routerLink="/coordinator/BankThemes" class="tab-link">
+          Banco Oficial de Temas
+        </a>
+        <a routerLink="/coordinator/PendingProposalComponent" class="tab-link active">
+          Propuestas Pendientes
+          <span class="badge-count" *ngIf="propuestas.length > 0">{{ propuestas.length }}</span>
+        </a>
+      </div>
+
+      <div class="section-header">
+        <div class="text-group">
+          <p class="page-subtitle">Panel de revisión y aprobación de propuestas de investigación.</p>
+        </div>
+        <span class="results-count">
+          Pendientes: <strong>{{ propuestas.length }}</strong>
+        </span>
+      </div>
+
+      <div class="propuestas-grid">
+        <div class="propuesta-card" *ngFor="let prop of propuestas">
+
+          <div class="card-header">
+            <div class="student-info">
+              <div class="name-row">
+                <h3>{{ prop.nombreEstudiante }}</h3>
+                <span class="badge-student">Estudiante</span>
+              </div>
+              <div class="meta-row">
+                <span><i class="material-symbols-outlined">id_card</i> ID: {{ prop.identificacionEstudiante }}</span>
+                <span><i class="material-symbols-outlined">school</i> {{ prop.carreraNombre }}</span>
+              </div>
+            </div>
+            <div class="date-info">
+              <small>FECHA DE ENVÍO</small>
+              <p>{{ prop.fechaEnvio }}</p>
+            </div>
+          </div>
+
+          <div class="card-content">
+            <div class="title-box">
+              <h4>{{ prop.titulo }}</h4>
+              <p class="description">{{ prop.descripcion }}</p>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <div class="action-buttons-top">
+              <button class="btn-secondary" (click)="verDocumento(prop.urlDocumento)">
+                <i class="material-symbols-outlined">description</i> Ver Anteproyecto (PDF)
+              </button>
+              <button class="btn-ia">
+                <i class="material-symbols-outlined">auto_awesome</i> Verificar Duplicidad
+              </button>
+            </div>
+            <div class="action-buttons-bottom">
+              <button class="btn-reject" (click)="procesarPropuesta(prop.idTemaPropuesto, 'rechazado')">Rechazar</button>
+              <button class="btn-approve" (click)="procesarPropuesta(prop.idTemaPropuesto, 'aprobado')">Aprobar Propuesta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="propuestas.length === 0 && !loading" class="empty-state">
+        <p>No hay propuestas pendientes por revisar en tu carrera.</p>
+      </div>
+    </div>
+  </main>
+</div>
