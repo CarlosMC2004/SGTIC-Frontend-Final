@@ -16,7 +16,7 @@ export interface RequestAccessDTO {
 })
 
 export class RequestAccess {
-  private apiUrl = 'http://localhost:8080/api/public/request-access';
+  private apiUrl = 'http://localhost:8080/api/request-access';
 
   constructor(private http: HttpClient) { }
 

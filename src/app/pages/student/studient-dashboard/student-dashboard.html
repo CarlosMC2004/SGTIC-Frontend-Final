@@ -1,18 +1,23 @@
 <div class="layout-wrapper">
-  
+
   <app-sidebar role="estudiante"></app-sidebar>
 
   <main class="main-content">
-    
-    <app-topbar></app-topbar>
+
+    <app-topbar (periodoChange)="onPeriodoChange($event)"></app-topbar>
 
     <div *ngIf="isLoading" style="text-align: center; padding: 50px;">
-      <span class="material-symbols-outlined" style="font-size: 40px; animation: spin 1s linear infinite;">autorenew</span>
+      <span
+        class="material-symbols-outlined"
+        style="font-size: 40px; animation: spin 1s linear infinite;"
+      >
+        autorenew
+      </span>
       <p>Cargando información de tu proceso...</p>
     </div>
 
     <div class="dashboard-container" *ngIf="!isLoading && status">
-      
+
       <section class="page-header">
         <h1>Mi Trabajo de Titulación</h1>
         <p>Gestión integral de tu proceso de fin de grado académico.</p>
@@ -20,120 +25,165 @@
 
       <section class="stepper-card">
         <div class="stepper">
-          
+          <div class="step" [ngClass]="status.prerequisitosNivel1 ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">
+                {{ status.prerequisitosNivel1 ? 'check' : 'radio_button_unchecked' }}
+              </span>
+            </div>
+            <div class="step-label">PRERREQUISITOS<br>NIVEL 1</div>
+          </div>
+          <div class="step-line" [ngClass]="status.temaSeleccionado ? 'completed-line' : 'pending-line'"></div>
+
           <div class="step" [ngClass]="status.temaSeleccionado ? 'completed' : 'pending'">
             <div class="step-icon">
-              <span class="material-symbols-outlined">{{ status.temaSeleccionado ? 'check' : 'radio_button_unchecked' }}</span>
+              <span class="material-symbols-outlined">
+                {{ status.temaSeleccionado ? 'check' : 'radio_button_unchecked' }}
+              </span>
             </div>
-            <div class="step-label">SELECCIÓN DEL<br>TIPO/TEMA TITULACIÓN</div>
+            <div class="step-label">SELECCIÓN DE<br>TIPO/TEMA</div>
           </div>
           <div class="step-line" [ngClass]="status.directorAsignado ? 'completed-line' : 'pending-line'"></div>
-          
+
           <div class="step" [ngClass]="status.directorAsignado ? 'completed' : 'pending'">
             <div class="step-icon">
-              <span class="material-symbols-outlined">{{ status.directorAsignado ? 'check' : 'person_search' }}</span>
+              <span class="material-symbols-outlined">
+                {{ status.directorAsignado ? 'check' : 'person_search' }}
+              </span>
             </div>
             <div class="step-label">ASIGNACIÓN<br>DE DIRECTOR</div>
           </div>
-          <div class="step-line" [ngClass]="status.procesoIniciado ? 'completed-line' : 'pending-line'"></div>
-          
-          <div class="step" [ngClass]="status.procesoIniciado ? 'completed' : (status.directorAsignado ? 'active' : 'pending')">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">{{ status.procesoIniciado ? 'check' : 'play_arrow' }}</span>
-            </div>
-            <div class="step-label">PROCESO</div>
-          </div>
-          <div class="step-line" [ngClass]="status.tribunalAsignado ? 'completed-line' : 'pending-line'"></div>
-          
-          <div class="step" [ngClass]="status.tribunalAsignado ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">{{ status.tribunalAsignado ? 'check' : 'schedule' }}</span>
-            </div>
-            <div class="step-label">PRESENTACIÓN<br>ANTE TRIBUNAL</div>
-          </div>
-          <div class="step-line" [ngClass]="status.actaEntregada ? 'completed-line' : 'pending-line'"></div>
-          
-          <div class="step" [ngClass]="status.actaEntregada ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">{{ status.actaEntregada ? 'check' : 'description' }}</span>
-            </div>
-            <div class="step-label">ENTREGA DE<br>ACTA</div>
-          </div>
-          <div class="step-line" [ngClass]="status.finalizado ? 'completed-line' : 'pending-line'"></div>
+          <div class="step-line" [ngClass]="status.reunionesMinimas ? 'completed-line' : 'pending-line'"></div>
 
-          <div class="step" [ngClass]="status.finalizado ? 'completed' : 'pending'">
+          <div class="step" [ngClass]="status.reunionesMinimas ? 'completed' : 'pending'">
             <div class="step-icon">
-              <span class="material-symbols-outlined">{{ status.finalizado ? 'check' : 'flag' }}</span>
+              <span class="material-symbols-outlined">
+                {{ status.reunionesMinimas ? 'check' : 'group' }}
+              </span>
             </div>
-            <div class="step-label">FINALIZADO</div>
+            <div class="step-label">REUNIONES<br>MÍNIMAS</div>
+          </div>
+          <div class="step-line" [ngClass]="status.defensaAnteproyecto ? 'completed-line' : 'pending-line'"></div>
+
+          <div class="step" [ngClass]="status.defensaAnteproyecto ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">
+                {{ status.defensaAnteproyecto ? 'check' : 'description' }}
+              </span>
+            </div>
+            <div class="step-label">DEFENSA DE<br>ANTEPROYECTO</div>
           </div>
 
+          <div class="level-separator">NIVEL 2</div>
+
+          <div class="step-line" [ngClass]="status.prerequisitosNivel2 ? 'completed-line' : 'pending-line'"></div>
+
+          <div class="step" [ngClass]="status.prerequisitosNivel2 ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">
+                {{ status.prerequisitosNivel2 ? 'check' : 'radio_button_unchecked' }}
+              </span>
+            </div>
+            <div class="step-label">PRERREQUISITOS<br>NIVEL 2</div>
+          </div>
+          <div class="step-line" [ngClass]="status.asistenciaTutorias ? 'completed-line' : 'pending-line'"></div>
+
+          <div class="step" [ngClass]="status.asistenciaTutorias ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">
+                {{ status.asistenciaTutorias ? 'check' : 'event' }}
+              </span>
+            </div>
+            <div class="step-label">ASISTENCIA A<br>TUTORÍAS</div>
+          </div>
+          <div class="step-line" [ngClass]="status.predefensa ? 'completed-line' : 'pending-line'"></div>
+
+          <div class="step" [ngClass]="status.predefensa ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">
+                {{ status.predefensa ? 'check' : 'visibility' }}
+              </span>
+            </div>
+            <div class="step-label">PREDEFENSA</div>
+          </div>
+          <div class="step-line" [ngClass]="status.defensaFinal ? 'completed-line' : 'pending-line'"></div>
+
+          <div class="step" [ngClass]="status.defensaFinal ? 'completed' : 'pending'">
+            <div class="step-icon">
+              <span class="material-symbols-outlined">
+                {{ status.defensaFinal ? 'check' : 'flag' }}
+              </span>
+            </div>
+            <div class="step-label">DEFENSA FINAL</div>
+          </div>
         </div>
       </section>
 
       <section class="info-cards-grid">
         <div class="info-card">
-          <div class="card-icon"><span class="material-symbols-outlined">menu_book</span></div>
+          <div class="card-icon">
+            <span class="material-symbols-outlined">menu_book</span>
+          </div>
           <div class="card-content">
             <span class="card-subtitle">MODALIDAD DE TITULACIÓN</span>
-            <span class="card-title">{{ status.nombreTema || 'Aún no asignada' }}</span>
+            <span class="card-title">{{ status.nombreOpcion || 'Aún no asignada' }}</span>
+            <span class="card-detail" *ngIf="status.nombreTema">
+              Tema: {{ status.nombreTema }}
+            </span>
           </div>
         </div>
-        
+
         <div class="info-card">
-          <div class="card-icon"><span class="material-symbols-outlined">account_circle</span></div>
+          <div class="card-icon">
+            <span class="material-symbols-outlined">account_circle</span>
+          </div>
           <div class="card-content flex-grow">
             <span class="card-subtitle">DIRECTOR ASIGNADO</span>
             <span class="card-title">{{ status.nombreDirector || 'Por asignar' }}</span>
           </div>
-          <button class="btn-outline-green" [disabled]="!status.directorAsignado">CONTACTAR</button>
+          <button class="btn-outline-green" [disabled]="!status.directorAsignado">
+            CONTACTAR
+          </button>
         </div>
       </section>
 
       <section class="content-grid">
-        
+
         <div class="left-column">
-          
           <div class="section-header">
             <div class="title-with-icon">
-              <span class="material-symbols-outlined">forum</span>
-              <h2>Últimos Mensajes Recibidos</h2>
+              <span class="material-symbols-outlined">groups</span>
+              <h2>5 Tutorías Obligatorias del Período</h2>
             </div>
-            <a href="#" class="link-green">Ver Historial</a>
-          </div>
-          
-          <div class="observation-card">
-            <div class="obs-avatar"><span class="material-symbols-outlined">person</span></div>
-            <div class="obs-content">
-              <div class="obs-header">
-                <strong>Dr. Roberto Pérez</strong> <span class="badge-tutor">TUTOR</span> <span class="obs-date">• Hace 2 días</span>
-              </div>
-              <p class="obs-text">"Excelente avance en el marco teórico. Por favor, asegúrate de citar correctamente las fuentes de la sección 2.4 siguiendo las normas APA 7ma edición antes de la próxima entrega."</p>
-            </div>
-          </div>
-
-          <div class="section-header margin-top">
-            <div class="title-with-icon">
-              <span class="material-symbols-outlined">task</span>
-              <h2>Entregables Pendientes</h2>
-            </div>
+            <span class="period-summary">
+              {{ tutoriasCumplidas }} / {{ totalTutoriasObligatorias }} cumplidas
+            </span>
           </div>
 
           <div class="deliverable-list">
-            <div class="deliverable-card" *ngFor="let doc of entregables">
-              <div class="doc-icon"><span class="material-symbols-outlined">{{doc.icono}}</span></div>
-              <div class="doc-info">
-                <h3>{{doc.titulo}}</h3>
-                <span><span class="material-symbols-outlined icon-tiny">calendar_today</span> Fecha límite: {{doc.fecha}}</span>
+            <div class="deliverable-card tutoria-card" *ngFor="let tutoria of tutoriasObligatoriasPeriodo">
+              <div class="doc-icon" [ngClass]="tutoria.cumplida ? 'icon-cumplida' : 'icon-pendiente'">
+                <span class="material-symbols-outlined">
+                  {{ tutoria.cumplida ? 'check_circle' : 'pending_actions' }}
+                </span>
               </div>
-              <button class="btn-upload"><span class="material-symbols-outlined">upload</span> Subir</button>
+
+              <div class="doc-info">
+                <h3>{{ tutoria.nombre }}</h3>
+                <span>
+                  <span class="material-symbols-outlined icon-tiny">calendar_today</span>
+                  {{ tutoria.fechaTexto }}
+                </span>
+              </div>
+
+              <span class="badge-estado" [ngClass]="tutoria.cumplida ? 'cumplida' : 'pendiente'">
+                {{ tutoria.cumplida ? 'Cumplida' : 'Pendiente' }}
+              </span>
             </div>
           </div>
-
         </div>
 
         <div class="right-column">
-          
           <div class="section-header">
             <div class="title-with-icon">
               <span class="material-symbols-outlined">calendar_month</span>
@@ -144,26 +194,39 @@
           <div class="event-list">
             <div class="event-card" *ngFor="let evento of tutorias">
               <div class="event-date">
-                <span class="month">{{evento.fechaMes}}</span>
-                <span class="day">{{evento.fechaDia}}</span>
+                <span class="month">{{ evento.fechaMes }}</span>
+                <span class="day">{{ evento.fechaDia }}</span>
               </div>
+
               <div class="event-details">
-                <h3>{{evento.titulo}}</h3>
-                <span *ngIf="evento.hora" class="event-time"><span class="material-symbols-outlined icon-tiny">schedule</span> {{evento.hora}}</span>
-                <span *ngIf="evento.lugar" class="event-location"><span class="material-symbols-outlined icon-tiny">location_on</span> {{evento.lugar}}</span>
-                
+                <h3>{{ evento.titulo }}</h3>
+
+                <span *ngIf="evento.hora" class="event-time">
+                  <span class="material-symbols-outlined icon-tiny">schedule</span>
+                  {{ evento.hora }}
+                </span>
+
+                <span *ngIf="evento.lugar" class="event-location">
+                  <span class="material-symbols-outlined icon-tiny">location_on</span>
+                  {{ evento.lugar }}
+                </span>
+
                 <button class="btn-join" *ngIf="evento.tipo === 'virtual'">
-                  <span class="material-symbols-outlined">videocam</span> Unirse
+                  <span class="material-symbols-outlined">videocam</span>
+                  Unirse
                 </button>
-                <span class="event-type-text" *ngIf="evento.tipo === 'presencial'">Presencial</span>
+
+                <span class="event-type-text" *ngIf="evento.tipo === 'presencial'">
+                  Presencial
+                </span>
               </div>
             </div>
 
             <button class="btn-request-tutoring">
-              <span class="material-symbols-outlined">add</span> Solicitar Tutoría
+              <span class="material-symbols-outlined">add</span>
+              Solicitar Tutoría
             </button>
           </div>
-
         </div>
 
       </section>

@@ -1,27 +1,35 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface DashboardStatus {
+  prerequisitosNivel1: boolean;
   temaSeleccionado: boolean;
   directorAsignado: boolean;
-  procesoIniciado: boolean;
-  tribunalAsignado: boolean;
-  actaEntregada: boolean;
-  finalizado: boolean;
+  reunionesMinimas: boolean;
+  defensaAnteproyecto: boolean;
+
+  prerequisitosNivel2: boolean;
+  asistenciaTutorias: boolean;
+  predefensa: boolean;
+  defensaFinal: boolean;
+
   nombreTema?: string;
   nombreDirector?: string;
+  nombreOpcion?: string;
+  totalTutorias?: number;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class StudentDashboard {
-  private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/student/dashboard';
-   
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = 'http://localhost:8080/api/student/dashboard';
 
-  getStatus(): Observable<DashboardStatus> {
-    return this.http.get<DashboardStatus>(`${this.apiUrl}/status`);
+  getStatus(periodoId: number): Observable<DashboardStatus> {
+    const params = new HttpParams().set('periodoId', periodoId);
+
+    return this.http.get<DashboardStatus>(`${this.apiUrl}/status`, { params });
   }
 }

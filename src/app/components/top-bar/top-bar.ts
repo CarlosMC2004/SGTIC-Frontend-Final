@@ -1,6 +1,6 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PeriodoService } from '../../services/modelo-service/periodo.service';
+import { PeriodoService, Periodo } from '../../services/modelo-service/periodo.service';
 
 @Component({
   selector: 'app-topbar',
@@ -10,68 +10,68 @@ import { PeriodoService } from '../../services/modelo-service/periodo.service';
   styleUrls: ['./top-bar.css']
 })
 export class Topbar implements OnInit {
-  periodos: any[] = [];
-  periodosActivos: any[] = [];
-  periodoSeleccionado: any = null;
-  
+
+  @Output() periodoChange = new EventEmitter<number>();
+
+  periodosAceptados: Periodo[] = [];
+  periodoSeleccionado: Periodo | null = null;
+
   isProfileMenuOpen = false;
   isPeriodMenuOpen = false;
 
   constructor(private periodoService: PeriodoService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.cargarPeriodos();
   }
 
-  cargarPeriodos() {
-    console.log('Cargando períodos...');
-    // 👇 CAMBIA ESTO: usa getPeriodosActivos() en lugar de getPeriodos()
-    this.periodoService.getPeriodosActivos().subscribe({
-      next: (data) => {
-        console.log('Datos recibidos:', data);
-        this.periodos = data; // Todos son activos porque viene de /active
-        this.periodosActivos = data; // Todos son activos
-        
-        console.log('Períodos activos:', this.periodosActivos);
-        
-        // Seleccionar el primer período activo por defecto
-        if (this.periodosActivos.length > 0) {
-          this.periodoSeleccionado = this.periodosActivos[0];
-          console.log('Período seleccionado:', this.periodoSeleccionado);
+  cargarPeriodos(): void {
+    this.periodoService.getPeriodosAceptados().subscribe({
+      next: (data: Periodo[]) => {
+        this.periodosAceptados = data ?? [];
+
+        if (this.periodosAceptados.length > 0) {
+          this.seleccionarPeriodo(this.periodosAceptados[0], false);
+        } else {
+          this.periodoSeleccionado = null;
         }
       },
       error: (error) => {
-        console.error('Error al cargar períodos:', error);
-        // Datos de ejemplo para pruebas si el backend falla
-        this.periodosActivos = [
-          { idPeriod: 1, name: 'REGULAR 2025-2026 SPA', active: true },
-          { idPeriod: 2, name: 'REGULAR 2024-2025 SPA', active: true }
-        ];
-        this.periodoSeleccionado = this.periodosActivos[0];
+        console.error('Error al cargar períodos aceptados del estudiante:', error);
+        this.periodosAceptados = [];
+        this.periodoSeleccionado = null;
       }
     });
   }
 
-  toggleProfileMenu(event: Event) {
+  toggleProfileMenu(event: Event): void {
     event.stopPropagation();
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
     this.isPeriodMenuOpen = false;
   }
 
-  togglePeriodMenu(event: Event) {
+  togglePeriodMenu(event: Event): void {
     event.stopPropagation();
     this.isPeriodMenuOpen = !this.isPeriodMenuOpen;
     this.isProfileMenuOpen = false;
   }
 
-  seleccionarPeriodo(periodo: any) {
-    console.log('Período seleccionado:', periodo);
+  seleccionarPeriodo(periodo: Periodo, cerrarMenu: boolean = true): void {
     this.periodoSeleccionado = periodo;
-    this.isPeriodMenuOpen = false;
+
+    if (cerrarMenu) {
+      this.isPeriodMenuOpen = false;
+    }
+
+    this.periodoChange.emit(periodo.idPeriod);
+  }
+
+  trackByPeriodo(_: number, periodo: Periodo): number {
+    return periodo.idPeriod;
   }
 
   @HostListener('document:click')
-  closeMenus() {
+  closeMenus(): void {
     this.isProfileMenuOpen = false;
     this.isPeriodMenuOpen = false;
   }

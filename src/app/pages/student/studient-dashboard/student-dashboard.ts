@@ -1,9 +1,24 @@
-import { Component, OnInit, inject } from '@angular/core'; // IMPORTANTE: faltaba agregar 'inject' aquí
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { Topbar } from '../../../components/top-bar/top-bar';
-import { StudentDashboard, DashboardStatus } from '../../../services/student-dashboard/student-dashboard'
+import { StudentDashboard, DashboardStatus } from '../../../services/student-dashboard/student-dashboard';
 
+export interface TutoriaObligatoria {
+  id: number;
+  nombre: string;
+  fechaTexto: string;
+  cumplida: boolean;
+}
+
+interface Tutoria {
+  titulo: string;
+  fechaMes: string;
+  fechaDia: string;
+  hora?: string;
+  lugar?: string;
+  tipo: 'virtual' | 'presencial';
+}
 
 @Component({
   selector: 'app-student-dashboard',
@@ -13,67 +28,99 @@ import { StudentDashboard, DashboardStatus } from '../../../services/student-das
   styleUrls: ['./student-dashboard.css']
 })
 export class StudentDashboardd implements OnInit {
-  // Ahora la inyección funciona perfectamente
-  private dashboardService = inject(StudentDashboard);
+  private readonly dashboardService = inject(StudentDashboard);
 
   status: DashboardStatus | null = null;
   isLoading = true;
 
-  entregables = [
-    { 
-      titulo: 'Capítulo 1: Introducción y Justificación', 
-      fecha: '15 Oct, 2025', 
-      icono: 'description' 
+  periodoSeleccionado = 1;
+  totalTutoriasObligatorias = 5;
+  tutoriasObligatoriasPeriodo: TutoriaObligatoria[] = [];
+
+  tutorias: Tutoria[] = [
+    {
+      titulo: 'Revisión de Avances - Cap. 1',
+      fechaMes: 'OCT',
+      fechaDia: '12',
+      hora: '10:00 AM - 11:00 AM',
+      tipo: 'virtual'
     },
-    { 
-      titulo: 'Diseño de la Metodología', 
-      fecha: '30 Oct, 2025', 
-      icono: 'bar_chart' 
+    {
+      titulo: 'Taller de Normativa APA',
+      fechaMes: 'OCT',
+      fechaDia: '19',
+      lugar: 'Auditorio Central',
+      tipo: 'presencial'
     }
   ];
 
-  tutorias = [
-    { 
-      titulo: 'Revisión de Avances - Cap. 1', 
-      fechaMes: 'OCT', 
-      fechaDia: '12', 
-      hora: '10:00 AM - 11:00 AM', 
-      tipo: 'virtual' 
-    },
-    { 
-      titulo: 'Taller de Normativa APA', 
-      fechaMes: 'OCT', 
-      fechaDia: '19', 
-      lugar: 'Auditorio Central', 
-      tipo: 'presencial' 
-    }
-  ];
-
-  ngOnInit() {
-    this.cargarDashboard();
+  get tutoriasCumplidas(): number {
+    return this.tutoriasObligatoriasPeriodo.filter(t => t.cumplida).length;
   }
 
-  cargarDashboard() {
-    this.dashboardService.getStatus().subscribe({
+  ngOnInit(): void {
+    this.cargarDashboard(this.periodoSeleccionado);
+  }
+
+  onPeriodoChange(periodoId: number): void {
+    if (!periodoId || periodoId === this.periodoSeleccionado) {
+      return;
+    }
+
+    this.periodoSeleccionado = periodoId;
+    this.cargarDashboard(periodoId);
+  }
+
+  cargarDashboard(periodoId: number): void {
+    this.isLoading = true;
+
+    this.dashboardService.getStatus(periodoId).subscribe({
       next: (data) => {
         this.status = data;
+        this.generarTutoriasObligatorias(data.totalTutorias ?? 0);
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error al cargar el progreso:', err);
 
         this.status = {
+          prerequisitosNivel1: false,
           temaSeleccionado: false,
           directorAsignado: false,
-          procesoIniciado: false,
-          tribunalAsignado: false,
-          actaEntregada: false,
-          finalizado: false,
+          reunionesMinimas: false,
+          defensaAnteproyecto: false,
+          prerequisitosNivel2: false,
+          asistenciaTutorias: false,
+          predefensa: false,
+          defensaFinal: false,
           nombreTema: '',
-          nombreDirector: ''
+          nombreDirector: '',
+          nombreOpcion: '',
+          totalTutorias: 0
         };
+
+        this.generarTutoriasObligatorias(0);
         this.isLoading = false;
       }
     });
+  }
+
+  private generarTutoriasObligatorias(totalCumplidas: number): void {
+    const cumplidas = Math.max(0, Math.min(totalCumplidas, this.totalTutoriasObligatorias));
+
+    this.tutoriasObligatoriasPeriodo = Array.from(
+      { length: this.totalTutoriasObligatorias },
+      (_, index) => {
+        const numero = index + 1;
+        const estaCumplida = numero <= cumplidas;
+
+        return {
+          id: numero,
+          nombre: `Tutoría obligatoria ${numero}`,
+          fechaTexto: estaCumplida ? 'Tutoría registrada' : 'Aún no registrada',
+          cumplida: estaCumplida
+        };
+      }
+    );
   }
 }
