@@ -7,7 +7,8 @@ import {
   ProcessSetupService,
   DegreeOptionDTO,
   TemaDTO,
-  SaveTopicSelectionRequestDTO
+  SaveTopicSelectionRequestDTO,
+  RegisterProposalStudentTopicRequestDTO
 } from '../../../services/process-setup/process-setup';
 
 interface TemaViewModel {
@@ -36,7 +37,12 @@ export class ProcessSetup implements OnInit {
   activeTab: 'banco' | 'proponer' = 'banco';
   selectedTopicId: number | null = null;
 
-  proposeForm: FormGroup;
+  proposeForm: FormGroup = this.fb.group({
+    titulo: ['', Validators.required],
+    descripcion: ['', Validators.required]
+  });
+
+  selectedFile: File | null = null;
   selectedFileName: string | null = null;
 
   bancoTemas: TemaViewModel[] = [];
@@ -47,25 +53,17 @@ export class ProcessSetup implements OnInit {
   isLoadingTopics = false;
   isSaving = false;
 
-  constructor() {
-    this.proposeForm = this.fb.group({
-      titulo: ['', Validators.required],
-      tipoProyecto: ['', Validators.required],
-      descripcion: ['', Validators.required]
-    });
-  }
-
   ngOnInit(): void {
     this.loadDegreeOptions();
   }
 
   get canSave(): boolean {
-    if (this.isSaving || !this.selectedModalityId || !this.selectedPeriodoId) {
+    if (this.isSaving || !this.selectedModalityId) {
       return false;
     }
 
     if (this.activeTab === 'banco') {
-      return this.selectedTopicId !== null;
+      return !!this.selectedPeriodoId && this.selectedTopicId !== null;
     }
 
     return this.proposeForm.valid;
@@ -163,6 +161,18 @@ export class ProcessSetup implements OnInit {
     return 'library_books';
   }
 
+  getSelectedModalityName(): string {
+    if (!this.selectedModalityId) {
+      return '';
+    }
+
+    const selected = this.modalityOptions.find(
+      option => option.idOption === this.selectedModalityId
+    );
+
+    return selected?.name || '';
+  }
+
   selectModality(idOption: number): void {
     if (this.selectedModalityId === idOption) {
       return;
@@ -193,33 +203,56 @@ export class ProcessSetup implements OnInit {
     const file = input.files?.[0];
 
     if (!file) {
+      this.selectedFile = null;
       this.selectedFileName = null;
       return;
     }
 
+    const allowedExtensions = ['pdf', 'doc', 'docx'];
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const maxBytes = 10 * 1024 * 1024;
+
+    if (!allowedExtensions.includes(extension)) {
+      alert('Solo se permiten archivos PDF, DOC o DOCX.');
+      input.value = '';
+      this.selectedFile = null;
+      this.selectedFileName = null;
+      return;
+    }
+
+    if (file.size > maxBytes) {
+      alert('El archivo supera el tamaño máximo permitido de 10 MB.');
+      input.value = '';
+      this.selectedFile = null;
+      this.selectedFileName = null;
+      return;
+    }
+
+    this.selectedFile = file;
     this.selectedFileName = file.name;
   }
 
   cancelar(): void {
     this.selectedTopicId = null;
+    this.selectedFile = null;
     this.selectedFileName = null;
     this.activeTab = 'banco';
     this.proposeForm.reset();
   }
 
   guardar(): void {
-    if (!this.selectedPeriodoId) {
-      alert('Debes seleccionar un período en la barra superior.');
-      return;
-    }
-
     if (!this.selectedModalityId) {
       alert('Debes seleccionar una modalidad de titulación.');
       return;
     }
 
     if (this.activeTab === 'proponer') {
-      alert('El guardado de propuesta de nuevo tema aún no está implementado.');
+      this.guardarPropuestaTema();
+      return;
+    }
+
+    if (!this.selectedPeriodoId) {
+      alert('Debes seleccionar un período en la barra superior.');
       return;
     }
 
@@ -247,5 +280,77 @@ export class ProcessSetup implements OnInit {
         alert(this.processService.extractErrorMessage(err));
       }
     });
+  }
+
+  private guardarPropuestaTema(): void {
+  if (this.proposeForm.invalid) {
+    this.proposeForm.markAllAsTouched();
+    alert('Completa los campos obligatorios de la propuesta.');
+    return;
+  }
+
+  if (!this.selectedModalityId) {
+    alert('Debes seleccionar una modalidad de titulación.');
+    return;
+  }
+
+  const idUsuario = this.getCurrentUserId();
+
+  if (!idUsuario) {
+    alert('No se pudo identificar al usuario actual. Verifica el idUsuario almacenado en sesión.');
+    return;
+  }
+
+  const idOpcion = this.selectedModalityId;
+
+  const payload: RegisterProposalStudentTopicRequestDTO = {
+    idUsuario,
+    idOpcion,
+    titulo: this.proposeForm.get('titulo')?.value?.trim() || '',
+    descripcion: this.buildProposalDescription(),
+    documento: this.selectedFile
+  };
+
+  this.isSaving = true;
+
+  this.processService.registerProposalStudentTopic(payload).subscribe({
+    next: (response) => {
+      this.isSaving = false;
+      alert(response.mensaje || 'Propuesta registrada correctamente.');
+
+      this.resetProposalForm();
+      this.activeTab = 'banco';
+
+      if (this.selectedModalityId) {
+        this.loadTemas(this.selectedModalityId);
+      }
+    },
+    error: (err) => {
+      this.isSaving = false;
+      console.error('Error al registrar propuesta', err);
+      alert(this.processService.extractErrorMessage(err));
+    }
+  });
+}
+
+  private buildProposalDescription(): string {
+    return this.proposeForm.get('descripcion')?.value?.trim() || '';
+  }
+
+  private resetProposalForm(): void {
+    this.proposeForm.reset();
+    this.selectedFile = null;
+    this.selectedFileName = null;
+  }
+
+  private getCurrentUserId(): number | null {
+    const raw = localStorage.getItem('idUsuario');
+
+    if (!raw) {
+      return null;
+    }
+
+    const id = Number(raw);
+    return Number.isInteger(id) && id > 0 ? id : null;
   }
 }

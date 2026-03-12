@@ -34,6 +34,20 @@ export interface SaveTopicSelectionResponseDTO {
   fechaLimiteSeleccion: string;
 }
 
+export interface RegisterProposalStudentTopicRequestDTO {
+  idUsuario: number;
+  idOpcion: number;
+  titulo: string;
+  descripcion: string;
+  documento?: File | null;
+}
+
+export interface RegisterProposalStudentTopicResponseDTO {
+  idPropuesta: number;
+  mensaje: string;
+  urlDocumento: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -55,13 +69,40 @@ export class ProcessSetupService {
     return this.http.post<SaveTopicSelectionResponseDTO>(`${this.apiUrl}/temas/seleccion`, payload);
   }
 
+  registerProposalStudentTopic(
+    payload: RegisterProposalStudentTopicRequestDTO
+  ): Observable<RegisterProposalStudentTopicResponseDTO> {
+    const formData = new FormData();
+    formData.append('idUsuario', payload.idUsuario.toString());
+    formData.append('idOpcion', payload.idOpcion.toString());
+    formData.append('titulo', payload.titulo);
+    formData.append('descripcion', payload.descripcion);
+
+    if (payload.documento) {
+      formData.append('documento', payload.documento);
+    }
+
+    return this.http.post<RegisterProposalStudentTopicResponseDTO>(
+      `${this.apiUrl}/student/topic-proposals`,
+      formData
+    );
+  }
+
   extractErrorMessage(error: HttpErrorResponse): string {
     if (typeof error.error === 'string' && error.error.trim()) {
       return error.error;
     }
 
+    if (error.error?.mensaje) {
+      return error.error.mensaje;
+    }
+
     if (error.error?.message) {
       return error.error.message;
+    }
+
+    if (error.error?.detalle) {
+      return error.error.detalle;
     }
 
     if (error.status === 0) {
@@ -77,7 +118,7 @@ export class ProcessSetupService {
     }
 
     if (error.status === 409) {
-      return 'No fue posible guardar la selección por una regla de negocio.';
+      return 'No fue posible guardar la información por una regla de negocio.';
     }
 
     if (error.status >= 500) {

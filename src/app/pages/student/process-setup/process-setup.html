@@ -154,16 +154,28 @@
                     formControlName="titulo"
                     placeholder="Ej. Implementación de una red neuronal para..."
                   >
+                  <small
+                    class="text-danger"
+                    *ngIf="proposeForm.get('titulo')?.invalid && proposeForm.get('titulo')?.touched"
+                  >
+                    El título es obligatorio.
+                  </small>
                 </div>
 
                 <div class="form-group">
-                  <label>Tipo de proyecto <span class="text-danger">*</span></label>
-                  <select formControlName="tipoProyecto">
-                    <option value="" disabled>Seleccione el enfoque...</option>
-                    <option value="implementacion">Implementación de Software</option>
-                    <option value="investigacion">Investigación Pura</option>
-                    <option value="infraestructura">Infraestructura y Redes</option>
-                  </select>
+                  <label>Opción de titulación seleccionada <span class="text-danger">*</span></label>
+
+                  <input
+                    type="text"
+                    [value]="getSelectedModalityName()"
+                    readonly
+                    class="readonly-input"
+                    placeholder="Seleccione una modalidad en el paso 1"
+                    >
+
+                  <small class="text-muted">
+                    Esta opción se toma de la modalidad seleccionada arriba.
+                  </small>
                 </div>
 
                 <div class="form-group">
@@ -173,19 +185,25 @@
                     rows="4"
                     placeholder="Describe brevemente el problema a resolver y tu enfoque..."
                   ></textarea>
+                  <small
+                    class="text-danger"
+                    *ngIf="proposeForm.get('descripcion')?.invalid && proposeForm.get('descripcion')?.touched"
+                  >
+                    La descripción es obligatoria.
+                  </small>
                 </div>
 
                 <div class="form-group">
-                  <label>Documento de propuesta (PDF)</label>
+                  <label>Documento de propuesta</label>
                   <div class="upload-zone" (click)="fileInput.click()">
                     <span class="material-symbols-outlined upload-icon">cloud_upload</span>
                     <p>Arrastra tu documento aquí o <strong>haz clic para buscar</strong></p>
-                    <span class="upload-hint">Tamaño máximo: 5MB (Solo PDF)</span>
+                    <span class="upload-hint">Tamaño máximo: 10MB (PDF, DOC, DOCX)</span>
                     <input
                       type="file"
                       #fileInput
                       style="display: none"
-                      accept=".pdf"
+                      accept=".pdf,.doc,.docx"
                       (change)="onFileSelected($event)"
                     >
                     <p *ngIf="selectedFileName" class="file-selected-name">
