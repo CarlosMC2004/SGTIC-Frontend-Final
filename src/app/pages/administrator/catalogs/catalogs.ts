@@ -59,8 +59,10 @@ export class CatalogsComponent implements OnInit {
   constructor(private periodoService: PeriodoService) {}
 
   ngOnInit() {
+  setTimeout(() => {
     this.loadPeriodos();
-  }
+  }, 500);
+}
 
   mostrarToast(mensaje: string, tipo: 'exito' | 'error' = 'exito') {
     setTimeout(() => {
