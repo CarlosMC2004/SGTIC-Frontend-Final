@@ -1,166 +1,126 @@
-<link rel="stylesheet" href="assignments.css">
-
 <div class="layout-container">
-
   <app-sidebar></app-sidebar>
 
   <main class="main-area">
-
     <app-header></app-header>
 
-    <div class="content-body">
-
-      <section class="card project-info">
-        <div class="card-header">
-          <span class="material-symbols-outlined icon-green">info</span>
-          <h3>Información del Proyecto</h3>
+    <div class="split-view-container">
+      <aside class="projects-panel">
+        <div class="panel-header">
+          <h3>
+            <span class="material-symbols-outlined">pending_actions</span>
+            Proyectos Pendientes
+          </h3>
+          <span class="count-badge">{{ pendingProjects.length }}</span>
         </div>
-        <div class="info-grid">
-          <div class="info-item full-width">
-            <label>Título del Proyecto</label>
-            <p>Implementación de IA para la optimización de procesos logísticos en pymes del sector alimentario</p>
+
+        <div class="projects-list custom-scrollbar">
+          <div class="project-card"
+               *ngFor="let p of pendingProjects"
+               [class.active]="p.idPropuesta === selectedProjectId"
+               (click)="seleccionarProyecto(p.idPropuesta)"
+               style="cursor: pointer;">
+
+            <div class="card-tag-row">
+              <span class="tag high">POR ASIGNAR</span>
+              <span class="time">{{ p.fechaEnvio }}</span>
+            </div>
+
+            <h4 class="project-title">{{ p.titulo }}</h4>
+
+            <div class="student-info">
+              <span class="material-symbols-outlined">person</span>
+              {{ p.nombreEstudiante }}
+            </div>
+
+            <div class="project-desc-container custom-scrollbar">
+              <p>
+                <strong>Descripción Completa:</strong>
+                {{ p.descripcion }}
+              </p>
+            </div>
           </div>
-          <div class="info-item">
-            <label>Estudiante</label>
-            <p>Juan Pérez</p>
+        </div>
+      </aside>
+
+      <section class="teachers-panel">
+        <div class="filters-bar">
+          <div class="search-box">
+            <span class="material-symbols-outlined">search</span>
+            <input
+              type="text"
+              placeholder="Buscar docente por nombre o especialidad..."
+              (input)="onSearch($event)"
+            />
           </div>
-          <div class="info-item">
-            <label>Carrera</label>
-            <p>Software</p>
+
+          <div class="filter-row">
+            <button class="btn-ia-magic"
+                    (click)="solicitarSugerenciasIA()"
+                    [disabled]="loadingAi || !selectedProjectId"
+                    [class.loading]="loadingAi">
+              <span class="material-symbols-outlined" *ngIf="!loadingAi">auto_awesome</span>
+              <span class="material-symbols-outlined spin-icon" *ngIf="loadingAi">sync</span>
+              {{ loadingAi ? 'Analizando docentes...' : 'Sugerencia de IA' }}
+            </button>
           </div>
-          <div class="info-item">
-            <label>Periodo</label>
-            <p>2023 - II</p>
+        </div>
+
+        <div class="teachers-grid custom-scrollbar">
+          <div class="teacher-card"
+               *ngFor="let teacher of teachers"
+               [class.recommended]="teacher.matchScore > 0">
+
+            <div class="ai-floating-badge" *ngIf="teacher.matchScore > 0">
+              <span class="material-symbols-outlined">verified</span>
+              {{ teacher.matchScore }}%
+            </div>
+
+            <div class="card-inner">
+              <div class="teacher-profile">
+                <div class="avatar-box">
+                  <img
+                    [src]="teacher.fotoUrl || 'https://ui-avatars.com/api/?name=' + teacher.nombreCompleto + '&background=1a5d43&color=fff'"
+                    alt="docente"
+                  />
+                </div>
+
+                <div class="name-box">
+                  <h5>{{ teacher.nombreCompleto }}</h5>
+                  <p class="rank">Docente Investigador</p>
+                </div>
+              </div>
+
+              <div class="ai-reason-bubble" *ngIf="teacher.matchScore > 0">
+                <span class="material-symbols-outlined">psychology</span>
+                <p>"{{ teacher.razonIA }}"</p>
+              </div>
+
+              <div class="specialties-row">
+                <span class="spec-tag" *ngFor="let spec of teacher.specializations">
+                  {{ spec }}
+                </span>
+              </div>
+
+              <div class="workload-box">
+                <div class="workload-labels">
+                  <span>
+                    <span class="material-symbols-outlined">analytics</span>
+                    Proyectos: {{ teacher.proyectosActivos }}/5
+                  </span>
+                </div>
+              </div>
+
+              <button class="btn-assign-action"
+                      [disabled]="teacher.proyectosActivos >= 5"
+                      (click)="asignarDirector(teacher)">
+                <span class="material-symbols-outlined">person_add</span>
+                Asignar como Director
+              </button>
+            </div>
           </div>
         </div>
       </section>
-
-      <section class="card assignment-section">
-        <div class="card-header">
-          <span class="material-symbols-outlined icon-green">person_add</span>
-          <h3>Asignación de Director</h3>
-        </div>
-
-        <div class="subsection-header">
-          <h4>Sugerencias del Sistema (IA)</h4>
-          <span>Basado en perfil académico y carga horaria</span>
-        </div>
-
-        <div class="suggestions-grid">
-          <div class="suggestion-card">
-            <div class="avatar-circle">
-              <span class="material-symbols-outlined">person</span>
-            </div>
-            <h5>Dr. Roberto Gómez</h5>
-            <p class="specialty">Especialista en IA & Big Data</p>
-            <div class="match-badge">98% Coincidencia</div>
-            <button class="btn-select">Seleccionar</button>
-          </div>
-
-          <div class="suggestion-card">
-            <div class="avatar-circle">
-              <span class="material-symbols-outlined">person</span>
-            </div>
-            <h5>Mgs. Elena Martínez</h5>
-            <p class="specialty">Gestión de Operaciones</p>
-            <div class="match-badge">95% Coincidencia</div>
-            <button class="btn-select">Seleccionar</button>
-          </div>
-
-          <div class="suggestion-card">
-            <div class="avatar-circle">
-              <span class="material-symbols-outlined">person</span>
-            </div>
-            <h5>Dr. Carlos Ruiz</h5>
-            <p class="specialty">Sistemas Expertos</p>
-            <div class="match-badge">92% Coincidencia</div>
-            <button class="btn-select">Seleccionar</button>
-          </div>
-        </div>
-
-        <div class="manual-search-section">
-          <h4>Búsqueda Manual</h4>
-          <div class="search-controls">
-            <div class="search-input">
-              <span class="material-symbols-outlined">search</span>
-              <input type="text" placeholder="Buscar por nombre o área...">
-            </div>
-            <select class="filter-select">
-              <option>Todas las Facultades</option>
-              <option>Ciencias de la Ingeniería</option>
-              <option>Sistemas y Computación</option>
-            </select>
-          </div>
-
-          <div class="table-wrapper">
-            <table>
-              <thead>
-              <tr>
-                <th>Docente</th>
-                <th>Facultad</th>
-                <th>Disponibilidad</th>
-                <th class="text-right">Acción</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td class="font-medium">Ana Lucía Torres</td>
-                <td class="text-gray">Sistemas</td>
-                <td>
-                  <div class="progress-container">
-                    <div class="progress-bar-bg">
-                      <div class="progress-fill green" style="width: 80%"></div>
-                    </div>
-                    <span class="progress-text">4/5 cupos</span>
-                  </div>
-                </td>
-                <td class="text-right">
-                  <button class="btn-assign">Asignar</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="font-medium">Mario Villagómez</td>
-                <td class="text-gray">Ingeniería</td>
-                <td>
-                  <div class="progress-container">
-                    <div class="progress-bar-bg">
-                      <div class="progress-fill green" style="width: 20%"></div>
-                    </div>
-                    <span class="progress-text">1/5 cupos</span>
-                  </div>
-                </td>
-                <td class="text-right">
-                  <button class="btn-assign">Asignar</button>
-                </td>
-              </tr>
-              <tr>
-                <td class="font-medium">Paola Sánchez</td>
-                <td class="text-gray">Software</td>
-                <td>
-                  <div class="progress-container">
-                    <div class="progress-bar-bg">
-                      <div class="progress-fill red" style="width: 100%"></div>
-                    </div>
-                    <span class="progress-text">5/5 cupos</span>
-                  </div>
-                </td>
-                <td class="text-right">
-                  <button class="btn-assign disabled" disabled>Asignar</button>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <footer class="page-footer">
-        <a href="#">
-          ¿No encuentra docente? Solicitar Especialista Externo
-          <span class="material-symbols-outlined">open_in_new</span>
-        </a>
-      </footer>
-
     </div>
   </main>
 </div>
