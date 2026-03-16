@@ -17,6 +17,7 @@ export const routes: Routes = [
     canActivate: [authGuard], // Opcional, pero recomendado para que no entren sin sesión
     loadComponent: () => import('./components/modal-change-password/modal-change-password').then(m => m.ChangePasswordModal)
   },
+  
   // Rutas de Administrador
   {
     path: 'admin',
@@ -49,9 +50,15 @@ export const routes: Routes = [
         path: 'configuration',
         loadComponent: () => import('./pages/administrator/academic-configuration/academic-configuration').then(m => m.AcademicConfiguration)
       },
+      // NUEVO: Gestión de Respaldos (Backup Dashboard)
+      {
+        path: 'backups',
+        loadComponent: () => import('./pages/administrator/backup-dashboard/backup-dashboard').then(m => m.BackupDashboard)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
+  
   // Rutas de Coordinador (ejemplo para futuro)
   {
     path: 'coordinator',
@@ -85,15 +92,24 @@ export const routes: Routes = [
     ]
   },
 
+  // Rutas de Estudiante
   {
     path: 'student',
     canActivate: [authGuard],
     children: [
-      {path: 'dashboard',
-      loadComponent: () => import('./pages/student/studient-dashboard/student-dashboard').then(m => m.StudentDashboardd)},
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/student/studient-dashboard/student-dashboard').then(m => m.StudentDashboardd)
+      },
       {
         path: 'process-setup',
-        loadComponent: () => import('./pages/student/process-setup/process-setup').then(m => m.ProcessSetup)}
+        loadComponent: () => import('./pages/student/process-setup/process-setup').then(m => m.ProcessSetup)
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./pages/student/student-reports/student-reports').then(m => m.StudentReports)
+      }
     ]
   },
   {

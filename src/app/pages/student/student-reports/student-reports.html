@@ -1,0 +1,314 @@
+<div class="layout-wrapper">
+  <app-sidebar role="estudiante"></app-sidebar>
+
+  <main class="main-content">
+    <app-topbar (periodoChange)="onPeriodoChange($event)"></app-topbar>
+
+    <div class="page-container">
+      <header class="page-header">
+        <div class="breadcrumb">
+          <span class="current-page">SGTIC &gt; Estudiante &gt; Reportes</span>
+        </div>
+
+        <div class="header-actions">
+          <div class="search-bar">
+            <span class="material-symbols-outlined">search</span>
+            <input
+              type="text"
+              placeholder="Buscar reporte..."
+              [(ngModel)]="searchTerm"
+            />
+          </div>
+        </div>
+      </header>
+
+      <section class="view-header">
+        <div class="title-block">
+          <h1 class="page-title">Mis Reportes</h1>
+          <p class="page-subtitle">
+            Consulte y descargue en PDF la información relacionada con su proceso
+            de titulación.
+          </p>
+
+          <p class="sub-text">
+            Período visible: <strong>{{ selectedPeriodLabel }}</strong>
+          </p>
+
+          <p *ngIf="isLoadingCatalog" class="sub-text info-text">
+            Cargando catálogo de reportes...
+          </p>
+
+          <p *ngIf="errorMessage" class="sub-text error-text">
+            {{ errorMessage }}
+          </p>
+
+          <p *ngIf="successMessage" class="sub-text success-text">
+            {{ successMessage }}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="!selectedReport || isDownloadingPdf || isLoadingCatalog"
+          (click)="downloadSelectedPdf()"
+        >
+          <span class="material-symbols-outlined">download</span>
+          {{ isDownloadingPdf ? 'Descargando...' : 'Descargar PDF' }}
+        </button>
+      </section>
+
+      <section class="metrics-grid">
+        <article class="metric-card">
+          <span class="label">REPORTE ACTUAL</span>
+          <div class="value value-compact">
+            {{ selectedReport?.title || '--' }}
+          </div>
+          <span class="sub-text">Vista previa y descarga</span>
+        </article>
+
+        <article class="metric-card">
+          <span class="label">REGISTROS VISIBLES</span>
+          <div class="value">{{ previewCount }}</div>
+          <span class="sub-text">Campos o filas del reporte</span>
+        </article>
+
+        <article class="metric-card">
+          <span class="label">TIPO</span>
+          <div class="value">{{ selectedReport?.type || '--' }}</div>
+          <span class="sub-text">Identificador del reporte</span>
+        </article>
+
+        <article class="metric-card">
+          <span class="label">ESTADO</span>
+          <div
+            class="value status-pill"
+            [ngClass]="{
+              'status-loading': isLoadingCatalog || isLoadingPreview,
+              'status-ready': !isLoadingCatalog && !isLoadingPreview && !!selectedReport,
+              'status-empty': !selectedReport
+            }"
+          >
+            <span class="dot"></span>
+            {{
+              isLoadingCatalog || isLoadingPreview
+                ? 'Cargando'
+                : selectedReport
+                ? 'Listo'
+                : 'Sin selección'
+            }}
+          </div>
+          <span class="sub-text">Respuesta del módulo</span>
+        </article>
+      </section>
+
+      <section class="filter-section card">
+        <div class="panel-header">
+          <h3>Selección de reporte</h3>
+          <button
+            type="button"
+            class="btn-secondary"
+            [disabled]="isLoadingCatalog || !selectedReport"
+            (click)="reloadCurrentPreview()"
+          >
+            <span class="material-symbols-outlined">refresh</span>
+            Actualizar vista
+          </button>
+        </div>
+
+        <div class="filter-grid">
+          <div class="field-group">
+            <label for="reportType">Reporte</label>
+            <div class="select-wrapper">
+              <select
+                id="reportType"
+                [(ngModel)]="selectedReportType"
+                (ngModelChange)="onReportSelectionChange($event)"
+              >
+                <option value="">Seleccione un reporte</option>
+                <option
+                  *ngFor="let item of filteredCatalog; trackBy: trackByReportType"
+                  [ngValue]="item.type"
+                >
+                  {{ item.title }}
+                </option>
+              </select>
+              <span class="material-symbols-outlined">expand_more</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="reportDescription">Descripción</label>
+            <input
+              id="reportDescription"
+              type="text"
+              [value]="selectedReportDescription"
+              readonly
+            />
+          </div>
+        </div>
+      </section>
+
+      <h3 class="section-title">Catálogo de reportes</h3>
+
+      <section class="report-grid">
+        <button
+          type="button"
+          class="report-card"
+          *ngFor="let item of filteredCatalog; trackBy: trackByReportType"
+          [ngClass]="{ selected: selectedReport?.type === item.type }"
+          (click)="selectReport(item)"
+        >
+          <div class="report-card-top">
+            <div class="icon-box">
+              <span class="material-symbols-outlined">description</span>
+            </div>
+
+            <div class="report-info">
+              <h4>{{ item.title }}</h4>
+              <p>{{ item.description }}</p>
+            </div>
+          </div>
+
+          <div class="report-card-bottom">
+            <span class="report-type">{{ item.type }}</span>
+
+            <div class="report-actions">
+              <span class="mini-action">Vista previa</span>
+
+              <button
+                type="button"
+                class="mini-download"
+                (click)="downloadPdf(item, $event)"
+                [disabled]="isDownloadingPdf"
+              >
+                <span class="material-symbols-outlined">download</span>
+              </button>
+            </div>
+          </div>
+        </button>
+      </section>
+
+      <section class="preview-layout">
+        <div class="card panel-card preview-card">
+          <div class="panel-header">
+            <div>
+              <h3>Vista previa del reporte</h3>
+              <p class="panel-subtitle">
+                {{ selectedReportTitle }}
+              </p>
+            </div>
+          </div>
+
+          <div *ngIf="isLoadingPreview" class="loading-state">
+            <span class="material-symbols-outlined spin">autorenew</span>
+            <p>Cargando vista previa del reporte...</p>
+          </div>
+
+          <div
+            *ngIf="!isLoadingPreview && previewMode === 'empty'"
+            class="empty-state"
+          >
+            No hay información disponible para mostrar en este reporte.
+          </div>
+
+          <div *ngIf="!isLoadingPreview && previewMode === 'object'" class="table-wrapper">
+            <table class="data-table key-value-table">
+              <thead>
+                <tr>
+                  <th>CAMPO</th>
+                  <th>VALOR</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let field of previewFields">
+                  <td class="field-label">{{ field.label }}</td>
+                  <td>{{ field.value }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!isLoadingPreview && previewMode === 'array'" class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th *ngFor="let column of previewColumns">
+                    {{ column.label | uppercase }}
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody *ngIf="previewRows.length > 0; else emptyArrayRows">
+                <tr *ngFor="let row of previewRows">
+                  <td *ngFor="let column of previewColumns">
+                    {{ row[column.key] }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <ng-template #emptyArrayRows>
+              <div class="empty-state">
+                No hay registros para mostrar.
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <div class="card panel-card help-card">
+          <div class="panel-header">
+            <h3>Acciones rápidas</h3>
+          </div>
+
+          <div class="quick-list">
+            <button
+              type="button"
+              class="quick-action"
+              [disabled]="!selectedReport || isLoadingPreview"
+              (click)="reloadCurrentPreview()"
+            >
+              <div class="icon-box light">
+                <span class="material-symbols-outlined">preview</span>
+              </div>
+              <div class="quick-info">
+                <h4>Actualizar vista</h4>
+                <p>Vuelve a consultar el reporte actual.</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              class="quick-action"
+              [disabled]="!selectedReport || isDownloadingPdf"
+              (click)="downloadSelectedPdf()"
+            >
+              <div class="icon-box gray">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+              </div>
+              <div class="quick-info">
+                <h4>Descargar PDF</h4>
+                <p>Descarga el reporte actualmente seleccionado.</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              class="quick-action"
+              [disabled]="isLoadingCatalog"
+              (click)="loadCatalog()"
+            >
+              <div class="icon-box light">
+                <span class="material-symbols-outlined">sync</span>
+              </div>
+              <div class="quick-info">
+                <h4>Recargar catálogo</h4>
+                <p>Vuelve a cargar los reportes disponibles.</p>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

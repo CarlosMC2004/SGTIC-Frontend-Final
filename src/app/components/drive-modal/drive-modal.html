@@ -1,0 +1,173 @@
+<!-- src/app/components/drive-modal/drive-modal.html -->
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h2>Vinculación con Google Drive</h2>
+        <p class="subtitle">
+          Conecte una cuenta para subir automáticamente los respaldos a Google Drive.
+        </p>
+      </div>
+
+      <button type="button" class="icon-button close-btn" (click)="close()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="isLoading" class="state-message info">
+        Cargando información de Google Drive...
+      </div>
+
+      <div *ngIf="errorMessage" class="state-message error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="successMessage" class="state-message success">
+        {{ successMessage }}
+      </div>
+
+      <div class="content-grid" *ngIf="!isLoading">
+        <section class="card-section">
+          <div class="section-header">
+            <h3>
+              <span class="material-symbols-outlined">cloud_sync</span>
+              Estado de la cuenta
+            </h3>
+          </div>
+
+          <ng-container *ngIf="hasLinkedAccount(); else noDriveAccount">
+            <div class="account-card">
+              <div class="account-icon">
+                <span class="material-symbols-outlined">cloud_done</span>
+              </div>
+
+              <div class="account-info">
+                <div class="account-title">
+                  <span>{{ activeAccount?.googleEmail || 'Cuenta vinculada' }}</span>
+                  <span
+                    class="status-badge"
+                    [ngClass]="{
+                      active: activeAccount?.active,
+                      inactive: !activeAccount?.active
+                    }"
+                  >
+                    {{ activeAccount?.active ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </div>
+
+                <div class="account-meta">
+                  <p><strong>ID interno:</strong> {{ activeAccount?.id }}</p>
+                  <p><strong>Google Sub:</strong> {{ activeAccount?.googleSub || '--' }}</p>
+                  <p><strong>Vinculada:</strong> {{ formatDate(activeAccount?.createdAt) }}</p>
+                  <p><strong>Actualizada:</strong> {{ formatDate(activeAccount?.updatedAt) }}</p>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #noDriveAccount>
+            <div class="empty-state">
+              <span class="material-symbols-outlined empty-icon">cloud_off</span>
+              <h4>No hay cuenta vinculada</h4>
+              <p>
+                Vincule una cuenta de Google Drive para habilitar el almacenamiento remoto de respaldos.
+              </p>
+            </div>
+          </ng-template>
+        </section>
+
+        <section class="card-section">
+          <div class="section-header">
+            <h3>
+              <span class="material-symbols-outlined">settings</span>
+              Acciones rápidas
+            </h3>
+          </div>
+
+          <div class="actions-list">
+            <button
+              type="button"
+              class="action-card primary"
+              (click)="connectGoogleDrive()"
+              [disabled]="isLinking"
+            >
+              <div class="action-icon">
+                <span class="material-symbols-outlined">link</span>
+              </div>
+              <div class="action-content">
+                <h4>{{ hasLinkedAccount() ? 'Vincular otra vez' : 'Vincular cuenta' }}</h4>
+                <p>Abre la autorización de Google en una ventana emergente.</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              class="action-card"
+              (click)="loadActiveAccount()"
+              [disabled]="isLoading || isLinking || isUnlinking"
+            >
+              <div class="action-icon">
+                <span class="material-symbols-outlined">refresh</span>
+              </div>
+              <div class="action-content">
+                <h4>Actualizar estado</h4>
+                <p>Consulta nuevamente la cuenta activa registrada en el sistema.</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              class="action-card danger"
+              (click)="unlinkGoogleDrive()"
+              [disabled]="!hasLinkedAccount() || isUnlinking"
+            >
+              <div class="action-icon">
+                <span class="material-symbols-outlined">link_off</span>
+              </div>
+              <div class="action-content">
+                <h4>{{ isUnlinking ? 'Desvinculando...' : 'Desvincular cuenta' }}</h4>
+                <p>Elimina la relación entre el sistema y la cuenta actual.</p>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <section class="card-section full-width">
+          <div class="section-header">
+            <h3>
+              <span class="material-symbols-outlined">info</span>
+              Información
+            </h3>
+          </div>
+
+          <div class="info-box">
+            <p>
+              La vinculación de la cuenta se realiza con OAuth de Google. No necesita ingresar
+              manualmente correo, contraseña ni tokens.
+            </p>
+            <p>
+              La carpeta destino y la activación de subida automática se configuran desde
+              <strong>Configuración General del Respaldo</strong>.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="close()">
+        Cerrar
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="connectGoogleDrive()"
+        [disabled]="isLinking"
+      >
+        {{ isLinking ? 'Abriendo autorización...' : (hasLinkedAccount() ? 'Volver a vincular' : 'Vincular Google Drive') }}
+      </button>
+    </div>
+  </div>
+</div>

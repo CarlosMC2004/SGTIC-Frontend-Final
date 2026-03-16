@@ -1,0 +1,240 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-main">
+      <div class="modal-header">
+        <div>
+          <h2>Historial de Respaldos</h2>
+          <p class="subtitle">Consulte las ejecuciones realizadas y su detalle.</p>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" class="btn-secondary" (click)="loadHistory()">
+            Actualizar
+          </button>
+
+          <button type="button" class="icon-button close-btn" (click)="close()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="isLoading" class="state-message info">
+          Cargando historial...
+        </div>
+
+        <div *ngIf="errorMessage" class="state-message error">
+          {{ errorMessage }}
+        </div>
+
+        <div class="filters-grid" *ngIf="!isLoading">
+          <div class="form-group search-group">
+            <label>Buscar</label>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Archivo, mensaje, tipo, ruta..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Estado</label>
+            <select [(ngModel)]="statusFilter">
+              <option value="ALL">Todos</option>
+              <option value="SUCCESS">Completado</option>
+              <option value="FAILED">Fallido</option>
+              <option value="RUNNING">En ejecución</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo</label>
+            <select [(ngModel)]="typeFilter">
+              <option *ngFor="let type of typeOptions" [value]="type">
+                {{ type === 'ALL' ? 'Todos' : type }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Desde</label>
+            <input type="date" [(ngModel)]="dateFrom" />
+          </div>
+
+          <div class="form-group">
+            <label>Hasta</label>
+            <input type="date" [(ngModel)]="dateTo" />
+          </div>
+
+          <div class="form-group actions-filter">
+            <button type="button" class="btn-secondary w-100" (click)="clearFilters()">
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper" *ngIf="!isLoading">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tipo</th>
+                <th>Inicio</th>
+                <th>Tamaño</th>
+                <th>Estado</th>
+                <th>Drive</th>
+              </tr>
+            </thead>
+
+            <tbody *ngIf="filteredExecutions.length > 0; else emptyHistory">
+              <tr
+                *ngFor="let item of filteredExecutions; trackBy: trackByExecution"
+                (click)="selectExecution(item)"
+                [class.selected]="selectedExecution?.id === item.id"
+              >
+                <td>
+                  <strong>BK-{{ item.id }}</strong><br>
+                  <span class="text-gray">{{ item.triggeredBy }}</span>
+                </td>
+                <td>{{ item.backupType }}</td>
+                <td>{{ formatDateTime(item.startedAt) }}</td>
+                <td>{{ formatBytes(item.fileSizeBytes) }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(item.status)">
+                    {{ getStatusLabel(item.status) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="mini-badge" [ngClass]="item.driveUploaded ? 'uploaded' : 'not-uploaded'">
+                    {{ item.driveUploaded ? 'Sí' : 'No' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ng-template #emptyHistory>
+            <div class="empty-state">
+              No se encontraron ejecuciones con los filtros actuales.
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side-panel open">
+      <div class="panel-header">
+        <h3>Detalle de ejecución</h3>
+      </div>
+
+      <div class="panel-body" *ngIf="selectedExecution; else noSelection">
+        <div class="detail-card">
+          <div class="detail-row">
+            <span class="label">ID</span>
+            <span class="value">BK-{{ selectedExecution.id }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Estado</span>
+            <span class="status-badge" [ngClass]="getStatusClass(selectedExecution.status)">
+              {{ getStatusLabel(selectedExecution.status) }}
+            </span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Tipo</span>
+            <span class="value">{{ selectedExecution.backupType }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Origen</span>
+            <span class="value">{{ selectedExecution.triggeredBy }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Inicio</span>
+            <span class="value">{{ formatDateTime(selectedExecution.startedAt) }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Fin</span>
+            <span class="value">{{ formatDateTime(selectedExecution.finishedAt) }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Duración</span>
+            <span class="value">
+              {{ getDuration(selectedExecution.startedAt, selectedExecution.finishedAt) }}
+            </span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Tamaño</span>
+            <span class="value">{{ formatBytes(selectedExecution.fileSizeBytes) }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Exit code</span>
+            <span class="value">{{ selectedExecution.exitCode ?? '--' }}</span>
+          </div>
+
+          <div class="detail-block">
+            <span class="label">Archivo</span>
+            <div class="multiline-value">{{ selectedExecution.fileName || '--' }}</div>
+          </div>
+
+          <div class="detail-block">
+            <span class="label">Ruta local</span>
+            <div class="multiline-value">{{ selectedExecution.filePath || '--' }}</div>
+            <button
+              type="button"
+              class="link-button"
+              *ngIf="selectedExecution.filePath"
+              (click)="copyText(selectedExecution.filePath)"
+            >
+              Copiar ruta
+            </button>
+          </div>
+
+          <div class="detail-block">
+            <span class="label">Mensaje</span>
+            <div class="multiline-value">{{ selectedExecution.message || '--' }}</div>
+          </div>
+
+          <div class="detail-block">
+            <span class="label">Drive</span>
+            <div class="multiline-value">
+              {{ selectedExecution.driveUploaded ? 'Archivo subido a Google Drive' : 'No subido a Drive' }}
+            </div>
+
+            <div class="drive-actions" *ngIf="selectedExecution.driveUploaded">
+              <button
+                type="button"
+                class="btn-secondary small"
+                *ngIf="selectedExecution.driveWebViewLink"
+                (click)="openDriveLink(selectedExecution.driveWebViewLink)"
+              >
+                Abrir en Drive
+              </button>
+
+              <button
+                type="button"
+                class="btn-secondary small"
+                *ngIf="selectedExecution.driveFileId"
+                (click)="copyText(selectedExecution.driveFileId)"
+              >
+                Copiar ID
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noSelection>
+        <div class="empty-state detail-empty">
+          Seleccione una ejecución para ver su detalle.
+        </div>
+      </ng-template>
+    </aside>
+  </div>
+</div>
