@@ -51,7 +51,7 @@ export interface CareerDTO {
 export interface AcademicPeriodDTO {
   idPeriod: number;
   name: string;
-  startDate: string; // ISO date string
+  startDate: string;
   endDate: string;
 }
 

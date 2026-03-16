@@ -81,6 +81,25 @@
       </a>
     </ng-container>
 
+    <ng-container *ngIf="role === 'director'">
+      <a class="menu-item" routerLink="/director/dashboard" routerLinkActive="active">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a class="menu-item" routerLink="/director/tutorships" routerLinkActive="active">
+        <span class="material-symbols-outlined">diversity_3</span>
+        <span>Tutorías & Reuniones</span>
+      </a>
+      <a class="menu-item" routerLink="/director/advances" routerLinkActive="active">
+        <span class="material-symbols-outlined">folder_shared</span>
+        <span>Avances y Entregables</span>
+      </a>
+      <a class="menu-item" routerLink="/director/certifications" routerLinkActive="active">
+        <span class="material-symbols-outlined">verified</span>
+        <span>Certificaciones</span>
+      </a>
+    </ng-container>
+
   </nav>
 
   <div class="logout">

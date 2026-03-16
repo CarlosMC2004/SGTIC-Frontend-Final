@@ -1,0 +1,90 @@
+<div class="layout-container">
+  <app-sidebar [role]="'director'"></app-sidebar>
+  <div class="main-content">
+    <app-header></app-header>
+    <div class="page-content">
+
+      <div class="header-actions">
+        <div>
+          <h2 class="page-title">Avances y Entregables</h2>
+          <p class="subtitle">Revisa y califica los documentos subidos por tus tesistas.</p>
+        </div>
+      </div>
+
+      <div class="advances-layout">
+        <div class="students-sidebar card-panel">
+          <h3 class="panel-title">Tus Tesistas</h3>
+
+          <div class="empty-state" *ngIf="assignedStudents.length === 0">
+            <span class="material-symbols-outlined empty-icon">group_off</span>
+            <p>No tienes estudiantes asignados aún.</p>
+          </div>
+
+          <div class="student-item"
+               *ngFor="let student of assignedStudents"
+               [class.active]="selectedStudent?.idWork === student.idWork"
+               (click)="selectStudent(student)">
+            <span class="material-symbols-outlined">person</span>
+            <div class="student-item-info">
+              <span class="student-name">{{ student.studentName }}</span>
+            </div>
+            <span class="material-symbols-outlined chevron">chevron_right</span>
+          </div>
+        </div>
+
+        <div class="documents-area card-panel">
+
+          <div class="empty-state center-all" *ngIf="!selectedStudent">
+            <span class="material-symbols-outlined empty-icon-large">touch_app</span>
+            <h3>Selecciona un estudiante</h3>
+            <p>Haz clic en un tesista de la lista para ver sus avances.</p>
+          </div>
+
+          <div *ngIf="selectedStudent">
+            <div class="documents-header">
+              <div class="header-info">
+                <h3>Documentos de {{ selectedStudent.studentName }}</h3>
+                <p class="thesis-title-muted">{{ selectedStudent.title }}</p>
+              </div>
+              <button class="btn-primary btn-sm" (click)="requestAdvance(selectedStudent)">
+                <span class="material-symbols-outlined">forward_to_inbox</span>
+                Solicitar Avance
+              </button>
+            </div>
+
+            <div class="empty-state" *ngIf="studentDocuments.length === 0 && !isLoadingDocs">
+              <span class="material-symbols-outlined empty-icon">folder_open</span>
+              <p>El estudiante no ha subido ningún avance todavía.</p>
+            </div>
+
+            <div class="document-list" *ngIf="studentDocuments.length > 0">
+              <div class="document-card" *ngFor="let doc of studentDocuments">
+                <div class="doc-icon"><span class="material-symbols-outlined">description</span></div>
+                <div class="doc-info">
+                  <span class="doc-name">{{ doc.fileName }}</span>
+                  <span class="doc-meta">{{ doc.category }} • Subido el {{ doc.uploadDate }}</span>
+                </div>
+                <div class="doc-status" [ngClass]="'status-' + doc.status">
+                  {{ doc.status | uppercase }}
+                </div>
+                <div class="doc-actions">
+                  <button class="btn-icon" title="Descargar" (click)="downloadDocument(doc.idDocument)">
+                    <span class="material-symbols-outlined">download</span>
+                  </button>
+                  <button class="btn-outline-primary" (click)="openReviewModal(doc)">Evaluar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+@if (isRequestModalOpen) {
+  <app-modal-request-advance
+    [student]="selectedStudent"
+    (close)="closeRequestModal()"
+    (send)="handleSendRequest($event)">
+  </app-modal-request-advance>
+}

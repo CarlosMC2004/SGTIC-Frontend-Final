@@ -96,8 +96,28 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/student/process-setup/process-setup').then(m => m.ProcessSetup)}
     ]
   },
-
-
+  {
+    path: 'director',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/director/director-dashboard/director-dashboard').then(m => m.DirectorDashboardComponent)
+      },
+      {
+        path: 'tutorships',
+        loadComponent: () => import('./pages/director/tutorships/tutorships').then(m => m.TutorshipsComponent)
+      },
+      {
+        path: 'advances',
+        loadComponent: () => import('./pages/director/advances/advances').then(m => m.AdvancesComponent)
+      },
+      {
+        path: 'certifications',
+        loadComponent: () => import('./pages/director/certifications/certifications').then(m => m.CertificationsComponent)
+      }
+    ]
+  },
   // Redirecciones por defecto
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
