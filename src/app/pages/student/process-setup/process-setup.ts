@@ -692,6 +692,10 @@ export class ProcessSetup implements OnInit {
           alert(response.mensaje || 'Propuesta registrada correctamente.');
 
           this.resetProposalForm();
+          
+          // OPACIONAL: Enviar de vuelta al dashboard para que vea el stepper actualizado
+          // this.router.navigate(['/dashboard']); 
+          
           this.activeTab = 'banco';
           this.loadSelectionStatus();
           this.loadStudentProposals();

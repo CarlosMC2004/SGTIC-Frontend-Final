@@ -6,17 +6,25 @@
 
     <app-topbar (periodoChange)="onPeriodoChange($event)"></app-topbar>
 
-    <div *ngIf="isLoading" style="text-align: center; padding: 50px;">
-      <span
-        class="material-symbols-outlined"
-        style="font-size: 40px; animation: spin 1s linear infinite;"
-      >
-        autorenew
-      </span>
+    <div class="loader-container" *ngIf="isLoading">
+      <span class="material-symbols-outlined loader-icon">autorenew</span>
       <p>Cargando información de tu proceso...</p>
     </div>
 
-    <div class="dashboard-container" *ngIf="!isLoading && status">
+    <div class="dashboard-container not-enrolled-state" *ngIf="!isLoading && status && !status.estaMatriculado">
+      <div class="empty-state-card text-center">
+        <span class="material-symbols-outlined icon-large-green">school</span>
+        <h2>No estás matriculado en este periodo</h2>
+        <p>Selecciona "Matricularme" para iniciar o continuar tu proceso de titulación en este periodo. El sistema validará tu nivel automáticamente.</p>
+        
+        <button class="btn-submit btn-enroll" (click)="abrirModalMatricula()">
+          <span class="material-symbols-outlined">how_to_reg</span>
+          MATRICULARME EN ESTE PERIODO
+        </button>
+      </div>
+    </div>
+
+    <div class="dashboard-container" *ngIf="!isLoading && status && status.estaMatriculado">
 
       <section class="page-header">
         <h1>Mi Trabajo de Titulación</h1>
@@ -26,159 +34,136 @@
       <section class="stepper-card">
         <div class="stepper">
           <div class="step" [ngClass]="status.prerequisitosNivel1 ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.prerequisitosNivel1 ? 'check' : 'radio_button_unchecked' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.prerequisitosNivel1 ? 'check' : 'radio_button_unchecked' }}</span></div>
             <div class="step-label">PRERREQUISITOS<br>NIVEL 1</div>
           </div>
           <div class="step-line" [ngClass]="status.temaSeleccionado ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.temaSeleccionado ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.temaSeleccionado ? 'check' : 'radio_button_unchecked' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.temaSeleccionado ? 'check' : 'radio_button_unchecked' }}</span></div>
             <div class="step-label">SELECCIÓN DE<br>TIPO/TEMA</div>
           </div>
           <div class="step-line" [ngClass]="status.directorAsignado ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.directorAsignado ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.directorAsignado ? 'check' : 'person_search' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.directorAsignado ? 'check' : 'person_search' }}</span></div>
             <div class="step-label">ASIGNACIÓN<br>DE DIRECTOR</div>
           </div>
           <div class="step-line" [ngClass]="status.reunionesMinimas ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.reunionesMinimas ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.reunionesMinimas ? 'check' : 'group' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.reunionesMinimas ? 'check' : 'group' }}</span></div>
             <div class="step-label">REUNIONES<br>MÍNIMAS</div>
           </div>
           <div class="step-line" [ngClass]="status.defensaAnteproyecto ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.defensaAnteproyecto ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.defensaAnteproyecto ? 'check' : 'description' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.defensaAnteproyecto ? 'check' : 'description' }}</span></div>
             <div class="step-label">DEFENSA DE<br>ANTEPROYECTO</div>
           </div>
 
           <div class="level-separator">NIVEL 2</div>
 
           <div class="step-line" [ngClass]="status.prerequisitosNivel2 ? 'completed-line' : 'pending-line'"></div>
-
           <div class="step" [ngClass]="status.prerequisitosNivel2 ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.prerequisitosNivel2 ? 'check' : 'radio_button_unchecked' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.prerequisitosNivel2 ? 'check' : 'radio_button_unchecked' }}</span></div>
             <div class="step-label">PRERREQUISITOS<br>NIVEL 2</div>
           </div>
           <div class="step-line" [ngClass]="status.asistenciaTutorias ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.asistenciaTutorias ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.asistenciaTutorias ? 'check' : 'event' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.asistenciaTutorias ? 'check' : 'event' }}</span></div>
             <div class="step-label">ASISTENCIA A<br>TUTORÍAS</div>
           </div>
           <div class="step-line" [ngClass]="status.predefensa ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.predefensa ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.predefensa ? 'check' : 'visibility' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.predefensa ? 'check' : 'visibility' }}</span></div>
             <div class="step-label">PREDEFENSA</div>
           </div>
           <div class="step-line" [ngClass]="status.defensaFinal ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.defensaFinal ? 'completed' : 'pending'">
-            <div class="step-icon">
-              <span class="material-symbols-outlined">
-                {{ status.defensaFinal ? 'check' : 'flag' }}
-              </span>
-            </div>
+            <div class="step-icon"><span class="material-symbols-outlined">{{ status.defensaFinal ? 'check' : 'flag' }}</span></div>
             <div class="step-label">DEFENSA FINAL</div>
           </div>
         </div>
       </section>
 
+      <section class="action-required-section">
+        
+        <div class="action-card theme-green" *ngIf="status.prerequisitosNivel1 && !status.temaSeleccionado">
+          <div class="action-content">
+            <h3>Paso Actual: Selección de Modalidad y Tema</h3>
+            <p>Debes elegir un tema del banco de propuestas o proponer tu propio tema para continuar.</p>
+          </div>
+          <button class="btn-action theme-green-btn" (click)="abrirModalTema()">
+            <span class="material-symbols-outlined">post_add</span> GESTIONAR TEMA
+          </button>
+        </div>
+
+        <div class="action-card theme-orange" *ngIf="status.temaSeleccionado && !status.directorAsignado">
+          <div class="action-content">
+            <h3>Paso Actual: Asignación de Director</h3>
+            <p>Tu tema está registrado. Coordinación está evaluando el perfil docente para asignarte un director.</p>
+          </div>
+          <div class="action-status theme-orange-text">
+            <span class="material-symbols-outlined icon-spin">hourglass_empty</span> En espera
+          </div>
+        </div>
+
+        <div class="action-card theme-blue" *ngIf="status.directorAsignado && !status.defensaAnteproyecto">
+          <div class="action-content">
+            <h3>Paso Actual: Desarrollo y Defensa de Anteproyecto</h3>
+            <p>Coordina con tu director las tutorías y prepara tu documento de anteproyecto.</p>
+          </div>
+          <button class="btn-action theme-blue-btn" (click)="abrirModalAnteproyecto()">
+            <span class="material-symbols-outlined">upload_file</span> ENTREGAR ANTEPROYECTO
+          </button>
+        </div>
+
+      </section>
+
       <section class="info-cards-grid">
         <div class="info-card">
-          <div class="card-icon">
-            <span class="material-symbols-outlined">menu_book</span>
-          </div>
+          <div class="card-icon"><span class="material-symbols-outlined">menu_book</span></div>
           <div class="card-content">
             <span class="card-subtitle">MODALIDAD DE TITULACIÓN</span>
             <span class="card-title">{{ status.nombreOpcion || 'Aún no asignada' }}</span>
-            <span class="card-detail" *ngIf="status.nombreTema">
-              Tema: {{ status.nombreTema }}
-            </span>
+            <span class="card-detail" *ngIf="status.nombreTema">Tema: {{ status.nombreTema }}</span>
           </div>
         </div>
 
         <div class="info-card">
-          <div class="card-icon">
-            <span class="material-symbols-outlined">account_circle</span>
-          </div>
+          <div class="card-icon"><span class="material-symbols-outlined">account_circle</span></div>
           <div class="card-content flex-grow">
             <span class="card-subtitle">DIRECTOR ASIGNADO</span>
             <span class="card-title">{{ status.nombreDirector || 'Por asignar' }}</span>
           </div>
-          <button class="btn-outline-green" [disabled]="!status.directorAsignado">
-            CONTACTAR
-          </button>
+          <button class="btn-outline-green" [disabled]="!status.directorAsignado">CONTACTAR</button>
         </div>
       </section>
 
       <section class="content-grid">
-
         <div class="left-column">
           <div class="section-header">
             <div class="title-with-icon">
               <span class="material-symbols-outlined">groups</span>
               <h2>5 Tutorías Obligatorias del Período</h2>
             </div>
-            <span class="period-summary">
-              {{ tutoriasCumplidas }} / {{ totalTutoriasObligatorias }} cumplidas
-            </span>
+            <span class="period-summary">{{ tutoriasCumplidas }} / {{ totalTutoriasObligatorias }} cumplidas</span>
           </div>
 
           <div class="deliverable-list">
             <div class="deliverable-card tutoria-card" *ngFor="let tutoria of tutoriasObligatoriasPeriodo">
               <div class="doc-icon" [ngClass]="tutoria.cumplida ? 'icon-cumplida' : 'icon-pendiente'">
-                <span class="material-symbols-outlined">
-                  {{ tutoria.cumplida ? 'check_circle' : 'pending_actions' }}
-                </span>
+                <span class="material-symbols-outlined">{{ tutoria.cumplida ? 'check_circle' : 'pending_actions' }}</span>
               </div>
-
               <div class="doc-info">
                 <h3>{{ tutoria.nombre }}</h3>
-                <span>
-                  <span class="material-symbols-outlined icon-tiny">calendar_today</span>
-                  {{ tutoria.fechaTexto }}
-                </span>
+                <span><span class="material-symbols-outlined icon-tiny">calendar_today</span> {{ tutoria.fechaTexto }}</span>
               </div>
-
-              <span class="badge-estado" [ngClass]="tutoria.cumplida ? 'cumplida' : 'pendiente'">
-                {{ tutoria.cumplida ? 'Cumplida' : 'Pendiente' }}
-              </span>
+              <span class="badge-estado" [ngClass]="tutoria.cumplida ? 'cumplida' : 'pendiente'">{{ tutoria.cumplida ? 'Cumplida' : 'Pendiente' }}</span>
             </div>
           </div>
         </div>
@@ -197,38 +182,17 @@
                 <span class="month">{{ evento.fechaMes }}</span>
                 <span class="day">{{ evento.fechaDia }}</span>
               </div>
-
               <div class="event-details">
                 <h3>{{ evento.titulo }}</h3>
-
-                <span *ngIf="evento.hora" class="event-time">
-                  <span class="material-symbols-outlined icon-tiny">schedule</span>
-                  {{ evento.hora }}
-                </span>
-
-                <span *ngIf="evento.lugar" class="event-location">
-                  <span class="material-symbols-outlined icon-tiny">location_on</span>
-                  {{ evento.lugar }}
-                </span>
-
-                <button class="btn-join" *ngIf="evento.tipo === 'virtual'">
-                  <span class="material-symbols-outlined">videocam</span>
-                  Unirse
-                </button>
-
-                <span class="event-type-text" *ngIf="evento.tipo === 'presencial'">
-                  Presencial
-                </span>
+                <span *ngIf="evento.hora" class="event-time"><span class="material-symbols-outlined icon-tiny">schedule</span> {{ evento.hora }}</span>
+                <span *ngIf="evento.lugar" class="event-location"><span class="material-symbols-outlined icon-tiny">location_on</span> {{ evento.lugar }}</span>
+                <button class="btn-join" *ngIf="evento.tipo === 'virtual'"><span class="material-symbols-outlined">videocam</span> Unirse</button>
+                <span class="event-type-text" *ngIf="evento.tipo === 'presencial'">Presencial</span>
               </div>
             </div>
-
-            <button class="btn-request-tutoring">
-              <span class="material-symbols-outlined">add</span>
-              Solicitar Tutoría
-            </button>
+            <button class="btn-request-tutoring"><span class="material-symbols-outlined">add</span> Solicitar Tutoría</button>
           </div>
         </div>
-
       </section>
 
       <footer class="dashboard-footer">
@@ -237,4 +201,40 @@
 
     </div>
   </main>
+</div>
+
+<div class="custom-modal-backdrop" *ngIf="mostrarModalMatricula">
+  <div class="custom-modal-container slide-down-animation">
+    
+    <div class="custom-modal-header header-green">
+      <div>
+        <h2>Confirmar Matrícula</h2>
+        <span class="header-subtitle">SGTIC - TITULACIÓN</span>
+      </div>
+      <button class="btn-close-circle" (click)="cerrarModalMatricula()">
+        <span class="material-symbols-outlined icon-small">close</span>
+      </button>
+    </div>
+
+    <div class="custom-modal-body">
+      <div class="modal-icon-wrapper">
+        <span class="material-symbols-outlined icon-modal">article</span>
+      </div>
+      <h3>¿Deseas matricularte en el periodo actual?</h3>
+      <p class="modal-description">
+        Al confirmar, el sistema evaluará tu historial académico para asignarte automáticamente al Nivel 1 (Desarrollo I) o Nivel 2 (Desarrollo II) según corresponda.
+      </p>
+      
+      <div class="modal-actions-flex">
+        <button type="button" class="btn-cancel-modal" (click)="cerrarModalMatricula()">
+          CANCELAR
+        </button>
+        <button type="button" class="btn-confirm-modal" (click)="confirmarMatricula()" [disabled]="isEnrolling">
+          <span class="material-symbols-outlined icon-medium" *ngIf="!isEnrolling">check_circle</span>
+          <span class="material-symbols-outlined icon-medium icon-spin" *ngIf="isEnrolling">autorenew</span>
+          {{ isEnrolling ? 'PROCESANDO...' : 'CONFIRMAR' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
