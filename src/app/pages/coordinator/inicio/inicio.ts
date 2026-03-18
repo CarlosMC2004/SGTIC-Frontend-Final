@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../../../components/header/header'; // Ajusta la ruta si es necesario
-import { SidebarComponent } from '../../../components/sidebar/sidebar'; // Ajusta la ruta si es necesario
+import { HeaderComponent } from '../../../components/header/header';
+import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { StatisticsReport } from '../../../services/statistics-report/statistics-report';
 import { AuthService } from '../../../services/auth.service';
 import Chart from 'chart.js/auto';

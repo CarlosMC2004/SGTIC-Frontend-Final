@@ -46,7 +46,7 @@
     </ng-container>
 
     <ng-container *ngIf="role === 'coordinador'">
-      <a class="menu-item" routerLink="/coordinator/dashboard" routerLinkActive="active">
+      <a class="menu-item" routerLink="/coordinator/Inicio" routerLinkActive="active">
         <span class="material-symbols-outlined">home</span>
         <span>Inicio</span>
       </a>
@@ -70,7 +70,11 @@
         <span class="material-symbols-outlined">check</span>
         <span>Opciones de Titulacion</span>
       </a>
-    </ng-container> <!-- ✅ CERRADO CORRECTAMENTE -->
+      <a class="menu-item" routerLink="/coordinator/Reports" routerLinkActive="active">
+        <span class="material-symbols-outlined">bar_chart</span>
+        <span>Reportes</span>
+      </a>
+    </ng-container>
 
     <ng-container *ngIf="role === 'estudiante'">
       <a class="menu-item" routerLink="/student/dashboard" routerLinkActive="active">

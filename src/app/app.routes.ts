@@ -9,7 +9,7 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/general/login/login').then(m => m.LoginComponent)
   },
-  
+
 
  // ✅ Ruta del chat - PÚBLICA (sin authGuard)
   {
@@ -32,7 +32,7 @@ export const routes: Routes = [
     canActivate: [authGuard], // Opcional, pero recomendado para que no entren sin sesión
     loadComponent: () => import('./components/modal-change-password/modal-change-password').then(m => m.ChangePasswordModal)
   },
-  
+
   // Rutas de Administrador
   {
     path: 'admin',
@@ -73,13 +73,16 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  
+
   // Rutas de Coordinador (ejemplo para futuro)
   {
     path: 'coordinator',
     canActivate: [authGuard],
     children: [
-      //{ path: 'dashboard', loadComponent: () => import('./pages/coordinator/dashboard').then(m => m.DashboardComponent) }
+      {
+        path: 'Inicio',
+        loadComponent: () => import('./pages/coordinator/inicio/inicio').then(m => m.Inicio)
+      },
       {
         path: 'StudentRequests',
         loadComponent: () => import('./pages/coordinator/student-requests/student-requests').then(m => m.StudentRequests)
@@ -103,6 +106,10 @@ export const routes: Routes = [
       {
         path: 'PendingProposalComponent',
         loadComponent: () => import('./pages/coordinator/pending-proposal/pending-proposal').then(m => m.PendingProposalComponent)
+      },
+      {
+        path: 'Reports',
+        loadComponent:() => import('./pages/coordinator/reports/reports').then(m => m.Reports)
       }
     ]
   },
@@ -156,6 +163,6 @@ export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
 
-  
+
 
 ];
