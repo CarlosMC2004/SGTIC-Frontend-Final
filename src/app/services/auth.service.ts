@@ -18,21 +18,22 @@ export class AuthService {
 
   private userContext: UserContext | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.loadStoredUser();
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials)
-      .pipe(
-        tap(response => {
-          this.setSession(response);
-        })
-      );
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
+      tap((response) => {
+        this.setSession(response);
+      })
+    );
   }
 
   private setSession(authResult: LoginResponse): void {
-    // Almacenar en sessionStorage (más seguro que localStorage contra XSS persistente)
     sessionStorage.setItem(this.TOKEN_KEY, authResult.token);
 
     const user: CurrentUser = {
@@ -50,10 +51,21 @@ export class AuthService {
 
   private loadStoredUser(): void {
     const userStr = sessionStorage.getItem(this.USER_KEY);
-    if (userStr) {
+
+    if (!userStr) {
+      return;
+    }
+
+    try {
       const user: CurrentUser = JSON.parse(userStr);
       this.currentUserSubject.next(user);
       this.userContext = user.context;
+    } catch (error) {
+      console.error('Error al cargar usuario almacenado:', error);
+      sessionStorage.removeItem(this.USER_KEY);
+      sessionStorage.removeItem(this.TOKEN_KEY);
+      this.currentUserSubject.next(null);
+      this.userContext = null;
     }
   }
 
@@ -73,7 +85,7 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  getCurrentUser() {
+  getCurrentUser(): CurrentUser | null {
     return this.currentUserSubject.value;
   }
 
@@ -91,7 +103,6 @@ export class AuthService {
     return this.userContext;
   }
 
-  // Obtener claims específicos para filtrar queries
   getFacultyId(): number | null {
     return this.userContext?.idFaculty || null;
   }
@@ -101,17 +112,17 @@ export class AuthService {
   }
 
   changeFirstPassword(newPassword: string): Observable<any> {
-    return this.http.put(`${this.API_URL}/change-password`, { newPassword })
-      .pipe(
-        tap(() => {
-          const currentUser = this.currentUserSubject.value;
-          if (currentUser) {
-            currentUser.primerIngreso = true;
-            sessionStorage.setItem(this.USER_KEY, JSON.stringify(currentUser));
-            this.currentUserSubject.next(currentUser);
-          }
-        })
-      );
+    return this.http.put(`${this.API_URL}/change-password`, { newPassword }).pipe(
+      tap(() => {
+        const currentUser = this.currentUserSubject.value;
+
+        if (currentUser) {
+          currentUser.primerIngreso = true;
+          sessionStorage.setItem(this.USER_KEY, JSON.stringify(currentUser));
+          this.currentUserSubject.next({ ...currentUser });
+        }
+      })
+    );
   }
 
   getUserId(): number | null {

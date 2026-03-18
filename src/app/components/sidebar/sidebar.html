@@ -8,7 +8,6 @@
 
   <nav class="menu">
 
-    <!-- Administrador -->
     <ng-container *ngIf="role === 'admin'">
       <a class="menu-item" routerLink="/admin/dashboard" routerLinkActive="active">
         <span class="material-symbols-outlined">dashboard</span>
@@ -39,11 +38,15 @@
         <span class="material-symbols-outlined">settings</span>
         <span>Configuración Académica</span>
       </a>
+
+      <a class="menu-item" routerLink="/admin/backups" routerLinkActive="active">
+        <span class="material-symbols-outlined">database</span>
+        <span>Gestión de Respaldos</span>
+      </a>
     </ng-container>
 
-    <!-- Coordinador -->
     <ng-container *ngIf="role === 'coordinador'">
-      <a class="menu-item" routerLink="/coordinator/Inicio" routerLinkActive="active">
+      <a class="menu-item" routerLink="/coordinator/dashboard" routerLinkActive="active">
         <span class="material-symbols-outlined">home</span>
         <span>Inicio</span>
       </a>
@@ -67,13 +70,8 @@
         <span class="material-symbols-outlined">check</span>
         <span>Opciones de Titulacion</span>
       </a>
-      <a class="menu-item" routerLink="/coordinator/Reports" routerLinkActive="active">
-        <span class="material-symbols-outlined">bar_chart</span>
-        <span>Reportes</span>
-      </a>
     </ng-container>
 
-    <!-- Estudiante -->
     <ng-container *ngIf="role === 'estudiante'">
       <a class="menu-item" routerLink="/student/dashboard" routerLinkActive="active">
         <span class="material-symbols-outlined">home</span>
@@ -82,6 +80,29 @@
       <a class="menu-item" routerLink="/student/process-setup" routerLinkActive="active">
         <span class="material-symbols-outlined">folder_shared</span>
         <span>Inicio del proceso</span>
+      </a>
+       <a class="menu-item" routerLink="/student/reports" routerLinkActive="active">
+        <span class="material-symbols-outlined">description</span>
+        <span>Reportes</span>
+      </a>
+    </ng-container>
+
+    <ng-container *ngIf="role === 'director'">
+      <a class="menu-item" routerLink="/director/dashboard" routerLinkActive="active">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a class="menu-item" routerLink="/director/tutorships" routerLinkActive="active">
+        <span class="material-symbols-outlined">diversity_3</span>
+        <span>Tutorías & Reuniones</span>
+      </a>
+      <a class="menu-item" routerLink="/director/advances" routerLinkActive="active">
+        <span class="material-symbols-outlined">folder_shared</span>
+        <span>Avances y Entregables</span>
+      </a>
+      <a class="menu-item" routerLink="/director/certifications" routerLinkActive="active">
+        <span class="material-symbols-outlined">verified</span>
+        <span>Certificaciones</span>
       </a>
     </ng-container>
 

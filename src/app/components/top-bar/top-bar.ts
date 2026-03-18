@@ -10,7 +10,6 @@ import { PeriodoService, Periodo } from '../../services/modelo-service/periodo.s
   styleUrls: ['./top-bar.css']
 })
 export class Topbar implements OnInit {
-
   @Output() periodoChange = new EventEmitter<number>();
 
   periodosAceptados: Periodo[] = [];
@@ -31,7 +30,8 @@ export class Topbar implements OnInit {
         this.periodosAceptados = data ?? [];
 
         if (this.periodosAceptados.length > 0) {
-          this.seleccionarPeriodo(this.periodosAceptados[0], false);
+          this.periodoSeleccionado = this.periodosAceptados[0];
+          this.periodoChange.emit(this.periodoSeleccionado.idPeriod);
         } else {
           this.periodoSeleccionado = null;
         }

@@ -5,6 +5,7 @@
   font-family: "Public Sans", sans-serif;
 }
 
+
 app-sidebar {
   width: 260px;
   flex-shrink: 0;
@@ -22,7 +23,6 @@ app-sidebar {
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
-  box-sizing: border-box;
 }
 
 .page-heading {
@@ -42,37 +42,7 @@ app-sidebar {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  margin-bottom: 24px;
-}
-
-@media (max-width: 1024px) {
-  .content-body {
-    padding: 24px;
-  }
-}
-
-/* Celulares y pantallas pequeñas */
-@media (max-width: 768px) {
-  .layout-container {
-    flex-direction: column;
-  }
-
-  app-sidebar {
-    width: 100%;
-  }
-
-  .content-body {
-    padding: 16px;
-  }
-
-  .page-title {
-    font-size: 22px;
-  }
-
-  .cards-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+  margin-bottom: 20px;
 }

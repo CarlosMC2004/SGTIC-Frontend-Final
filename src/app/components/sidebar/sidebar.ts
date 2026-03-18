@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./sidebar.css']
 })
 export class SidebarComponent {
-  @Input() role: 'coordinador' | 'estudiante' | 'admin' = 'coordinador';
+  @Input() role: 'coordinador' | 'estudiante' | 'admin' | 'director' = 'coordinador';
 
   constructor(private authService: AuthService, private router: Router) {}
 
