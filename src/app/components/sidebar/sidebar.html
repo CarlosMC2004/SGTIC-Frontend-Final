@@ -13,35 +13,34 @@
         <span class="material-symbols-outlined">dashboard</span>
         <span>Panel de Control</span>
       </a>
-
       <a class="menu-item" routerLink="/admin/users" routerLinkActive="active">
         <span class="material-symbols-outlined">people</span>
         <span>Gestión de Usuarios</span>
       </a>
-
       <a class="menu-item" routerLink="/admin/roles" routerLinkActive="active">
         <span class="material-symbols-outlined">manage_accounts</span>
         <span>Gestión de Roles</span>
       </a>
-
       <a class="menu-item" routerLink="/admin/catalogs" routerLinkActive="active">
         <span class="material-symbols-outlined">folder_open</span>
         <span>Catálogos</span>
       </a>
-
       <a class="menu-item" routerLink="/admin/structure" routerLinkActive="active">
         <span class="material-symbols-outlined">domain</span>
         <span>Estructura Institucional</span>
       </a>
-
       <a class="menu-item" routerLink="/admin/configuration" routerLinkActive="active">
         <span class="material-symbols-outlined">settings</span>
         <span>Configuración Académica</span>
       </a>
-
       <a class="menu-item" routerLink="/admin/backups" routerLinkActive="active">
         <span class="material-symbols-outlined">database</span>
         <span>Gestión de Respaldos</span>
+      </a>
+      <!-- Chat Admin -->
+      <a class="menu-item" routerLink="/chat/admin" routerLinkActive="active">
+        <span class="material-symbols-outlined">chat</span>
+        <span>Chat</span>
       </a>
     </ng-container>
 
@@ -56,7 +55,7 @@
       </a>
       <a class="menu-item" routerLink="/coordinator/BankThemes" routerLinkActive="active">
         <span class="material-symbols-outlined">library_books</span>
-        <span>Gestiòn de Temas</span>
+        <span>Gestión de Temas</span>
       </a>
       <a class="menu-item" routerLink="/coordinator/Assignments" routerLinkActive="active">
         <span class="material-symbols-outlined">assignment_ind</span>
@@ -68,11 +67,16 @@
       </a>
       <a class="menu-item" routerLink="/coordinator/DegreeOptions" routerLinkActive="active">
         <span class="material-symbols-outlined">check</span>
-        <span>Opciones de Titulacion</span>
+        <span>Opciones de Titulación</span>
       </a>
       <a class="menu-item" routerLink="/coordinator/Reports" routerLinkActive="active">
         <span class="material-symbols-outlined">bar_chart</span>
         <span>Reportes</span>
+      </a>
+      <!-- Chat Coordinador -->
+      <a class="menu-item" routerLink="/chat/coordinator" routerLinkActive="active">
+        <span class="material-symbols-outlined">chat</span>
+        <span>Chat</span>
       </a>
     </ng-container>
 
@@ -85,9 +89,14 @@
         <span class="material-symbols-outlined">folder_shared</span>
         <span>Inicio del proceso</span>
       </a>
-       <a class="menu-item" routerLink="/student/reports" routerLinkActive="active">
+      <a class="menu-item" routerLink="/student/reports" routerLinkActive="active">
         <span class="material-symbols-outlined">description</span>
         <span>Reportes</span>
+      </a>
+      <!-- 👇 Chat Estudiante -->
+      <a class="menu-item" routerLink="/chat/student" routerLinkActive="active">
+        <span class="material-symbols-outlined">chat</span>
+        <span>Chat</span>
       </a>
     </ng-container>
 
@@ -108,27 +117,12 @@
         <span class="material-symbols-outlined">verified</span>
         <span>Certificaciones</span>
       </a>
+      <!-- Chat Director -->
       <a class="menu-item" routerLink="/chat/student" routerLinkActive="active">
         <span class="material-symbols-outlined">chat</span>
         <span>Chat</span>
       </a>
     </ng-container>
-
-    <!-- Admin Chat -->
-    <ng-container *ngIf="role === 'admin'">
-      <a class="menu-item" routerLink="/chat/admin" routerLinkActive="active">
-        <span class="material-symbols-outlined">chat</span>
-        <span>Chat</span>
-      </a>
-    </ng-container>
-
-    <!-- Coordinador Chat -->
-    <ng-container *ngIf="role === 'coordinador'">
-      <a class="menu-item" routerLink="/chat/coordinator" routerLinkActive="active">
-        <span class="material-symbols-outlined">chat</span>
-        <span>Chat</span>
-      </a>
-    </ng-container> <!-- ✅ CERRADO CORRECTAMENTE -->
 
   </nav>
 
