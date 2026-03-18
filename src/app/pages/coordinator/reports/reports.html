@@ -1,0 +1,205 @@
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-area">
+    <app-header></app-header>
+
+    <div class="content-body" style="background-color: #f8fafc; padding: 20px;">
+
+      <header class="reportes-header">
+        <div class="header-titles">
+          <h2 class="page-title">Reportes Estadísticos</h2>
+          <p class="page-description">
+            Visualización de datos y seguimiento de procesos de titulación para <strong>{{ nombreCarreraActual }}</strong>.
+          </p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-export-pdf" (click)="exportarPDF()">
+            <span class="material-symbols-outlined">description</span>
+            Exportar PDF
+          </button>
+        </div>
+      </header>
+
+      <section class="card filter-card">
+        <div class="filter-grid">
+
+          <div class="filter-group">
+            <label>Periodo Académico</label>
+            <select [(ngModel)]="filtroPeriodo" (change)="cargarDatosReporte()" class="form-select">
+              <option [ngValue]="0">Todos los periodos</option>
+              <option *ngFor="let p of listadoPeriodos" [ngValue]="p.idPeriod">
+                {{ p.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Estado de Tesis</label>
+            <select [(ngModel)]="filtroEstado" (change)="cargarDatosReporte()" class="form-select">
+              <option value="">Todos los estados</option>
+              <option *ngFor="let estado of listadoEstados" [value]="estado">
+                {{ estado | titlecase }}
+              </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Director / Docente</label>
+            <select [(ngModel)]="filtroDirector" (change)="cargarDatosReporte()" class="form-select">
+              <option [ngValue]="0">Todos los docentes</option>
+              <option *ngFor="let d of listadoDocentes" [ngValue]="d.idDocente">
+                {{ d.nombreCompleto }}
+              </option>
+            </select>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="charts-grid">
+        <div class="card chart-box">
+          <h3 class="card-subtitle">Temas de Tesis por Estado</h3>
+          <div class="bar-chart-container">
+            <div class="bar-column">
+              <div class="bar bg-green" [style.height.%]="(estadisticas.temasAprobados / (estadisticas.totalTemas || 1)) * 100 + 10">
+                <span class="bar-value">{{ estadisticas.temasAprobados }}</span>
+              </div>
+              <span class="bar-label">Aprobada</span>
+            </div>
+            <div class="bar-column">
+              <div class="bar bg-yellow" [style.height.%]="(estadisticas.temasPendientes / (estadisticas.totalTemas || 1)) * 100 + 10">
+                <span class="bar-value">{{ estadisticas.temasPendientes }}</span>
+              </div>
+              <span class="bar-label">Pendiente</span>
+            </div>
+            <div class="bar-column">
+              <div class="bar bg-red" [style.height.%]="(estadisticas.temasRechazados / (estadisticas.totalTemas || 1)) * 100 + 10">
+                <span class="bar-value">{{ estadisticas.temasRechazados }}</span>
+              </div>
+              <span class="bar-label">Rechazada</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card chart-box">
+          <h3 class="card-subtitle">Origen de Temas</h3>
+          <div class="donut-container">
+            <div class="donut-visual">
+              <div class="donut-circle">
+                <div class="donut-inner-text">
+                  <span class="donut-number">{{ estadisticas.totalTemas }}</span>
+                  <span class="donut-label">Temas Totales</span>
+                </div>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <div class="legend-item">
+                <span class="legend-dot dot-banco"></span>
+                <div class="legend-text">
+                  <p class="legend-title">Banco de Temas</p>
+                  <p class="legend-value">{{ estadisticas.temasBanco }}</p>
+                </div>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot dot-propuesta"></span>
+                <div class="legend-text">
+                  <p class="legend-title">Propuesta Estudiante</p>
+                  <p class="legend-value">{{ estadisticas.temasPropuesta }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tables-container">
+
+        <div class="card table-wrapper">
+          <div class="table-header bg-gray-light">
+            <h3 class="card-title-table">Docentes con Proyectos Asignados</h3>
+            <span class="badge badge-emerald">Total: {{ docentesTable.length }} Docentes</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+              <tr>
+                <th>Nombre del Docente</th>
+                <th>Especialización</th>
+                <th class="text-center">Proyectos</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let docente of docentesTable">
+                <td class="font-medium text-dark">{{ docente.nombreCompleto }}</td>
+                <td class="text-light">{{ docente.especializacionPrincipal || 'Sin especialidad asignada' }}</td>
+                <td class="text-center">
+                  <div class="box-badge" [ngClass]="docente.proyectosAsignados >= 5 ? 'box-yellow' : 'box-green'">
+                    {{ docente.proyectosAsignados }}
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="docentesTable.length === 0">
+                <td colspan="3" class="text-center py-5 text-light">No hay docentes vinculados a esta carrera.</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card table-wrapper">
+          <div class="table-header bg-gray-light">
+            <h3 class="card-title-table">Estudiantes en Proceso de Titulación</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Tema</th>
+                <th>Director</th>
+                <th class="text-center">Periodo</th>
+                <th>Estado</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let est of estudiantesTable">
+                <td>
+                  <div class="flex-align">
+                    <div class="avatar" *ngIf="est.nombreCompleto">{{ est.nombreCompleto.substring(0,2) | uppercase }}</div>
+                    <span class="font-medium text-dark">{{ est.nombreCompleto }}</span>
+                  </div>
+                </td>
+                <td class="text-light text-truncate" [title]="est.tituloTema">
+                  {{ est.tituloTema || 'Sin Título' }}
+                </td>
+                <td class="text-light">{{ est.nombreDirector || 'Sin asignar' }}</td>
+                <td class="text-center text-light">{{ est.periodo || 'N/A' }}</td>
+                <td>
+                    <span class="pill"
+                          [ngClass]="{
+                            'pill-green': ['aprobada', 'asignada', 'aprobado'].includes(est.estado?.toLowerCase() || ''),
+                            'pill-yellow': est.estado?.toLowerCase() === 'pendiente',
+                            'pill-red': est.estado?.toLowerCase() === 'rechazada',
+                            'pill-blue': est.estado?.toLowerCase() === 'en_desarrollo' || est.estado?.toLowerCase() === 'en proceso'
+                          }">
+                      {{ est.estado | titlecase }}
+                    </span>
+                </td>
+              </tr>
+              <tr *ngIf="estudiantesTable.length === 0">
+                <td colspan="5" class="text-center py-5 text-light">No se encontraron registros para los filtros seleccionados.</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <p class="footer-text">Total de registros: <strong>{{ estudiantesTable.length }}</strong></p>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+</div>

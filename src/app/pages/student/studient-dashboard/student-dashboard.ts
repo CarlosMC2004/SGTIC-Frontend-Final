@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { Topbar } from '../../../components/top-bar/top-bar';
@@ -29,8 +29,6 @@ interface Tutoria {
 })
 export class StudentDashboardd implements OnInit {
   private readonly dashboardService = inject(StudentDashboard);
-  private readonly cdr = inject(ChangeDetectorRef);
-  private readonly ngZone = inject(NgZone);
 
   status: DashboardStatus | null = null;
   isLoading = true;
@@ -75,41 +73,34 @@ export class StudentDashboardd implements OnInit {
 
   cargarDashboard(periodoId: number): void {
     this.isLoading = true;
-    this.cdr.detectChanges();
 
     this.dashboardService.getStatus(periodoId).subscribe({
       next: (data) => {
-        this.ngZone.run(() => {
-          this.status = data;
-          this.generarTutoriasObligatorias(data.totalTutorias ?? 0);
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        });
+        this.status = data;
+        this.generarTutoriasObligatorias(data.totalTutorias ?? 0);
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error al cargar el progreso:', err);
 
-        this.ngZone.run(() => {
-          this.status = {
-            prerequisitosNivel1: false,
-            temaSeleccionado: false,
-            directorAsignado: false,
-            reunionesMinimas: false,
-            defensaAnteproyecto: false,
-            prerequisitosNivel2: false,
-            asistenciaTutorias: false,
-            predefensa: false,
-            defensaFinal: false,
-            nombreTema: '',
-            nombreDirector: '',
-            nombreOpcion: '',
-            totalTutorias: 0
-          };
+        this.status = {
+          prerequisitosNivel1: false,
+          temaSeleccionado: false,
+          directorAsignado: false,
+          reunionesMinimas: false,
+          defensaAnteproyecto: false,
+          prerequisitosNivel2: false,
+          asistenciaTutorias: false,
+          predefensa: false,
+          defensaFinal: false,
+          nombreTema: '',
+          nombreDirector: '',
+          nombreOpcion: '',
+          totalTutorias: 0
+        };
 
-          this.generarTutoriasObligatorias(0);
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        });
+        this.generarTutoriasObligatorias(0);
+        this.isLoading = false;
       }
     });
   }

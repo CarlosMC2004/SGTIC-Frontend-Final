@@ -17,7 +17,6 @@ export const routes: Routes = [
     canActivate: [authGuard], // Opcional, pero recomendado para que no entren sin sesión
     loadComponent: () => import('./components/modal-change-password/modal-change-password').then(m => m.ChangePasswordModal)
   },
-  
   // Rutas de Administrador
   {
     path: 'admin',
@@ -50,21 +49,19 @@ export const routes: Routes = [
         path: 'configuration',
         loadComponent: () => import('./pages/administrator/academic-configuration/academic-configuration').then(m => m.AcademicConfiguration)
       },
-      // NUEVO: Gestión de Respaldos (Backup Dashboard)
-      {
-        path: 'backups',
-        loadComponent: () => import('./pages/administrator/backup-dashboard/backup-dashboard').then(m => m.BackupDashboard)
-      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
-  
   // Rutas de Coordinador (ejemplo para futuro)
   {
     path: 'coordinator',
     canActivate: [authGuard],
     children: [
-      //{ path: 'dashboard', loadComponent: () => import('./pages/coordinator/dashboard').then(m => m.DashboardComponent) }
+      {
+        path: 'Inicio',
+        loadComponent: () => import('./pages/coordinator/inicio/inicio').then(m => m.Inicio)
+
+      },
       {
         path: 'StudentRequests',
         loadComponent: () => import('./pages/coordinator/student-requests/student-requests').then(m => m.StudentRequests)
@@ -88,52 +85,27 @@ export const routes: Routes = [
       {
         path: 'PendingProposalComponent',
         loadComponent: () => import('./pages/coordinator/pending-proposal/pending-proposal').then(m => m.PendingProposalComponent)
+      },
+      {
+        path: 'Reports',
+        loadComponent: () => import('./pages/coordinator/reports/reports').then(m => m.Reports)
       }
     ]
   },
 
-  // Rutas de Estudiante
   {
     path: 'student',
     canActivate: [authGuard],
     children: [
-      {
-        path: 'dashboard',
-        loadComponent: () => import('./pages/student/studient-dashboard/student-dashboard').then(m => m.StudentDashboardd)
-      },
+      {path: 'dashboard',
+      loadComponent: () => import('./pages/student/studient-dashboard/student-dashboard').then(m => m.StudentDashboardd)},
       {
         path: 'process-setup',
-        loadComponent: () => import('./pages/student/process-setup/process-setup').then(m => m.ProcessSetup)
-      },
-      {
-        path: 'reports',
-        loadComponent: () =>
-          import('./pages/student/student-reports/student-reports').then(m => m.StudentReports)
-      }
+        loadComponent: () => import('./pages/student/process-setup/process-setup').then(m => m.ProcessSetup)}
     ]
   },
-  {
-    path: 'director',
-    canActivate: [authGuard],
-    children: [
-      {
-        path: 'dashboard',
-        loadComponent: () => import('./pages/director/director-dashboard/director-dashboard').then(m => m.DirectorDashboardComponent)
-      },
-      {
-        path: 'tutorships',
-        loadComponent: () => import('./pages/director/tutorships/tutorships').then(m => m.TutorshipsComponent)
-      },
-      {
-        path: 'advances',
-        loadComponent: () => import('./pages/director/advances/advances').then(m => m.AdvancesComponent)
-      },
-      {
-        path: 'certifications',
-        loadComponent: () => import('./pages/director/certifications/certifications').then(m => m.CertificationsComponent)
-      }
-    ]
-  },
+
+
   // Redirecciones por defecto
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
