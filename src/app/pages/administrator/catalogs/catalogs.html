@@ -27,6 +27,7 @@
 <!-- TAB: Períodos Académicos -->
 <div class="tab-content" *ngIf="activeTab === 'periodos'">
 
+  <!-- TARJETAS DE ESTADÍSTICAS -->
   <div class="stats-container">
     <div class="stat-card">
       <div class="stat-icon">
@@ -59,6 +60,7 @@
     </div>
   </div>
 
+  <!-- BOTÓN CREAR PERÍODO -->
   <div class="form-inline">
     <button class="btn-primary" (click)="openPeriodoModal()">
       <span class="material-symbols-outlined">add</span>
@@ -66,6 +68,7 @@
     </button>
   </div>
 
+  <!-- MODAL -->
   <app-modal-periodo
     *ngIf="showPeriodoModal"
     [periodo]="selectedPeriodo"
@@ -73,6 +76,7 @@
     (save)="handlePeriodoSave($event)">
   </app-modal-periodo>
 
+  <!-- TABLA DE PERÍODOS CON NUEVAS COLUMNAS -->
   <div class="table-container">
     <table>
       <thead>
@@ -80,6 +84,9 @@
           <th>Período Académico</th>
           <th>Fecha Inicio</th>
           <th>Fecha Fin</th>
+          <th>Fecha Límite Mat.</th>
+          <th>Plazo Cambio (días)</th>
+          <th>Mín. Avances</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -91,6 +98,9 @@
           </td>
           <td>{{ periodo.fechaInicio | date:'dd/MM/yyyy' }}</td>
           <td>{{ periodo.fechaFin | date:'dd/MM/yyyy' }}</td>
+          <td>{{ periodo.enrollmentDeadline | date:'dd/MM/yyyy' }}</td>
+          <td class="text-center">{{ periodo.plazoCambioTema || '-' }}</td>
+          <td class="text-center">{{ periodo.minimoAvances || '-' }}</td>
           <td>
             <span class="status-badge" [class.active]="periodo.activo">
               {{ periodo.activo ? 'Activo' : 'Inactivo' }}
@@ -105,9 +115,9 @@
               </button>
               
               <div class="toggle-switch" 
-               [class.active]="periodo.activo" 
-               (click)="$event.stopPropagation(); togglePeriodoStatus(periodo.id)">
-                 <div class="toggle-circle"></div>
+                   [class.active]="periodo.activo" 
+                   (click)="togglePeriodoStatus(periodo.id)">
+                <div class="toggle-circle"></div>
               </div>
             </div>
           </td>
@@ -121,7 +131,7 @@
 <div class="tab-content" *ngIf="activeTab === 'roles'">
   <div class="info-box">
     <span class="material-symbols-outlined">info</span>
-    <p>Los roles marcados como "Sistema" son roles base y no deben eliminarse. Puedes crear roles adicionales desde la sección "Gestión de Roles".</p>
+    <p>Los roles marcados como "Sistema" son roles base y no deben eliminarse.</p>
   </div>
 
   <div class="table-container">

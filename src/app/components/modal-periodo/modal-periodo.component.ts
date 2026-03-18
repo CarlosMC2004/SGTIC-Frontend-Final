@@ -12,7 +12,7 @@ import { ToastMensajeComponent } from '../Toast/toast-mensaje.component';
 })
 export class ModalPeriodoComponent implements OnInit {
   @ViewChild('toast') toast!: ToastMensajeComponent;
-  
+
   @Input() periodo: any = null;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
@@ -22,29 +22,38 @@ export class ModalPeriodoComponent implements OnInit {
     name: '',
     startDate: '',
     endDate: '',
+    enrollmentDeadline: '',
+    plazoCambioTema: 30,
+    minimoAvances: 3,
     active: true
   };
-  
+
   isSaving = false;
 
   ngOnInit() {
     if (this.periodo) {
-      // CORREGIDO: Mapear explícitamente cada campo
       this.formData = {
-        id: this.periodo.id,                    // ← ESTO ES LO QUE FALTABA
+        id: this.periodo.id,
         name: this.periodo.name || this.periodo.nombre,
         startDate: this.periodo.startDate,
         endDate: this.periodo.endDate,
+        enrollmentDeadline: this.periodo.enrollmentDeadline || this.periodo.startDate,
+        plazoCambioTema: this.periodo.plazoCambioTema || 30,
+        minimoAvances: this.periodo.minimoAvances || 3,
         active: this.periodo.active !== undefined ? this.periodo.active : true
       };
-      console.log('EDITANDO - FormData cargado:', this.formData);
-    } else {
-      console.log('CREANDO NUEVO - FormData inicializado');
     }
   }
 
   isValid(): boolean {
-    return this.formData.name && this.formData.startDate && this.formData.endDate;
+    return this.formData.name &&
+           this.formData.startDate &&
+           this.formData.endDate &&
+           this.formData.enrollmentDeadline &&
+           this.formData.plazoCambioTema !== null &&
+           this.formData.plazoCambioTema !== undefined &&
+           this.formData.minimoAvances !== null &&
+           this.formData.minimoAvances !== undefined;
   }
 
   closeModal(): void {
@@ -54,45 +63,62 @@ export class ModalPeriodoComponent implements OnInit {
   }
 
   savePeriodo(): void {
-    if (!this.isValid() || this.isSaving) {
+    if (!this.isValid() || this.isSaving) return;
+
+    if (this.formData.startDate > this.formData.endDate) {
+      this.mostrarToast('La fecha de inicio debe ser anterior a la fecha de fin', 'error');
       return;
     }
 
-    // Validar fechas
-    if (this.formData.startDate && this.formData.endDate && 
-        this.formData.startDate > this.formData.endDate) {
-      this.mostrarToast('La fecha de inicio debe ser anterior a la fecha de fin', 'error');
+    if (this.formData.enrollmentDeadline < this.formData.startDate ||
+        this.formData.enrollmentDeadline > this.formData.endDate) {
+      this.mostrarToast('La fecha límite de matriculación debe estar entre fecha inicio y fecha fin', 'error');
+      return;
+    }
+
+    if (this.formData.plazoCambioTema < 0) {
+      this.mostrarToast('El plazo para cambio de tema debe ser positivo', 'error');
+      return;
+    }
+
+    if (this.formData.minimoAvances < 1) {
+      this.mostrarToast('El mínimo de avances debe ser al menos 1', 'error');
       return;
     }
 
     this.isSaving = true;
     this.saving.emit(true);
 
-    // Construir objeto asegurando que el ID se incluya
     const periodoCompleto: any = {
       name: this.formData.name,
       startDate: this.formData.startDate,
       endDate: this.formData.endDate,
-      active: this.formData.active,
-      enrollmentDeadline: this.formData.startDate
+      enrollmentDeadline: this.formData.enrollmentDeadline,
+      plazoCambioTema: Number(this.formData.plazoCambioTema),
+      minimoAvances: Number(this.formData.minimoAvances),
+      active: this.formData.active
     };
 
-    // SOLO agregar el ID si existe (para edición)
     if (this.formData.id) {
       periodoCompleto.id = this.formData.id;
     }
-    
-    console.log('Enviando al padre:', periodoCompleto);
+
     this.save.emit(periodoCompleto);
   }
 
-  resetSavingState(): void {
-  this.isSaving = false;
-  this.saving.emit(false);
-  console.log('Modal reset - isSaving:', this.isSaving);
-}
+  // ✅ Llamado por el padre cuando la API responde OK → cierra el modal
+  onSaveSuccess(): void {
+    this.isSaving = false;
+    this.saving.emit(false);
+    this.close.emit(); // <-- AQUÍ está el fix: cierra el modal desde adentro
+  }
 
-  // Método para mostrar mensajes desde el padre
+  // Llamado por el padre cuando la API responde con error → resetea sin cerrar
+  resetSavingState(): void {
+    this.isSaving = false;
+    this.saving.emit(false);
+  }
+
   mostrarToast(mensaje: string, tipo: 'exito' | 'error' = 'exito'): void {
     setTimeout(() => {
       if (this.toast) {

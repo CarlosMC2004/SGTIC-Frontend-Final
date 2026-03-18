@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
 import { ModalPeriodoComponent } from '../../../components/modal-periodo/modal-periodo.component';
 import { PeriodoService } from '../../../services/modelo-service/periodo.service';
 import { ToastMensajeComponent } from '../../../components/Toast/toast-mensaje.component';
@@ -11,6 +10,9 @@ interface PeriodoAcademico {
   nombre: string;
   fechaInicio: string;
   fechaFin: string;
+  enrollmentDeadline?: string;
+  plazoCambioTema?: number;
+  minimoAvances?: number;
   activo: boolean;
 }
 
@@ -59,10 +61,10 @@ export class CatalogsComponent implements OnInit {
   constructor(private periodoService: PeriodoService) {}
 
   ngOnInit() {
-  setTimeout(() => {
-    this.loadPeriodos();
-  }, 500);
-}
+    setTimeout(() => {
+      this.loadPeriodos();
+    }, 500);
+  }
 
   mostrarToast(mensaje: string, tipo: 'exito' | 'error' = 'exito') {
     setTimeout(() => {
@@ -73,22 +75,25 @@ export class CatalogsComponent implements OnInit {
   }
 
   loadPeriodos() {
-    this.periodoService.getPeriodos().subscribe({
-      next: (data) => {
-        this.periodos = data.map((p: any) => ({
-          id: p.idPeriod,
-          nombre: p.name,
-          fechaInicio: p.startDate,
-          fechaFin: p.endDate,
-          activo: p.active
-        }));
-      },
-      error: (err) => {
-        console.error('Error cargando períodos:', err);
-        this.mostrarToast('Error al cargar los períodos', 'error');
-      }
-    });
-  }
+  this.periodoService.getPeriodos().subscribe({
+    next: (data) => {
+      this.periodos = [...data.map((p: any) => ({  // ✅ spread fuerza nueva referencia
+        id: p.idPeriod,
+        nombre: p.name,
+        fechaInicio: p.startDate,
+        fechaFin: p.endDate,
+        enrollmentDeadline: p.enrollmentDeadline,
+        plazoCambioTema: p.plazoCambioTema,
+        minimoAvances: p.minimoAvances,
+        activo: p.active
+      }))];
+    },
+    error: (err) => {
+      console.error('Error cargando períodos:', err);
+      this.mostrarToast('Error al cargar los períodos', 'error');
+    }
+  });
+}
 
   openPeriodoModal(periodo?: any) {
     if (periodo) {
@@ -97,6 +102,9 @@ export class CatalogsComponent implements OnInit {
         name: periodo.nombre,
         startDate: periodo.fechaInicio,
         endDate: periodo.fechaFin,
+        enrollmentDeadline: periodo.enrollmentDeadline,
+        plazoCambioTema: periodo.plazoCambioTema,
+        minimoAvances: periodo.minimoAvances,
         active: periodo.activo
       };
     } else {
@@ -121,22 +129,59 @@ export class CatalogsComponent implements OnInit {
       name: periodoData.name,
       startDate: periodoData.startDate,
       endDate: periodoData.endDate,
-      active: periodoData.id ? periodoData.active : true,  // ✅ 'active' no 'activo'
-      enrollmentDeadline: periodoData.startDate
+      enrollmentDeadline: periodoData.enrollmentDeadline,
+      plazoCambioTema: Number(periodoData.plazoCambioTema),
+      minimoAvances: Number(periodoData.minimoAvances),
+      active: periodoData.id ? periodoData.active : true
     };
-
+ 
     const request = periodoData.id
       ? this.periodoService.updatePeriodo(periodoData.id, periodoBackend)
       : this.periodoService.createPeriodo(periodoBackend);
-
+ 
     request.subscribe({
-      next: () => {
-        this.loadPeriodos();
-        const mensaje = periodoData.id ? 'Período actualizado correctamente' : 'Período creado correctamente';
-        this.mostrarToast(mensaje);
-        if (this.modalComponent) this.modalComponent.resetSavingState();
-        this.showPeriodoModal = false;
+      next: (respuesta) => {
+        const mensaje = periodoData.id
+          ? 'Período actualizado correctamente'
+          : 'Período creado correctamente';
+ 
+        if (periodoData.id) {
+          // ✅ ACTUALIZAR: reemplaza el item en el array local al instante
+          const index = this.periodos.findIndex(p => p.id === periodoData.id);
+          if (index !== -1) {
+            this.periodos[index] = {
+              id: periodoData.id,
+              nombre: periodoData.name,
+              fechaInicio: periodoData.startDate,
+              fechaFin: periodoData.endDate,
+              enrollmentDeadline: periodoData.enrollmentDeadline,
+              plazoCambioTema: Number(periodoData.plazoCambioTema),
+              minimoAvances: Number(periodoData.minimoAvances),
+              activo: periodoData.active
+            };
+            this.periodos = [...this.periodos]; // nueva referencia para Angular
+          }
+        } else {
+          // ✅ CREAR: agrega el nuevo período al array local al instante
+          const nuevo: PeriodoAcademico = {
+            id: respuesta.idPeriod || respuesta.id,
+            nombre: periodoData.name,
+            fechaInicio: periodoData.startDate,
+            fechaFin: periodoData.endDate,
+            enrollmentDeadline: periodoData.enrollmentDeadline,
+            plazoCambioTema: Number(periodoData.plazoCambioTema),
+            minimoAvances: Number(periodoData.minimoAvances),
+            activo: true
+          };
+          this.periodos = [...this.periodos, nuevo];
+        }
+ 
+        // Cierra el modal y muestra toast
+        if (this.modalComponent) {
+          this.modalComponent.onSaveSuccess();
+        }
         this.selectedPeriodo = null;
+        this.mostrarToast(mensaje);
       },
       error: (err) => {
         console.error('Error:', err);
@@ -146,58 +191,58 @@ export class CatalogsComponent implements OnInit {
     });
   }
 
-togglePeriodoStatus(id: number) {
-  const periodo = this.periodos.find(p => p.id === id);
-  if (!periodo || this.isModalSaving) return;
+  togglePeriodoStatus(id: number) {
+    const periodo = this.periodos.find(p => p.id === id);
+    if (!periodo || this.isModalSaving) return;
 
-  const estadoActual = periodo.activo;
-  const nuevoEstado = !estadoActual;
-  this.isModalSaving = true;
+    const estadoActual = periodo.activo;
+    const nuevoEstado = !estadoActual;
+    this.isModalSaving = true;
 
-  // ✅ Guardar otros activos ANTES de cambiar estados
-  const otrosActivos = this.periodos.filter(p => p.id !== id && p.activo);
+    const otrosActivos = this.periodos.filter(p => p.id !== id && p.activo);
 
-  // Actualizar visualmente de inmediato
-  periodo.activo = nuevoEstado;
+    periodo.activo = nuevoEstado;
 
-  // ✅ Desactivar otros visualmente también
-  if (nuevoEstado) {
-    otrosActivos.forEach(p => p.activo = false);
-  }
-
-  this.periodoService.updatePeriodo(id, {
-    name: periodo.nombre,
-    startDate: periodo.fechaInicio,
-    endDate: periodo.fechaFin,
-    active: nuevoEstado,
-    enrollmentDeadline: periodo.fechaInicio
-  }).subscribe({
-    next: () => {
-      if (nuevoEstado) {
-        otrosActivos.forEach(p => {
-          this.periodoService.updatePeriodo(p.id, {
-            name: p.nombre,
-            startDate: p.fechaInicio,
-            endDate: p.fechaFin,
-            active: false,
-            enrollmentDeadline: p.fechaInicio
-          }).subscribe();
-        });
-      }
-      this.mostrarToast(nuevoEstado ? 'Período activado' : 'Período desactivado');
-      this.isModalSaving = false;
-    },
-    error: () => {
-      // Revertir todo si falla
-      periodo.activo = estadoActual;
-      if (nuevoEstado) {
-        otrosActivos.forEach(p => p.activo = true);
-      }
-      this.mostrarToast('Error al actualizar el estado', 'error');
-      this.isModalSaving = false;
+    if (nuevoEstado) {
+      otrosActivos.forEach(p => p.activo = false);
     }
-  });
-}
+
+    this.periodoService.updatePeriodo(id, {
+      name: periodo.nombre,
+      startDate: periodo.fechaInicio,
+      endDate: periodo.fechaFin,
+      enrollmentDeadline: periodo.enrollmentDeadline,
+      plazoCambioTema: periodo.plazoCambioTema,
+      minimoAvances: periodo.minimoAvances,
+      active: nuevoEstado
+    }).subscribe({
+      next: () => {
+        if (nuevoEstado) {
+          otrosActivos.forEach(p => {
+            this.periodoService.updatePeriodo(p.id, {
+              name: p.nombre,
+              startDate: p.fechaInicio,
+              endDate: p.fechaFin,
+              enrollmentDeadline: p.enrollmentDeadline,
+              plazoCambioTema: p.plazoCambioTema,
+              minimoAvances: p.minimoAvances,
+              active: false
+            }).subscribe();
+          });
+        }
+        this.mostrarToast(nuevoEstado ? 'Período activado' : 'Período desactivado');
+        this.isModalSaving = false;
+      },
+      error: () => {
+        periodo.activo = estadoActual;
+        if (nuevoEstado) {
+          otrosActivos.forEach(p => p.activo = true);
+        }
+        this.mostrarToast('Error al actualizar el estado', 'error');
+        this.isModalSaving = false;
+      }
+    });
+  }
 
   deleteRole(id: number) {
     if (confirm('¿Estás seguro que quieres eliminar este rol?')) {

@@ -9,6 +9,8 @@ export interface Periodo {
   endDate?: string;
   active: boolean;
   enrollmentDeadline?: string;
+  plazoCambioTema?: number;
+  minimoAvances?: number;
 }
 
 @Injectable({

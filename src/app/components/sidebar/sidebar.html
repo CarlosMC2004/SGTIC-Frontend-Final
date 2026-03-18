@@ -70,7 +70,7 @@
         <span class="material-symbols-outlined">check</span>
         <span>Opciones de Titulacion</span>
       </a>
-    </ng-container>
+    </ng-container> <!-- ✅ CERRADO CORRECTAMENTE -->
 
     <ng-container *ngIf="role === 'estudiante'">
       <a class="menu-item" routerLink="/student/dashboard" routerLinkActive="active">
@@ -104,7 +104,27 @@
         <span class="material-symbols-outlined">verified</span>
         <span>Certificaciones</span>
       </a>
+      <a class="menu-item" routerLink="/chat/student" routerLinkActive="active">
+        <span class="material-symbols-outlined">chat</span>
+        <span>Chat</span>
+      </a>
     </ng-container>
+
+    <!-- Admin Chat -->
+    <ng-container *ngIf="role === 'admin'">
+      <a class="menu-item" routerLink="/chat/admin" routerLinkActive="active">
+        <span class="material-symbols-outlined">chat</span>
+        <span>Chat</span>
+      </a>
+    </ng-container>
+
+    <!-- Coordinador Chat -->
+    <ng-container *ngIf="role === 'coordinador'">
+      <a class="menu-item" routerLink="/chat/coordinator" routerLinkActive="active">
+        <span class="material-symbols-outlined">chat</span>
+        <span>Chat</span>
+      </a>
+    </ng-container> <!-- ✅ CERRADO CORRECTAMENTE -->
 
   </nav>
 

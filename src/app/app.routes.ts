@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { ChatComponent } from './components/chat/chat';
+
 
 export const routes: Routes = [
   // Ruta pública - Login
@@ -7,6 +9,19 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/general/login/login').then(m => m.LoginComponent)
   },
+  
+
+ // ✅ Ruta del chat - PÚBLICA (sin authGuard)
+  {
+  path: 'chat/:id',  // Cambiado para aceptar parámetro :id
+   component: ChatComponent
+  },
+
+  {
+  path: 'chat/coordinator',  // Ruta para el coordinador
+  component: ChatComponent
+},
+
   {
     path: 'hoja-de-vida',
     canActivate: [authGuard], // Opcional, pero recomendado para que no entren sin sesión
@@ -134,7 +149,13 @@ export const routes: Routes = [
       }
     ]
   },
+
+
+
   // Redirecciones por defecto
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/login' }
+
+  
+
 ];
