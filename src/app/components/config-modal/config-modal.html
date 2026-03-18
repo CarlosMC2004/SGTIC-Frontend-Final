@@ -1,0 +1,174 @@
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Configuración General del Respaldo</h2>
+      <button type="button" class="icon-button close-btn" (click)="close()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="isLoading" class="state-message info">
+        Cargando configuración...
+      </div>
+
+      <div *ngIf="errorMessage" class="state-message error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="successMessage" class="state-message success">
+        {{ successMessage }}
+      </div>
+
+      <ng-container *ngIf="!isLoading">
+        <div class="form-section">
+          <div class="section-header">
+            <h3>
+              <span class="material-symbols-outlined">settings</span>
+              Estado general
+            </h3>
+
+            <label class="toggle-wrapper">
+              <span>Activo</span>
+              <div class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.active">
+                <span class="toggle-slider"></span>
+              </div>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Prefijo del archivo</label>
+              <input type="text" [(ngModel)]="config.filePrefix" placeholder="Ej: sgtic">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <span class="material-symbols-outlined">folder</span>
+            Almacenamiento local
+          </h3>
+
+          <div class="form-row two-columns">
+            <div class="form-group">
+              <label>Ruta local</label>
+              <input type="text" [(ngModel)]="config.localPath" placeholder="C:\SGTIC\backups">
+            </div>
+
+            <div class="form-group">
+              <label>Ruta pg_dump</label>
+              <input type="text" [(ngModel)]="config.pgDumpPath" placeholder="C:\Program Files\PostgreSQL\18\bin\pg_dump.exe">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>
+            <span class="material-symbols-outlined">database</span>
+            Conexión Base de Datos
+          </h3>
+
+          <div class="form-row two-columns">
+            <div class="form-group">
+              <label>Host</label>
+              <input type="text" [(ngModel)]="config.databaseHost">
+            </div>
+
+            <div class="form-group small">
+              <label>Puerto</label>
+              <input type="number" [(ngModel)]="config.databasePort">
+            </div>
+          </div>
+
+          <div class="form-row two-columns">
+            <div class="form-group">
+              <label>Base de datos</label>
+              <input type="text" [(ngModel)]="config.databaseName">
+            </div>
+
+            <div class="form-group">
+              <label>Usuario</label>
+              <input type="text" [(ngModel)]="config.databaseUser">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ruta pgpass</label>
+              <input type="text" [(ngModel)]="config.pgpassFilePath" placeholder="C:\SGTIC\config\pgpass.conf">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <h3>
+              <span class="material-symbols-outlined">delete_sweep</span>
+              Retención y Limpieza
+            </h3>
+
+            <label class="toggle-wrapper">
+              <span>Limpieza automática</span>
+              <div class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.cleanupEnabled">
+                <span class="toggle-slider"></span>
+              </div>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group small">
+              <label>Días de retención</label>
+              <input type="number" [(ngModel)]="config.retentionDays" [disabled]="!config.cleanupEnabled">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <h3>
+              <span class="material-symbols-outlined">cloud_sync</span>
+              Google Drive
+            </h3>
+
+            <label class="toggle-wrapper">
+              <span>Subida a Drive</span>
+              <div class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="config.driveEnabled">
+                <span class="toggle-slider"></span>
+              </div>
+            </label>
+          </div>
+
+          <div *ngIf="activeDriveEmail" class="helper-text">
+            Cuenta activa detectada: <strong>{{ activeDriveEmail }}</strong>
+          </div>
+
+          <div class="form-row two-columns">
+            <div class="form-group small">
+              <label>ID cuenta Drive</label>
+              <input type="number" [(ngModel)]="config.driveAccountId" [disabled]="!config.driveEnabled">
+            </div>
+
+            <div class="form-group">
+              <label>ID carpeta Drive</label>
+              <input type="text" [(ngModel)]="config.driveFolderId" [disabled]="!config.driveEnabled">
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="close()" [disabled]="isSaving">
+        Cancelar
+      </button>
+
+      <button type="button" class="btn-primary" (click)="save()" [disabled]="isSaving || isLoading">
+        {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+      </button>
+    </div>
+  </div>
+</div>

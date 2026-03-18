@@ -1,0 +1,126 @@
+<div class="chat-wrapper">
+  <div class="chat-container">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+      <div class="header-left">
+        <button class="btn-back" (click)="goBack()" title="Volver">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div class="chat-info">
+          <div class="contact-avatar">
+            {{ roomId.charAt(0).toUpperCase() }}
+          </div>
+          <div class="contact-details">
+            <span class="contact-name">Sala {{ roomId }}</span>
+            <span class="contact-status">
+              <span class="status-dot" [class.connected]="isConnected" [class.disconnected]="!isConnected"></span>
+              <span class="status-text">{{ isConnected ? 'Conectado' : 'Desconectado' }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ userName }}</span>
+      </div>
+    </div>
+
+    <!-- ÁREA DE MENSAJES -->
+    <div class="messages-area" #scrollMe>
+      <div class="system-message" *ngIf="isConnected">
+         Conectado a la sala {{ roomId }}
+      </div>
+
+      <div *ngFor="let msg of messages"
+           class="message-row"
+           [class.own-message]="msg.user === userName"
+           [class.other-message]="msg.user !== userName"
+           [id]="'msg-' + msg.id">
+
+        <!-- Mensaje de OTROS (izquierda) -->
+        <div class="message other" *ngIf="msg.user !== userName">
+          <div class="avatar">
+            {{ msg.user ? msg.user.charAt(0).toUpperCase() : '?' }}
+          </div>
+          <div class="bubble">
+            <div class="replied-to" *ngIf="msg.replyTo" (click)="scrollToMessage(msg.replyTo.id)">
+              <div class="replied-content">
+                <span class="replied-user">{{ msg.replyTo.user }}</span>
+                <span class="replied-text">{{ msg.replyTo.message }}</span>
+              </div>
+            </div>
+            <div class="sender">{{ msg.user || 'Usuario' }}</div>
+            <div class="text">{{ msg.message }}</div>
+            <div class="time">
+              {{ msg.timestamp ? (msg.timestamp | date:'HH:mm') : '' }}
+            </div>
+          </div>
+          <div class="message-actions">
+            <button class="reply-btn" (click)="setReplyTo(msg)" title="Responder">
+              <span class="material-symbols-outlined">reply</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mensaje PROPIO (derecha) -->
+        <div class="message own" *ngIf="msg.user === userName">
+          <div class="message-actions">
+            <button class="reply-btn" (click)="setReplyTo(msg)" title="Responder">
+              <span class="material-symbols-outlined">reply</span>
+            </button>
+          </div>
+          <div class="bubble">
+            <div class="replied-to" *ngIf="msg.replyTo" (click)="scrollToMessage(msg.replyTo.id)">
+              <div class="replied-content">
+                <span class="replied-user">{{ msg.replyTo.user }}</span>
+                <span class="replied-text">{{ msg.replyTo.message }}</span>
+              </div>
+            </div>
+            <div class="text">{{ msg.message }}</div>
+            <div class="time">
+              {{ msg.timestamp ? (msg.timestamp | date:'HH:mm') : '' }}
+              <span class="status">✓✓</span>
+            </div>
+          </div>
+          <div class="avatar placeholder"></div>
+        </div>
+
+      </div>
+
+      <div *ngIf="messages.length === 0" class="empty-messages">
+        <div class="empty-icon">💬</div>
+        <div class="empty-text">No hay mensajes aún</div>
+      </div>
+    </div>
+
+    <!-- PREVIEW DE RESPUESTA -->
+    <div class="reply-preview" *ngIf="replyToMessage">
+      <div class="reply-content">
+        <span class="reply-label">Respondiendo a:</span>
+        <span class="reply-user">{{ replyToMessage.user }}</span>
+        <span class="reply-text">{{ replyToMessage.message }}</span>
+      </div>
+      <button class="close-reply" (click)="cancelReply()">✕</button>
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-area">
+      <div class="input-container">
+        <input
+          class="message-input"
+          [(ngModel)]="newMessage"
+          (keyup.enter)="sendMessage()"
+          placeholder="Escribe tu mensaje..."
+          [disabled]="!isConnected"
+        />
+        <button
+          class="send-button"
+          (click)="sendMessage()"
+          [disabled]="!isConnected || !newMessage.trim()">
+          Enviar
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

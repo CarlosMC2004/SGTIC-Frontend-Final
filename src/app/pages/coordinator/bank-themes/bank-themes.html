@@ -1,0 +1,67 @@
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-area">
+    <app-header></app-header>
+
+    <div class="content-body">
+      <div class="navigation-tabs">
+        <a routerLink="/coordinator/BankThemes" routerLinkActive="active" class="tab-link">
+          Banco Oficial de Temas
+        </a>
+        <a routerLink="/coordinator/PendingProposalComponent" routerLinkActive="active" class="tab-link">
+          Propuestas Pendientes
+          <span class="badge-count" *ngIf="pendientesCount > 0">{{ pendientesCount }}</span>
+        </a>
+      </div>
+
+      <div class="section-header">
+        <div class="text-group">
+          <p class="page-subtitle">Gestiona y supervisa los temas de investigación disponibles.</p>
+        </div>
+        <span class="results-count">Mostrando {{ temas.length }} resultados</span>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-wrapper">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input type="text" placeholder="Buscar por título, área o palabra clave...">
+        </div>
+        <button class="btn-new-topic" (click)="abrirModal()">
+          <span class="material-symbols-outlined">add</span>
+          Nuevo Tema
+        </button>
+      </div>
+
+      <div class="topics-grid">
+        <div class="topic-card" *ngFor="let tema of temas">
+          <div class="card-body">
+            <h4 class="topic-title">{{ tema.titulo }}</h4>
+            <p class="topic-desc">{{ tema.descripcion }}</p>
+          </div>
+          <div class="card-footer">
+            <span class="badge">{{ tema.nombreOpcion }}</span>
+
+            <div class="card-actions">
+              <button class="btn-icon edit" (click)="abrirModal(tema)" title="Editar">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+
+              <button class="btn-icon delete" (click)="eliminarTema(tema.idTema)" title="Eliminar">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <app-modal-new-theme
+        *ngIf="showModal"
+        [idUsuario]="idUsuarioActual"
+        [temaAEditar]="temaSeleccionado"
+        (close)="cerrarModal()"
+        (onSaved)="recargarYcerrar()">
+      </app-modal-new-theme>
+    </div>
+  </main>
+</div>

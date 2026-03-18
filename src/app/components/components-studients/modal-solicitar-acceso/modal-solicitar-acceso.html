@@ -1,0 +1,87 @@
+<div class="modal-backdrop">
+  <div class="modal-container">
+    
+    <div class="modal-header">
+      <div class="header-titles">
+        <h2>Solicitud de Ingreso</h2>
+        <span class="subtitle">ADMISSION REQUEST</span>
+      </div>
+      <button class="btn-close" (click)="cerrarModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="solicitudForm" (ngSubmit)="enviarSolicitud()">
+
+        <div class="section-title">INFORMACIÓN PERSONAL</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Número de Identificación</label>
+            <div class="input-wrapper">
+              <span class="icon material-symbols-outlined">badge</span>
+              <input type="text" formControlName="identificacion" placeholder="Ej: 1-1234-5678">
+            </div>
+            <div class="error-msg" *ngIf="solicitudForm.get('identificacion')?.touched && solicitudForm.get('identificacion')?.invalid">
+              Identificación requerida y solo números/guiones.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row split">
+          <div class="form-group">
+            <label>Nombre(s)</label>
+            <input type="text" formControlName="nombres" placeholder="Nombre">
+          </div>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input type="text" formControlName="apellidos" placeholder="Apellidos">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Correo Electrónico Institucional</label>
+            <div class="input-wrapper">
+              <span class="icon material-symbols-outlined">mail</span>
+              <input type="email" formControlName="correo" placeholder="ejemplo@uteq.edu.ec">
+            </div>
+          </div>
+        </div>
+
+        <div class="section-title margin-top">DETALLES DE CARRERA</div>
+
+        <div class="form-row split">
+          <div class="form-group">
+            <label>Facultad</label>
+            <select formControlName="id_facultad">
+              <option value="">Seleccione facultad</option>
+              <option *ngFor="let fac of facultades" [value]="fac.id">
+                {{ fac.nombre }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Carrera de Interés</label>
+            <select formControlName="id_carrera">
+              <option value="">Seleccione carrera</option>
+              <option *ngFor="let car of carrerasDisponibles" [value]="car.id">
+                {{ car.nombre }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="cerrarModal()">CANCELAR</button>
+          
+          <button type="submit" class="btn-submit">
+            <span class="material-symbols-outlined">send</span> ENVIAR SOLICITUD
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

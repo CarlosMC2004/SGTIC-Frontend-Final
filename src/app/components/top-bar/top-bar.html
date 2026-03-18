@@ -1,0 +1,91 @@
+<header class="topbar">
+  <div class="topbar-left"></div>
+
+  <div class="topbar-right">
+
+    <div class="period-selector" (click)="togglePeriodMenu($event)">
+      <span class="material-symbols-outlined icon-small">calendar_month</span>
+      <span class="period-text">{{ periodoSeleccionado?.name || 'Seleccionar período' }}</span>
+      <span class="material-symbols-outlined icon-small">expand_more</span>
+
+      <div class="dropdown-menu period-menu" *ngIf="isPeriodMenuOpen" (click)="$event.stopPropagation()">
+        <ul *ngIf="periodosAceptados.length > 0; else emptyPeriods">
+          <li
+            *ngFor="let periodo of periodosAceptados; trackBy: trackByPeriodo"
+            [class.active]="periodoSeleccionado?.idPeriod === periodo.idPeriod"
+            (click)="seleccionarPeriodo(periodo)"
+          >
+            {{ periodo.name }}
+          </li>
+        </ul>
+
+        <ng-template #emptyPeriods>
+          <div class="empty-message">
+            No hay períodos aceptados disponibles
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <button class="notification-btn" type="button">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="badge">5</span>
+    </button>
+
+    <div class="user-profile" (click)="toggleProfileMenu($event)">
+      <div class="user-info hide-on-mobile">
+        <span class="user-name">Juan Pérez</span>
+        <span class="user-role">Estudiante</span>
+      </div>
+
+      <img
+        src="https://ui-avatars.com/api/?name=Juan+Perez&background=e9ecef&color=1a5d43"
+        alt="Avatar"
+        class="avatar"
+      >
+
+      <span class="material-symbols-outlined icon-small hide-on-mobile">expand_more</span>
+
+      <div class="dropdown-menu profile-menu" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
+        <div class="menu-section-title">
+          <span class="material-symbols-outlined icon-tiny">person</span>
+          PERFILES DISPONIBLES
+        </div>
+
+        <ul>
+          <li class="active">
+            <span class="material-symbols-outlined icon-small">check</span>
+            ESTUDIANTE
+          </li>
+        </ul>
+
+        <hr>
+
+        <ul>
+          <li>
+            <span class="material-symbols-outlined icon-small">person_outline</span>
+            Mi perfil
+          </li>
+          <li>
+            <span class="material-symbols-outlined icon-small">image</span>
+            Cambio de foto
+          </li>
+          <li>
+            <span class="material-symbols-outlined icon-small">lock</span>
+            Cambio de clave
+          </li>
+        </ul>
+
+        <hr>
+
+        <ul class="logout-menu">
+          <li class="logout-item">
+            <span class="material-symbols-outlined icon-small">logout</span>
+            Cerrar sesión
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</header>

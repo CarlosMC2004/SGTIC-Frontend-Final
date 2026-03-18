@@ -1,0 +1,523 @@
+<div class="layout-wrapper">
+  <app-sidebar role="estudiante"></app-sidebar>
+
+  <main class="main-content">
+    <app-topbar (periodoChange)="onPeriodoChange($event)"></app-topbar>
+
+    <div class="page-container">
+      <div class="page-header">
+        <h1>Configuración de Titulación</h1>
+        <p>Selecciona tu modalidad y define el tema para tu proyecto de grado.</p>
+      </div>
+
+      <div class="status-banner status-neutral" *ngIf="!selectedPeriodoId">
+        Debes seleccionar un período académico en la barra superior para continuar.
+      </div>
+
+      <div class="status-banner status-danger" *ngIf="selectedPeriodoId && selectionStatus?.desactivadoPorPlazo">
+        {{ selectionStatus?.mensaje }}
+      </div>
+
+      <div
+        class="status-banner status-info"
+        *ngIf="selectedPeriodoId && selectionStatus && !selectionStatus.desactivadoPorPlazo"
+      >
+        {{ selectionStatus.mensaje }}
+      </div>
+
+      <section class="config-section">
+        <h2 class="section-title">
+          <span class="step-number">1</span>
+          Modalidad de Titulación
+        </h2>
+
+        <div class="modality-grid">
+          <div
+            class="modality-card"
+            *ngFor="let option of modalityOptions"
+            [class.active]="selectedModalityId === option.idOption"
+            (click)="selectModality(option.idOption)"
+          >
+            <div class="card-header">
+              <div class="icon-wrapper">
+                <span class="material-symbols-outlined">{{ getIconForOption(option.name) }}</span>
+              </div>
+
+              <span
+                class="material-symbols-outlined check-icon"
+                *ngIf="selectedModalityId === option.idOption"
+              >
+                check_circle
+              </span>
+
+              <span
+                class="material-symbols-outlined empty-icon"
+                *ngIf="selectedModalityId !== option.idOption"
+              >
+                radio_button_unchecked
+              </span>
+            </div>
+
+            <h3>{{ option.name }}</h3>
+            <p>{{ option.description }}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="config-section">
+        <h2 class="section-title">
+          <span class="step-number">2</span>
+          Selección de Tema
+        </h2>
+
+        <div class="tabs-container">
+          <div class="tabs-header">
+            <button
+              type="button"
+              class="tab-btn"
+              [class.active]="activeTab === 'banco'"
+              (click)="switchTab('banco')"
+            >
+              <span class="material-symbols-outlined">library_books</span>
+              Banco de Temas
+            </button>
+
+            <button
+              type="button"
+              class="tab-btn"
+              [class.active]="activeTab === 'proponer'"
+              (click)="switchTab('proponer')"
+            >
+              <span class="material-symbols-outlined">edit_document</span>
+              Proponer Nuevo Tema
+            </button>
+          </div>
+
+          <div class="tab-content">
+            <div
+              *ngIf="activeTab === 'banco'"
+              class="banco-temas-view"
+              [class.readonly-panel]="!canUseBankTab"
+            >
+              <div class="info-note" *ngIf="selectionStatus?.puedeCambiarTema">
+                Ya tienes una selección inicial registrada. Puedes cambiar de tema una sola vez
+                hasta el {{ selectionStatus?.fechaLimiteSeleccion }}.
+              </div>
+
+              <div class="search-bar">
+                <span class="material-symbols-outlined">search</span>
+                <input
+                  type="text"
+                  placeholder="Buscar por palabra clave..."
+                  [value]="searchTerm"
+                  (input)="onSearch(($any($event.target).value))"
+                  [disabled]="!canUseBankTab"
+                >
+              </div>
+
+              <div *ngIf="isLoadingTopics" class="loading-state">
+                Cargando temas disponibles...
+              </div>
+
+              <div *ngIf="!isLoadingTopics && filteredTemas.length === 0" class="empty-state">
+                No hay temas disponibles para la modalidad seleccionada.
+              </div>
+
+              <div class="topics-list" *ngIf="!isLoadingTopics && filteredTemas.length > 0">
+                <div
+                  class="topic-card"
+                  *ngFor="let tema of filteredTemas"
+                  [class.selected]="selectedTopicId === tema.id"
+                >
+                  <div class="topic-info">
+                    <div class="topic-tags">
+                      <span class="tag tag-blue">{{ tema.tags[0] }}</span>
+
+                      <span class="tag tag-gray">
+                        <span class="material-symbols-outlined icon-tiny">schedule</span>
+                        {{ tema.tags[1] }}
+                      </span>
+                    </div>
+
+                    <h4>{{ tema.titulo }}</h4>
+                    <p>{{ tema.descripcion }}</p>
+
+                    <span class="profesor">
+                      <span class="material-symbols-outlined icon-tiny">person</span>
+                      Propuesto por: {{ tema.profesor }}
+                    </span>
+                  </div>
+
+                  <div class="topic-action">
+                    <button
+                      type="button"
+                      class="btn-select-topic"
+                      *ngIf="selectedTopicId !== tema.id"
+                      (click)="selectTopic(tema.id)"
+                      [disabled]="!canUseBankTab || isSelectingTopicId === tema.id"
+                    >
+                      {{ isSelectingTopicId === tema.id ? 'Guardando...' : 'Seleccionar' }}
+                    </button>
+
+                    <button
+                      type="button"
+                      class="btn-topic-selected"
+                      *ngIf="selectedTopicId === tema.id"
+                      [disabled]="true"
+                    >
+                      <span class="material-symbols-outlined">check</span>
+                      Seleccionado
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="activeTab === 'proponer'"
+              class="proponer-tema-view"
+              [class.readonly-panel]="!canUseProposalTab"
+            >
+              <div class="info-note" *ngIf="!canUseProposalTab && selectedPeriodoId">
+                En este momento no puedes registrar una nueva propuesta.
+              </div>
+
+              <form [formGroup]="proposeForm" class="form-propose">
+                <div class="form-group">
+                  <label>Título de la propuesta <span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    formControlName="titulo"
+                    placeholder="Ej. Implementación de una red neuronal para..."
+                    [readonly]="!canUseProposalTab"
+                  >
+                  <small
+                    class="text-danger"
+                    *ngIf="proposeForm.get('titulo')?.invalid && proposeForm.get('titulo')?.touched"
+                  >
+                    El título es obligatorio.
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label>Opción de titulación seleccionada <span class="text-danger">*</span></label>
+                  <input
+                    type="text"
+                    [value]="getSelectedModalityName()"
+                    readonly
+                    class="readonly-input"
+                    placeholder="Seleccione una modalidad en el paso 1"
+                  >
+                  <small class="text-muted">
+                    Esta opción se toma de la modalidad seleccionada arriba.
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label>Breve descripción o justificación <span class="text-danger">*</span></label>
+                  <textarea
+                    formControlName="descripcion"
+                    rows="4"
+                    placeholder="Describe brevemente el problema a resolver y tu enfoque..."
+                    [readonly]="!canUseProposalTab"
+                  ></textarea>
+                  <small
+                    class="text-danger"
+                    *ngIf="proposeForm.get('descripcion')?.invalid && proposeForm.get('descripcion')?.touched"
+                  >
+                    La descripción es obligatoria.
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label>Documento de propuesta</label>
+                  <div
+                    class="upload-zone"
+                    [class.disabled-upload]="!canUseProposalTab"
+                    (click)="openFilePicker(fileInput)"
+                  >
+                    <span class="material-symbols-outlined upload-icon">cloud_upload</span>
+                    <p>Arrastra tu documento aquí o <strong>haz clic para buscar</strong></p>
+                    <span class="upload-hint">Tamaño máximo: 10MB (PDF, DOC, DOCX)</span>
+
+                    <input
+                      type="file"
+                      #fileInput
+                      style="display: none"
+                      accept=".pdf,.doc,.docx"
+                      [disabled]="!canUseProposalTab"
+                      (change)="onFileSelected($event)"
+                    >
+
+                    <p *ngIf="selectedFileName" class="file-selected-name">
+                      Archivo: {{ selectedFileName }}
+                    </p>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="config-section">
+        <h2 class="section-title">
+          <span class="step-number">3</span>
+          Historial de Propuestas
+        </h2>
+
+        <div *ngIf="!selectedPeriodoId" class="empty-state">
+          Selecciona un período para ver el historial de tus propuestas.
+        </div>
+
+        <div *ngIf="selectedPeriodoId && isLoadingProposalList" class="loading-state">
+          Cargando historial de propuestas...
+        </div>
+
+        <div *ngIf="selectedPeriodoId && !isLoadingProposalList && studentProposals.length === 0" class="empty-state">
+          No registras propuestas propias en este período.
+        </div>
+
+        <div
+          class="proposal-history-layout"
+          *ngIf="selectedPeriodoId && !isLoadingProposalList && studentProposals.length > 0"
+        >
+          <div class="proposal-list-column">
+            <div
+              class="proposal-card"
+              *ngFor="let proposal of studentProposals"
+              [class.active]="selectedProposal?.idPropuesta === proposal.idPropuesta"
+            >
+              <div class="proposal-card-header">
+                <div>
+                  <h3>{{ proposal.titulo }}</h3>
+                  <p>{{ proposal.nombreOpcion || 'Sin opción' }}</p>
+                </div>
+
+                <span class="status-badge" [ngClass]="getProposalStatusClass(proposal.estadoPropuesta)">
+                  {{ getProposalStatusLabel(proposal.estadoPropuesta) }}
+                </span>
+              </div>
+
+              <div class="proposal-card-meta">
+                <span>Versión actual: {{ proposal.numeroVersion }}</span>
+                <span>Total versiones: {{ proposal.totalVersiones }}</span>
+                <span>Último envío: {{ proposal.fechaEnvio }}</span>
+              </div>
+
+              <p class="proposal-snippet">{{ proposal.descripcion }}</p>
+
+              <div class="feedback-box" *ngIf="proposal.feedbackDocente">
+                <strong>Feedback:</strong> {{ proposal.feedbackDocente }}
+              </div>
+
+              <div class="proposal-card-actions">
+                <button type="button" class="btn-secondary" (click)="selectProposal(proposal)">
+                  Ver detalle
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-primary"
+                  *ngIf="proposal.editable"
+                  (click)="startEditProposal(proposal)"
+                >
+                  Modificar propuesta
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="proposal-detail-column">
+            <div *ngIf="!selectedProposal" class="empty-state">
+              Selecciona una propuesta para ver su historial y detalle.
+            </div>
+
+            <div *ngIf="selectedProposal" class="proposal-detail-card">
+              <div class="proposal-detail-header">
+                <div>
+                  <h3>{{ selectedProposal.titulo }}</h3>
+                  <p>{{ selectedProposal.nombreOpcion || 'Sin opción' }}</p>
+                </div>
+
+                <span class="status-badge" [ngClass]="getProposalStatusClass(selectedProposal.estadoPropuesta)">
+                  {{ getProposalStatusLabel(selectedProposal.estadoPropuesta) }}
+                </span>
+              </div>
+
+              <div class="proposal-info-grid">
+                <div>
+                  <label>Versión actual</label>
+                  <span>{{ selectedProposal.numeroVersion }}</span>
+                </div>
+
+                <div>
+                  <label>Total de versiones</label>
+                  <span>{{ selectedProposal.totalVersiones }}</span>
+                </div>
+
+                <div>
+                  <label>Último envío</label>
+                  <span>{{ selectedProposal.fechaEnvio }}</span>
+                </div>
+
+                <div>
+                  <label>Última actualización</label>
+                  <span>{{ selectedProposal.fechaUltimaActualizacion }}</span>
+                </div>
+              </div>
+
+              <div class="proposal-content-block">
+                <label>Descripción actual</label>
+                <p>{{ selectedProposal.descripcion }}</p>
+              </div>
+
+              <div class="proposal-content-block" *ngIf="selectedProposal.feedbackDocente">
+                <label>Feedback del docente / coordinador</label>
+                <p>{{ selectedProposal.feedbackDocente }}</p>
+              </div>
+
+              <div class="proposal-document-row">
+                <a
+                  *ngIf="selectedProposal.urlDocumento"
+                  class="btn-link"
+                  [href]="selectedProposal.urlDocumento"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ver documento actual
+                </a>
+              </div>
+
+              <div class="proposal-edit-panel" *ngIf="isEditingProposal">
+                <h4>Actualizar propuesta pendiente</h4>
+
+                <form [formGroup]="editProposalForm" class="form-propose">
+                  <div class="form-group">
+                    <label>Título <span class="text-danger">*</span></label>
+                    <input type="text" formControlName="titulo">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Opción de titulación <span class="text-danger">*</span></label>
+                    <select formControlName="idOpcion">
+                      <option [ngValue]="null">Seleccione</option>
+                      <option *ngFor="let option of modalityOptions" [ngValue]="option.idOption">
+                        {{ option.name }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Descripción <span class="text-danger">*</span></label>
+                    <textarea rows="4" formControlName="descripcion"></textarea>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Nuevo documento</label>
+                    <div class="upload-zone compact-upload" (click)="openEditFilePicker(editFileInput)">
+                      <span class="material-symbols-outlined upload-icon">cloud_upload</span>
+                      <p>Haz clic para reemplazar el documento actual</p>
+                      <span class="upload-hint">Si no subes uno nuevo, se conserva el actual</span>
+
+                      <input
+                        type="file"
+                        #editFileInput
+                        style="display: none"
+                        accept=".pdf,.doc,.docx"
+                        (change)="onEditFileSelected($event)"
+                      >
+
+                      <p *ngIf="editSelectedFileName" class="file-selected-name">
+                        Archivo: {{ editSelectedFileName }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="edit-actions">
+                    <button type="button" class="btn-cancel-inline" (click)="cancelEditProposal()">
+                      Cancelar edición
+                    </button>
+
+                    <button type="button" class="btn-primary" [disabled]="!canSaveProposalEdit" (click)="saveProposalEdition()">
+                      {{ isUpdatingProposal ? 'Actualizando...' : 'Guardar cambios' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="version-section">
+                <h4>Historial de versiones</h4>
+
+                <div *ngIf="isLoadingProposalDetail" class="loading-state">
+                  Cargando historial de versiones...
+                </div>
+
+                <div *ngIf="!isLoadingProposalDetail && selectedProposalHistory.length === 0" class="empty-state">
+                  No hay versiones registradas para mostrar.
+                </div>
+
+                <div class="version-timeline" *ngIf="!isLoadingProposalDetail && selectedProposalHistory.length > 0">
+                  <div class="version-item" *ngFor="let item of selectedProposalHistory">
+                    <div class="version-header">
+                      <div class="version-title-row">
+                        <span class="version-title">Versión {{ item.numeroVersion }}</span>
+                        <span class="current-version-badge" *ngIf="item.esVersionActual">Actual</span>
+                      </div>
+
+                      <span class="status-badge" [ngClass]="getProposalStatusClass(item.estadoPropuesta)">
+                        {{ getProposalStatusLabel(item.estadoPropuesta) }}
+                      </span>
+                    </div>
+
+                    <div class="version-meta">
+                      <span>Opción: {{ item.nombreOpcion || 'Sin opción' }}</span>
+                      <span>Fecha envío: {{ item.fechaEnvio }}</span>
+                      <span>Movimiento: {{ item.fechaMovimiento }}</span>
+                    </div>
+
+                    <h5>{{ item.titulo }}</h5>
+                    <p>{{ item.descripcion }}</p>
+
+                    <div class="feedback-box" *ngIf="item.feedbackDocente">
+                      <strong>Feedback:</strong> {{ item.feedbackDocente }}
+                    </div>
+
+                    <div class="version-reason" *ngIf="item.motivo">
+                      <strong>Motivo / referencia:</strong> {{ item.motivo }}
+                    </div>
+
+                    <a
+                      *ngIf="item.urlDocumento"
+                      class="btn-link"
+                      [href]="item.urlDocumento"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Ver documento de esta versión
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="action-bar">
+        <button type="button" class="btn-cancel" (click)="cancelar()">Cancelar</button>
+
+        <button
+          type="button"
+          class="btn-save"
+          [disabled]="!canSave"
+          (click)="guardar()"
+          *ngIf="activeTab === 'proponer'"
+        >
+          {{ isSaving ? 'Guardando...' : getSaveButtonLabel() }}
+          <span class="material-symbols-outlined" *ngIf="!isSaving">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

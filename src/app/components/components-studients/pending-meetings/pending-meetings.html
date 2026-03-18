@@ -1,0 +1,29 @@
+<div class="panel-header">
+  <h3>Reuniones Pendientes</h3>
+  <button class="btn-icon-small">
+    <span class="material-symbols-outlined">calendar_add_on</span>
+  </button>
+</div>
+
+<div class="meetings-list">
+  <div class="meeting-item" *ngFor="let meet of meetings">
+    <div class="meeting-date-box">
+      <span class="date-day">{{ meet.date.split(' ')[0] }}</span> <span class="date-month">{{ meet.date.split(' ')[1] }}</span> </div>
+
+    <div class="meeting-info">
+      <h4 class="meeting-title">{{ meet.title }}</h4>
+      <p class="meeting-with">
+        <span class="material-symbols-outlined icon-tiny">person</span>
+        {{ meet.with }}
+      </p>
+    </div>
+
+    <div class="meeting-time-action">
+      <span class="meeting-time">
+        <span class="material-symbols-outlined icon-tiny">schedule</span>
+        {{ meet.time }}
+      </span>
+      <button class="btn-join">Unirse</button>
+    </div>
+  </div>
+</div>

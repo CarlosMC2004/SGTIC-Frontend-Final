@@ -1,0 +1,137 @@
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ModalRechazo } from '../modal-rechazo/modal-rechazo';
+import { AdmissionRequestsService, AdmissionRequest } from '../../services/admission-requests.service';
+import {AuthService} from '../../services/auth.service';
+
+@Component({
+  selector: 'app-requests-table',
+  standalone: true,
+  imports: [ModalRechazo, CommonModule],
+  templateUrl: './requests-table.html',
+  styleUrl: './requests-table.css',
+})
+export class RequestsTable implements OnInit {
+  showModal = false;
+  solicitudSeleccionadaId: number | null = null;
+  requestsList: AdmissionRequest[] = [];
+  allRequests: AdmissionRequest[] = [];
+  idUser: number | null = null;
+  totalPendientes: number = 0;
+  totalAprobadas: number = 0;
+  totalRechazadas: number = 0;
+
+  estadoActual: string = 'todas';
+  terminoBusqueda: string = '';
+
+  @Output() estadisticasCalculadas = new EventEmitter<any>();
+
+  constructor(
+    private admissionService: AdmissionRequestsService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    const idReal = this.authService.getUserId();
+    console.log(idReal);
+    if (idReal) {
+      this.idUser = idReal;
+      this.cargarSolicitudes();
+    } else {
+      console.warn('Usuario no identificado');
+      this.authService.logout();
+    }
+  }
+
+  cargarSolicitudes() {
+    if (this.idUser !== null) {
+      this.admissionService.getRequestsByCoordinator(this.idUser).subscribe({
+        next: (datos) => {
+          this.allRequests = datos;
+          this.calcularEstadisticas();
+          this.aplicarFiltros();
+        },
+        error: (err) => console.error('Error al cargar:', err)
+      });
+    }
+  }
+
+  aplicarFiltros() {
+    let resultado = [...this.allRequests];
+
+    if (this.estadoActual !== 'todas') {
+      resultado = resultado.filter(req => req.estado?.toLowerCase() === this.estadoActual);
+    }
+
+    if (this.terminoBusqueda.trim() !== '') {
+      const termino = this.terminoBusqueda.toLowerCase();
+      resultado = resultado.filter(req =>
+        req.nombres?.toLowerCase().includes(termino) ||
+        req.apellidos?.toLowerCase().includes(termino) ||
+        req.identificacion?.includes(termino)
+      );
+    }
+
+    this.requestsList = resultado;
+  }
+
+  calcularEstadisticas() {
+    this.totalPendientes = this.allRequests.filter(req => req.estado?.toLowerCase() === 'pendiente').length;
+    this.totalAprobadas = this.allRequests.filter(req => req.estado?.toLowerCase() === 'aprobada').length;
+    this.totalRechazadas = this.allRequests.filter(req => req.estado?.toLowerCase() === 'rechazada').length;
+
+    this.estadisticasCalculadas.emit({
+      pendientes: this.totalPendientes,
+      aprobadas: this.totalAprobadas,
+      rechazadas: this.totalRechazadas
+    });
+  }
+
+  onFilterChange(event: any) {
+    this.estadoActual = event.target.value;
+    this.aplicarFiltros();
+  }
+
+  onSearch(event: any) {
+    this.terminoBusqueda = event.target.value;
+    this.aplicarFiltros();
+  }
+
+  aprobar(id: number) {
+    if(confirm('¿Estás seguro de aprobar esta solicitud? Se generarán credenciales de acceso para el estudiante.')) {
+      this.admissionService.aprobarSolicitud(id).subscribe({
+        next: (respuesta) => {
+          alert(respuesta.mensaje);
+          this.cargarSolicitudes();
+        },
+        error: (err) => {
+          console.error('Error al aprobar:', err);
+          alert('Error: ' + (err.error?.error || 'No se pudo procesar la solicitud'));
+        }
+      });
+    }
+  }
+
+  openModal(id: number) {
+    this.solicitudSeleccionadaId = id;
+    this.showModal = true;
+  }
+
+  confirmarRechazo(motivo: string) {
+    if (!this.solicitudSeleccionadaId || !motivo.trim()) return;
+    this.admissionService.rechazarSolicitud(this.solicitudSeleccionadaId, motivo).subscribe({
+      next: (respuesta) => {
+        this.closeModal();
+        this.cargarSolicitudes();
+      },
+      error: (err) => {
+        console.error('Error al rechazar:', err);
+      }
+    });
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.solicitudSeleccionadaId = null;
+  }
+}

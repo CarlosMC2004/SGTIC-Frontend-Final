@@ -1,0 +1,136 @@
+<header class="page-header-bar">
+  <div class="breadcrumbs">
+    <span class="text-muted">Panel de Control</span>
+    <span class="separator">›</span>
+    <span class="current">Gestión de Roles</span>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="header-text">
+    <h1>Gestión de Roles y Permisos</h1>
+    <p>Administra los roles del sistema y asigna permisos a nivel de base de datos.</p>
+  </div>
+</div>
+
+<div class="tabs-container">
+  <button class="tab-btn" [class.active]="activeTab === 'assign'" (click)="activeTab = 'assign'">
+    <span class="material-symbols-outlined">assignment_ind</span>
+    Asignar Roles a Usuarios
+  </button>
+  <button class="tab-btn" [class.active]="activeTab === 'create'" (click)="activeTab = 'create'">
+    <span class="material-symbols-outlined">add_circle</span>
+    Crear Nuevo Rol
+  </button>
+</div>
+
+<!-- TAB 1: Asignar Roles -->
+<div class="tab-content" *ngIf="activeTab === 'assign'">
+
+  <div class="stats-row">
+    <div class="stat-card" *ngFor="let role of availableRoles">
+      <span class="material-symbols-outlined icon">badge</span>
+      <div>
+        <h3>{{ role.usuariosAsignados }}</h3>
+        <p>{{ role.nombre }}s</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-actions">
+      <div class="search-box">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" placeholder="Buscar usuario..." [(ngModel)]="searchText">
+      </div>
+    </div>
+
+    <table>
+      <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Administrador</th>
+        <th>Coordinador</th>
+        <th>Docente</th>
+        <th>Estudiante</th>
+        <th>Estado</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let user of filteredUsers">
+        <td>
+          <div class="user-cell">
+            <div class="avatar-circle" [style.background-color]="user.avatarColor">
+              {{ user.nombres.charAt(0) }}{{ user.apellidos.charAt(0) }}
+            </div>
+            <div>
+              <div class="font-bold">{{ user.nombres }} {{ user.apellidos }}</div>
+              <div class="text-small text-muted">{{ user.correo }}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <input type="checkbox" [checked]="hasRole(user, 'Administrador')"
+                 (change)="toggleRole(user.id, 'Administrador')">
+        </td>
+        <td>
+          <input type="checkbox" [checked]="hasRole(user, 'Coordinador')"
+                 (change)="toggleRole(user.id, 'Coordinador')">
+        </td>
+        <td>
+          <input type="checkbox" [checked]="hasRole(user, 'Docente')"
+                 (change)="toggleRole(user.id, 'Docente')">
+        </td>
+        <td>
+          <input type="checkbox" [checked]="hasRole(user, 'Estudiante')"
+                 (change)="toggleRole(user.id, 'Estudiante')">
+        </td>
+        <td>
+            <span class="status-badge" [class.active]="user.activo">
+              {{ user.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TAB 2: Crear Rol -->
+<div class="tab-content" *ngIf="activeTab === 'create'">
+  <div class="form-card">
+    <h3>Crear Nuevo Rol del Sistema</h3>
+
+    <div class="form-group">
+      <label>Nombre del Rol</label>
+      <input type="text" [(ngModel)]="newRole.nombre" placeholder="Ej: Editor de Contenidos">
+    </div>
+
+    <div class="form-group">
+      <label>Descripción</label>
+      <textarea [(ngModel)]="newRole.descripcion" rows="3" placeholder="Describe las funciones de este rol..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Permisos a Nivel de Base de Datos</label>
+      <div class="permissions-grid">
+        <div class="permission-item" *ngFor="let perm of bdPermissions"
+             [class.selected]="newRole.permisos.includes(perm)"
+             (click)="togglePermission(perm)">
+          <span class="material-symbols-outlined">
+            {{ newRole.permisos.includes(perm) ? 'check_box' : 'check_box_outline_blank' }}
+          </span>
+          <span class="perm-text">{{ perm }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-secondary" (click)="activeTab = 'assign'">Cancelar</button>
+      <button class="btn-primary" (click)="createNewRole()" [disabled]="!newRole.nombre || !newRole.descripcion">
+        <span class="material-symbols-outlined">save</span>
+        Crear Rol
+      </button>
+    </div>
+  </div>
+</div>

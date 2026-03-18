@@ -1,0 +1,97 @@
+/* Overlay y Contenedor Principal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 1rem;
+}
+
+.modal-container {
+  background: #ffffff; border-radius: 16px; width: 100%; max-width: 600px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex; flex-direction: column; max-height: 90vh; overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.modal-header {
+  padding: 1.5rem 2rem; border-bottom: 1px solid #e2e8f0;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.header-titles h2 { margin: 0; font-size: 1.5rem; color: #0f172a; }
+.subtitle { font-size: 0.85rem; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.btn-close {
+  background: none; border: none; color: #94a3b8; cursor: pointer;
+  border-radius: 50%; padding: 0.5rem; display: flex; align-items: center;
+  transition: all 0.2s;
+}
+.btn-close:hover { background: #f1f5f9; color: #ef4444; }
+
+/* Body y Formularios */
+.modal-body { padding: 2rem; overflow-y: auto; }
+
+.form-group { margin-bottom: 1.5rem; }
+.form-row.split { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+label { display: block; font-size: 0.875rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem; }
+.required { color: #ef4444; }
+
+.input-wrapper {
+  position: relative; display: flex; align-items: center;
+}
+
+.input-wrapper .icon {
+  position: absolute; left: 1rem; color: #94a3b8; font-size: 1.25rem; pointer-events: none;
+}
+
+input, select, textarea {
+  width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1;
+  border-radius: 8px; font-size: 0.95rem; color: #0f172a; transition: all 0.2s;
+  background-color: #f8fafc; font-family: inherit;
+}
+
+/* Espacio extra para los iconos a la izquierda */
+input[type="text"], input[type="date"], select { padding-left: 2.75rem; }
+
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: #3b82f6; background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.error { border-color: #ef4444 !important; background-color: #fef2f2 !important; }
+.error-msg { color: #ef4444; font-size: 0.8rem; margin-top: 0.4rem; font-weight: 500; }
+
+textarea { resize: vertical; min-height: 80px; max-width: 500px; }
+
+/* Selectores */
+.select-wrapper::after {
+  content: "expand_more"; font-family: 'Material Symbols Outlined';
+  position: absolute; right: 1rem; color: #64748b; pointer-events: none;
+}
+select { appearance: none; }
+
+/* Footer */
+.modal-footer {
+  padding: 1.25rem 2rem; border-top: 1px solid #e2e8f0; background: #f8fafc;
+  display: flex; justify-content: flex-end; gap: 1rem;
+}
+
+.btn-cancel {
+  background: white; border: 1px solid #cbd5e1; color: #475569; padding: 0.6rem 1.2rem;
+  border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.btn-cancel:hover { background: #f1f5f9; color: #0f172a; }
+
+.btn-primary {
+  background: #2563eb; border: none; color: white; padding: 0.6rem 1.2rem;
+  border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }

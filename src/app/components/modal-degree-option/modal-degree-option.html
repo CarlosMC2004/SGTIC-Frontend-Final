@@ -1,0 +1,38 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h3>Nuevo Método de Titulación</h3>
+      <button class="btn-cancel" (click)="cerrar()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form (ngSubmit)="guardar()">
+      <div class="form-group">
+        <label>Nombre del Método</label>
+        <input type="text" class="form-control" placeholder="Ej: Tesis de Grado" [(ngModel)]="option.name" name="name">
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <textarea class="form-control" rows="3" placeholder="Breve explicación..." [(ngModel)]="option.description" name="description"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Icono (Material Symbol)</label>
+        <select class="form-control" [(ngModel)]="option.iconName" name="iconName">
+          <option value="menu_book">Libro (Tesis)</option>
+          <option value="article">Artículo Científico</option>
+          <option value="task">Examen Complexivo</option>
+          <option value="developer_board">Proyecto Técnico</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="cerrar()">Cancelar</button>
+        <button type="submit" class="btn-save">Guardar Método</button>
+      </div>
+    </form>
+  </div>
+</div>

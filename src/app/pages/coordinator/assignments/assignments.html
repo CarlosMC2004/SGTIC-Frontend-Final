@@ -1,0 +1,126 @@
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-area">
+    <app-header></app-header>
+
+    <div class="split-view-container">
+      <aside class="projects-panel">
+        <div class="panel-header">
+          <h3>
+            <span class="material-symbols-outlined">pending_actions</span>
+            Proyectos Pendientes
+          </h3>
+          <span class="count-badge">{{ pendingProjects.length }}</span>
+        </div>
+
+        <div class="projects-list custom-scrollbar">
+          <div class="project-card"
+               *ngFor="let p of pendingProjects"
+               [class.active]="p.idPropuesta === selectedProjectId"
+               (click)="seleccionarProyecto(p.idPropuesta)"
+               style="cursor: pointer;">
+
+            <div class="card-tag-row">
+              <span class="tag high">POR ASIGNAR</span>
+              <span class="time">{{ p.fechaEnvio }}</span>
+            </div>
+
+            <h4 class="project-title">{{ p.titulo }}</h4>
+
+            <div class="student-info">
+              <span class="material-symbols-outlined">person</span>
+              {{ p.nombreEstudiante }}
+            </div>
+
+            <div class="project-desc-container custom-scrollbar">
+              <p>
+                <strong>Descripción Completa:</strong>
+                {{ p.descripcion }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="teachers-panel">
+        <div class="filters-bar">
+          <div class="search-box">
+            <span class="material-symbols-outlined icon">search</span>
+            <input
+              type="text"
+              placeholder="Buscar docente por nombre o especialidad..."
+              (input)="onSearch($event)"
+            />
+          </div>
+
+          <div class="filter-row">
+            <button class="btn-ia-magic"
+                    (click)="solicitarSugerenciasIA()"
+                    [disabled]="loadingAi || !selectedProjectId"
+                    [class.loading]="loadingAi">
+              <span class="material-symbols-outlined" *ngIf="!loadingAi">auto_awesome</span>
+              <span class="material-symbols-outlined spin-icon" *ngIf="loadingAi">sync</span>
+              {{ loadingAi ? 'Analizando docentes...' : 'Sugerencia de IA' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="teachers-grid custom-scrollbar">
+          <div class="teacher-card"
+               *ngFor="let teacher of teachers"
+               [class.recommended]="teacher.matchScore > 0">
+
+            <div class="ai-floating-badge" *ngIf="teacher.matchScore > 0">
+              <span class="material-symbols-outlined">verified</span>
+              {{ teacher.matchScore }}%
+            </div>
+
+            <div class="card-inner">
+              <div class="teacher-profile">
+                <div class="avatar-box">
+                  <img
+                    [src]="teacher.fotoUrl || 'https://ui-avatars.com/api/?name=' + teacher.nombreCompleto + '&background=1a5d43&color=fff'"
+                    alt="docente"
+                  />
+                </div>
+
+                <div class="name-box">
+                  <h5>{{ teacher.nombreCompleto }}</h5>
+                  <p class="rank">Docente Investigador</p>
+                </div>
+              </div>
+
+              <div class="ai-reason-bubble" *ngIf="teacher.matchScore > 0">
+                <span class="material-symbols-outlined">psychology</span>
+                <p>"{{ teacher.razonIA }}"</p>
+              </div>
+
+              <div class="specialties-row">
+                <span class="spec-tag" *ngFor="let spec of teacher.specializations">
+                  {{ spec }}
+                </span>
+              </div>
+
+              <div class="workload-box">
+                <div class="workload-labels">
+                  <span>
+                    <span class="material-symbols-outlined">analytics</span>
+                    Proyectos: {{ teacher.proyectosActivos }}/5
+                  </span>
+                </div>
+              </div>
+
+              <button class="btn-assign-action"
+                      [disabled]="teacher.proyectosActivos >= 5"
+                      (click)="asignarDirector(teacher)">
+                <span class="material-symbols-outlined">person_add</span>
+                Asignar como Director
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,114 @@
+<header class="page-header-bar">
+  <div class="breadcrumbs">
+    <span class="text-muted">Panel de Control</span>
+    <span class="separator">›</span>
+    <span class="current">Configuración Académica</span>
+  </div>
+</header>
+
+<div class="page-header-flex">
+  <div>
+    <h2 class="page-title">Configuración Académica</h2>
+    <p class="page-subtitle">Gestión de modalidades de titulación y áreas de conocimiento</p>
+  </div>
+  <button class="btn-primary" (click)="openModal()">
+    <span class="material-symbols-outlined">add</span>
+    Nueva Modalidad
+  </button>
+</div>
+
+<div class="tabs-container">
+  <button class="tab-btn"
+          [class.active]="activeTab === 'degrees'"
+          (click)="setActiveTab('degrees')">
+    Opciones de Titulación
+  </button>
+  <button class="tab-btn"
+          [class.active]="activeTab === 'areas'"
+          (click)="setActiveTab('areas')">
+    Especializaciones Docentes
+  </button>
+</div>
+
+<div class="tab-content" *ngIf="activeTab === 'degrees'">
+  <div class="card-container">
+
+    <div class="modality-item" *ngFor="let option of degreeOptions">
+      <div class="modality-info">
+        <div class="modality-icon">
+          <span class="material-symbols-outlined">{{ option.icon }}</span>
+        </div>
+        <div>
+          <h4 class="modality-title">{{ option.title }}</h4>
+          <p class="modality-subtitle">{{ option.subtitle }}</p>
+        </div>
+      </div>
+
+      <div class="modality-actions">
+        <div class="status-control">
+          <span class="status-label">ESTADO</span>
+          <div class="toggle-switch" [class.active]="option.active" (click)="option.active = !option.active">
+            <div class="toggle-circle"></div>
+          </div>
+        </div>
+        <button class="btn-icon">
+          <span class="material-symbols-outlined">more_vert</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="tab-content" *ngIf="activeTab === 'areas'">
+  <div class="areas-header">
+    <h3 class="section-title">Áreas de Conocimiento</h3>
+    <p class="section-subtitle">Especializaciones registradas en el sistema para docentes</p>
+  </div>
+
+  <div class="areas-card">
+    <div class="search-box">
+      <span class="material-symbols-outlined icon">search</span>
+      <input type="text" placeholder="Buscar especialización o área técnica...">
+    </div>
+
+    <div class="tags-wrapper">
+      <span class="tag" *ngFor="let area of knowledgeAreas">
+        {{ area }}
+        <button class="btn-close-tag" (click)="removeArea(area)">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </span>
+
+      <button class="btn-add-tag" (click)="openAreaModal()">
+        <span class="material-symbols-outlined">add</span>
+        Agregar Área
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="info-footer">
+  <div class="info-card">
+    <div class="info-icon bg-green">
+      <span class="material-symbols-outlined">info</span>
+    </div>
+    <div>
+      <h5 class="info-title">Guía de Configuración</h5>
+      <p class="info-text">Las modalidades activas aparecerán como opciones para los estudiantes al momento de registrar su anteproyecto.</p>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="info-icon bg-green">
+      <span class="material-symbols-outlined">auto_awesome</span>
+    </div>
+    <div>
+      <h5 class="info-title">Sugerencias Inteligentes</h5>
+      <p class="info-text">El sistema asocia automáticamente las áreas de conocimiento con los docentes según su historial académico.</p>
+    </div>
+  </div>
+</div>
+
+<app-modal-new-modality *ngIf="isModalOpen" (close)="closeModal()" (save)="saveNewModality($event)"></app-modal-new-modality>
+<app-modal-add-area *ngIf="isAreaModalOpen" (close)="closeAreaModal()" (save)="saveNewArea($event)"></app-modal-add-area>

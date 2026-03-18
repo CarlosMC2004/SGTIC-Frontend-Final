@@ -1,0 +1,21 @@
+<div class="panel-header">
+  <h3>Próximas Entregas</h3>
+  <a href="#" class="view-all-link">Ver todo</a>
+</div>
+
+<div class="deliveries-list">
+  <div class="delivery-item" *ngFor="let item of deliveries">
+    <div class="item-icon placeholder-icon">
+      <span class="material-symbols-outlined">description</span>
+    </div>
+    <div class="item-content">
+      <h4 class="item-title">{{ item.title }}</h4>
+      <span class="item-date">Vence: {{ item.date }}</span>
+    </div>
+    <div class="item-status">
+      <span class="status-chip" [ngClass]="'status-' + item.statusClass">
+        {{ item.status }}
+      </span>
+    </div>
+  </div>
+</div>

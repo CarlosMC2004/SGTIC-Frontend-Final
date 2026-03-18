@@ -1,0 +1,103 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="header-titles">
+        <h2>Schedule Tutorship</h2>
+        <span class="subtitle">Agendar nueva reunión con tesista</span>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="scheduleForm" (ngSubmit)="onSave()">
+
+        <div class="form-group">
+          <label>Estudiante y Trabajo de Titulación <span class="required">*</span></label>
+          <div class="input-wrapper select-wrapper">
+            <span class="icon material-symbols-outlined">school</span>
+            <select formControlName="idWork" [class.error]="scheduleForm.get('idWork')?.invalid && scheduleForm.get('idWork')?.touched">
+              <option value="" disabled selected>Seleccione un estudiante...</option>
+              <option *ngFor="let work of assignedWorks" [value]="work.idWork">
+                {{ work.studentName }} - {{ work.title }}
+              </option>
+            </select>
+          </div>
+          <div class="error-msg" *ngIf="scheduleForm.get('idWork')?.invalid && scheduleForm.get('idWork')?.touched">
+            Debe seleccionar un estudiante.
+          </div>
+        </div>
+
+        <div class="form-row split">
+          <div class="form-group">
+            <label>Fecha <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <span class="icon material-symbols-outlined">calendar_today</span>
+              <input type="date" formControlName="date" [min]="minDate" [class.error]="scheduleForm.get('date')?.invalid && scheduleForm.get('date')?.touched">
+            </div>
+            <div class="error-msg" *ngIf="scheduleForm.get('date')?.invalid && scheduleForm.get('date')?.touched">
+              Fecha inválida o vacía.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Tutoría <span class="required">*</span></label>
+            <div class="input-wrapper select-wrapper">
+              <span class="icon material-symbols-outlined">category</span>
+              <select formControlName="type" [class.error]="scheduleForm.get('type')?.invalid && scheduleForm.get('type')?.touched">
+                <option value="" disabled selected>Seleccione tipo...</option>
+                <option value="seguimiento">Seguimiento</option>
+                <option value="revision">Revisión de Avances</option>
+                <option value="orientacion">Orientación Inicial</option>
+              </select>
+            </div>
+            <div class="error-msg" *ngIf="scheduleForm.get('type')?.invalid && scheduleForm.get('type')?.touched">
+              Debe seleccionar el tipo.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row split">
+
+          <div class="form-group">
+            <label>Modalidad <span class="required">*</span></label>
+            <div class="input-wrapper select-wrapper">
+              <span class="icon material-symbols-outlined">wifi_tethering</span>
+              <select formControlName="modality" [class.error]="scheduleForm.get('modality')?.invalid && scheduleForm.get('modality')?.touched">
+                <option value="" disabled selected>Seleccione modalidad...</option>
+                <option value="presencial">Presencial</option>
+                <option value="virtual">Virtual</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Lugar o Enlace <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <span class="icon material-symbols-outlined">location_on</span>
+              <input type="text" formControlName="locationLink" placeholder="Ej: Laboratorio 3 o link de Zoom" [class.error]="scheduleForm.get('locationLink')?.invalid && scheduleForm.get('locationLink')?.touched">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-group">
+          <label>Mensaje o Nota (Opcional)</label>
+          <textarea formControlName="observations" rows="3" placeholder="Ej: Traer el diagrama de base de datos corregido..."></textarea>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+      <button type="button" class="btn-primary" (click)="onSave()">
+        <span class="material-symbols-outlined">event_available</span>
+        Agendar
+      </button>
+    </div>
+
+  </div>
+</div>
