@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { PeriodoService, Periodo } from '../../services/modelo-service/periodo.service';
 import { ChatService } from '../../services/chat';
 import { ChatMessage } from '../../models/chat-message';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-topbar',
@@ -24,13 +25,20 @@ export class Topbar implements OnInit {
   unreadMessages_count = 0;
   unreadMessages: ChatMessage[] = [];
 
+  // Variables dinámicas para el usuario
+  userName: string = 'Usuario';
+  userRole: string = 'Rol no definido';
+  isCoordinator: boolean = false;
+
   constructor(
     private periodoService: PeriodoService,
     private chatService: ChatService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.cargarDatosUsuario();
     this.cargarPeriodos();
 
     this.chatService.unreadCount$.subscribe(count => {
@@ -43,10 +51,32 @@ export class Topbar implements OnInit {
     });
   }
 
+  cargarDatosUsuario(): void {
+    const user = this.authService.getCurrentUser();
+    
+    if (user) {
+      this.userName = user.fullName || 'Usuario';
+      
+      if (this.authService.hasRole('COORDINADOR') || this.authService.hasRole('COORDINATOR') || this.authService.hasRole('ROLE_COORDINATOR') || this.authService.hasRole('administrador_sgtic') || this.authService.hasRole('coordinador_carrera')) {
+        this.userRole = 'Coordinador';
+        this.isCoordinator = true;
+      } else if (this.authService.hasRole('ESTUDIANTE') || this.authService.hasRole('STUDENT') || this.authService.hasRole('ROLE_STUDENT') || this.authService.hasRole('estudiante')) {
+        this.userRole = 'Estudiante';
+        this.isCoordinator = false;
+      } else if (user.roles && user.roles.length > 0) {
+        this.userRole = user.roles[0];
+      }
+    }
+  }
+
   goToChat() {
     this.chatService.clearUnread();
     this.showNotificationDropdown = false;
-    this.router.navigate(['/chat/student']);
+    if (this.isCoordinator) {
+      this.router.navigate(['/chat/coordinator']); 
+    } else {
+      this.router.navigate(['/chat/student']);
+    }
   }
 
   toggleNotifications(event: Event) {
@@ -57,7 +87,8 @@ export class Topbar implements OnInit {
   }
 
   cargarPeriodos(): void {
-    this.periodoService.getPeriodosAceptados().subscribe({
+    // TODOS los roles consultan la misma ruta para el periodo activo
+    this.periodoService.getPeriodosActivos().subscribe({
       next: (data: Periodo[]) => {
         this.periodosAceptados = data ?? [];
         if (this.periodosAceptados.length > 0) {
@@ -68,7 +99,7 @@ export class Topbar implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error al cargar períodos:', error);
+        console.error('Error al cargar periodos activos:', error);
         this.periodosAceptados = [];
         this.periodoSeleccionado = null;
       }
@@ -97,6 +128,10 @@ export class Topbar implements OnInit {
 
   trackByPeriodo(_: number, periodo: Periodo): number {
     return periodo.idPeriod;
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   @HostListener('document:click')

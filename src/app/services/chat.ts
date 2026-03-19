@@ -65,13 +65,13 @@ export class ChatService {
           },
           onStompError: (frame) => {
             console.error('Error STOMP:', frame);
-            console.error('Error STOMP:', frame);
+            
             this.isConnected = false;
             reject(frame);
           },
           onWebSocketError: (ev) => {
             console.error('Error WebSocket:', ev);
-            console.error('Error WebSocket:', ev);
+            
             this.isConnected = false;
             reject(ev);
           }
@@ -117,7 +117,7 @@ export class ChatService {
       });
 
       console.log(`Suscrito a sala: ${roomId}`);
-      console.log(`Suscrito a sala: ${roomId}`);
+      
     }
   }
 
