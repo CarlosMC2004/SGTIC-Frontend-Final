@@ -6,6 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ChatService } from '../../services/chat';
 import { ChatMessage } from '../../models/chat-message';
+// NUEVO: Importamos el AuthService para saber quién está logueado
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-chat',
@@ -25,10 +27,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   connectionError: string = '';
   replyToMessage: ChatMessage | null = null;
 
-  private usuarios: { [key: number]: string } = {
-    13: 'jperezg@uteq.edu.ec',
-    15: 'coordf1@uteq.edu.ec',
-  };
+  // Nota: Esto sigue sirviendo para el historial viejo, pero los nuevos 
+  // mensajes usarán la identidad real del usuario conectado.
+  
 
   constructor(
     private chatService: ChatService,
@@ -36,23 +37,18 @@ export class ChatComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private ngZone: NgZone,
     private location: Location,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService // NUEVO: Inyectamos el servicio aquí
   ) {}
 
   ngOnInit() {
-    // Limpiar no leídos al entrar al chat
     this.chatService.clearUnread();
 
     this.route.params.subscribe(params => {
       this.roomId = params['id'] || 'general';
 
-      if (this.roomId === 'coordinator') {
-        this.userName = 'coordf1@uteq.edu.ec';
-        this.userRole = 'coordinador';
-      } else {
-        this.userName = 'jperezg@uteq.edu.ec';
-        this.userRole = 'estudiante';
-      }
+      // NUEVO: En lugar de asignar nombres estáticos, llamamos a la función
+      this.cargarDatosUsuario();
 
       this.cargarHistorial();
 
@@ -62,13 +58,33 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   }
 
+  // NUEVO: Función que extrae los datos reales del usuario
+  cargarDatosUsuario(): void {
+    const user = this.authService.getCurrentUser();
+    
+    if (user) {
+      // Intentamos tomar el email o username. Ajusta 'email' o 'correo' según 
+      // cómo venga tu objeto de usuario desde el backend.
+      this.userName = user.email || user.fullName || 'Usuario Desconocido';
+
+      // Asignamos el rol real
+      if (this.authService.hasRole('COORDINADOR') || this.authService.hasRole('COORDINATOR') || this.authService.hasRole('ROLE_COORDINATOR') || this.authService.hasRole('administrador_sgtic') || this.authService.hasRole('coordinador_carrera')) {
+        this.userRole = 'coordinador';
+      } else {
+        this.userRole = 'estudiante';
+      }
+    }
+  }
+
   cargarHistorial() {
     this.http.get<any[]>('http://localhost:8080/api/chat/historial')
       .subscribe({
         next: (historial) => {
           this.ngZone.run(() => {
             this.messages = historial.map(item => {
-              let userEmail = this.usuarios[item.idRemitente] || `usuario_${item.idRemitente}@uteq.edu.ec`;
+              
+              // AHORA TOMAMOS EL CORREO REAL DIRECTO DEL BACKEND
+              let userEmail = item.correoRemitente || `usuario_${item.idRemitente}@uteq.edu.ec`;
 
               const message: ChatMessage = {
                 id: item.id,
@@ -77,13 +93,14 @@ export class ChatComponent implements OnInit, OnDestroy {
                 timestamp: new Date(item.fechaEnvio)
               };
 
+              // Si el mensaje es una respuesta a otro, también le ponemos su correo real
               if (item.replyToId) {
-                const repliedMessage = historial.find(m => m.id === item.replyToId);
+                const repliedMessage = historial.find((m: any) => m.id === item.replyToId);
                 if (repliedMessage) {
                   message.replyTo = {
                     id: item.replyToId,
                     message: repliedMessage.mensaje,
-                    user: this.usuarios[repliedMessage.idRemitente] || `usuario_${repliedMessage.idRemitente}@uteq.edu.ec`
+                    user: repliedMessage.correoRemitente || `usuario_${repliedMessage.idRemitente}@uteq.edu.ec`
                   };
                 }
               }
@@ -96,7 +113,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           });
         },
         error: (error) => {
-          console.error('❌ Error cargando historial:', error);
+          console.error(' Error cargando historial:', error);
         }
       });
   }
@@ -128,27 +145,18 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   joinRoom() {
-    if (this.userRole === 'coordinador') {
-      ['student', 'coordinator', 'general'].forEach(sala => {
-        this.chatService.joinRoom(sala, (message: ChatMessage) => {
-          this.ngZone.run(() => {
-            if (message.user !== this.userName) {
-              this.chatService.incrementUnread(message);
-            }
-            this.messages = [...this.messages, message];
-          });
-        });
-      });
-    } else {
-      this.chatService.joinRoom(this.roomId, (message: ChatMessage) => {
+    const salas = this.userRole === 'coordinador' ? ['student', 'coordinator', 'general'] : [this.roomId];
+    
+    salas.forEach(sala => {
+      this.chatService.joinRoom(sala, (message: ChatMessage) => {
         this.ngZone.run(() => {
-          if (message.user !== this.userName) {
-            this.chatService.incrementUnread(message);
-          }
+          // SOLO actualizamos la lista visual de mensajes
+          // El contador de la campana ya lo manejó el servicio arriba
           this.messages = [...this.messages, message];
+          this.scrollToBottom();
         });
       });
-    }
+    });
   }
 
   setReplyTo(message: ChatMessage) {
@@ -179,7 +187,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (this.newMessage.trim() && this.isConnected) {
       const chatMessage: ChatMessage = {
         message: this.newMessage,
-        user: this.userName,
+        user: this.userName, // AHORA TOMA LA IDENTIDAD REAL
         timestamp: new Date()
       };
 
