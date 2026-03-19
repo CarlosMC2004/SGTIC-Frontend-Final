@@ -3,13 +3,17 @@
   <app-sidebar role="coordinador"></app-sidebar>
 
   <div class="main-wrapper">
-
     <app-topbar></app-topbar>
 
     <main class="content-area">
 
       <div class="page-header">
         <h2 class="page-title">Directorio de Docentes e Investigadores</h2>
+
+        <button class="btn-add-teacher" (click)="editarDocente(null)">
+          <span class="material-symbols-outlined">add</span>
+          Agregar Docente
+        </button>
       </div>
 
       <div class="filters-bar">
@@ -18,32 +22,17 @@
           <span class="material-symbols-outlined icon">search</span>
           <input type="text"
                  [(ngModel)]="terminoBusqueda"
-                 (ngModelChange)="onFiltroChange()"
+                 (input)="aplicarFiltros()"
                  placeholder="Buscar por nombre o email..."
                  class="search-input-field">
         </div>
 
         <div class="filters-actions">
-
-          <button class="btn-filter">
-            Tipo de Contrato <span class="material-symbols-outlined">expand_more</span>
-          </button>
-
           <div class="select-wrapper">
-            <select class="custom-select" [(ngModel)]="filtroEspecialidad" (change)="onFiltroChange()">
-              <option value="todos">Todas las Especialidades</option>
-              <option *ngFor="let esp of especialidades" [value]="esp">
-                {{ esp }}
-              </option>
-            </select>
-            <span class="material-symbols-outlined select-icon">expand_more</span>
-          </div>
-
-          <div class="select-wrapper">
-            <select class="custom-select" [(ngModel)]="filtroDisponibilidad" (change)="onFiltroChange()">
-              <option value="todos">Todas las Disponibilidades</option>
-              <option value="disponible">Disponibles</option>
-              <option value="lleno">No Disponibles</option>
+            <select class="custom-select" [(ngModel)]="filtroEstado" (change)="aplicarFiltros()">
+              <option value="todos">Todos los Estados</option>
+              <option value="activo">Solo Activos</option>
+              <option value="inactivo">Solo Inactivos</option>
             </select>
             <span class="material-symbols-outlined select-icon">expand_more</span>
           </div>
@@ -51,55 +40,44 @@
         </div>
       </div>
 
-      <div class="teachers-grid">
-
-        <div class="teacher-card" *ngFor="let t of teachers">
+      <div class="teachers-grid" *ngIf="!cargando && teachers.length > 0">
+        <div class="teacher-card" *ngFor="let t of teachers" [class.inactive-card]="!t.activo">
 
           <div class="card-top">
             <div class="avatar-circle">
-              <span>{{ t.fullName.charAt(0) }}</span>
+              <span>{{ t.nombreCompleto?.charAt(0) }}</span>
             </div>
 
             <div class="status-toggle">
-              <span class="label-inv">INV.</span>
-              <div class="toggle-switch" [class.active]="t.isResearcher">
-                <div class="toggle-circle"></div>
-              </div>
+              <span class="label-status">{{ t.activo ? 'ACTIVO' : 'INACTIVO' }}</span>
+              <label class="switch">
+                <input type="checkbox" [(ngModel)]="t.activo" (change)="cambiarEstado(t)">
+                <span class="slider round"></span>
+              </label>
             </div>
           </div>
 
           <div class="teacher-info">
-            <h3>{{ t.fullName }}</h3>
-            <p>{{ t.email }}</p>
+            <h3>{{ t.nombreCompleto }}</h3>
+            <p>{{ t.correo }}</p>
           </div>
 
           <div class="badges">
-            <span class="badge">{{ t.degree }}</span>
-            <span class="badge">{{ t.contract }}</span>
-          </div>
-
-          <div class="workload-section">
-            <div class="workload-header">
-              <span>CARGA DE TESIS</span>
-              <span>{{ t.workload }} / 5</span>
-            </div>
-            <div class="progress-track">
-              <div class="progress-fill"
-                   [style.width]="getWorkloadPercentage(t.workload)"
-                   [style.background-color]="getProgressBarColor(t.workload)">
-              </div>
-            </div>
+            <span class="badge" *ngFor="let esp of t.especialidades">{{ esp }}</span>
+            <span class="badge-empty" *ngIf="t.especialidades.length === 0">Sin especialidad</span>
           </div>
 
           <div class="card-footer">
-            <a class="link-edit" (click)="editarDocente(t)">Editar Perfil</a>
-            <span class="link-history">Historial</span>
+            <button class="btn-edit" (click)="editarDocente(t)">
+              <span class="material-symbols-outlined">edit</span> Editar Perfil
+            </button>
+            <span class="link-history">Ver Proyectos</span>
           </div>
         </div>
 
       </div>
       <div *ngIf="teachers.length === 0 && !cargando" class="no-data">
-        <p>No se encontraron docentes con esos criterios.</p>
+        <p>No se encontraron docentes.</p>
       </div>
 
     </main>
@@ -107,7 +85,8 @@
     <app-modal-edit-teacher
       *ngIf="selectedTeacher"
       [teacherData]="selectedTeacher"
-      (close)="closeEditModal()">
+      (close)="closeEditModal()"
+      (save)="guardarDocente($event)">
     </app-modal-edit-teacher>
 
   </div>
