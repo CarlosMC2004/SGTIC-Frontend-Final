@@ -252,3 +252,82 @@
     padding: 8px;
   }
 }
+.chat-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d9fdd3;
+  border: 1px solid #00a884;
+  color: #075e54;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-alert:hover {
+  background: #c5f5bc;
+}
+
+.close-alert {
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-dropdown {
+  min-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notification-user {
+  font-weight: 600;
+  font-size: 12px;
+  color: #128C7E;
+}
+
+.notification-text {
+  font-size: 13px;
+  color: #333;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #999;
+}
+
+.chat-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d9fdd3;
+  border: 1px solid #00a884;
+  color: #075e54;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-alert:hover {
+  background: #c5f5bc;
+}
+
+.close-alert {
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
+}

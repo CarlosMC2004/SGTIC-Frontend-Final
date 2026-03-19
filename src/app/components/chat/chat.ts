@@ -35,11 +35,14 @@ export class ChatComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private http: HttpClient,
     private ngZone: NgZone,
-    private location: Location,  //  agregar
-    private cdr: ChangeDetectorRef //  agregado
+    private location: Location,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    // Limpiar no leídos al entrar al chat
+    this.chatService.clearUnread();
+
     this.route.params.subscribe(params => {
       this.roomId = params['id'] || 'general';
 
@@ -60,64 +63,59 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   cargarHistorial() {
-  this.http.get<any[]>('http://localhost:8080/api/chat/historial')
-    .subscribe({
-      next: (historial) => {
-        this.ngZone.run(() => {
-          this.messages = historial.map(item => {
-            let userEmail = this.usuarios[item.idRemitente] || `usuario_${item.idRemitente}@uteq.edu.ec`;
+    this.http.get<any[]>('http://localhost:8080/api/chat/historial')
+      .subscribe({
+        next: (historial) => {
+          this.ngZone.run(() => {
+            this.messages = historial.map(item => {
+              let userEmail = this.usuarios[item.idRemitente] || `usuario_${item.idRemitente}@uteq.edu.ec`;
 
-            const message: ChatMessage = {
-              id: item.id,
-              message: item.mensaje,
-              user: userEmail,
-              timestamp: new Date(item.fechaEnvio)
-            };
+              const message: ChatMessage = {
+                id: item.id,
+                message: item.mensaje,
+                user: userEmail,
+                timestamp: new Date(item.fechaEnvio)
+              };
 
-            if (item.replyToId) {
-              const repliedMessage = historial.find(m => m.id === item.replyToId);
-              if (repliedMessage) {
-                message.replyTo = {
-                  id: item.replyToId,
-                  message: repliedMessage.mensaje,
-                  user: this.usuarios[repliedMessage.idRemitente] || `usuario_${repliedMessage.idRemitente}@uteq.edu.ec`
-                };
+              if (item.replyToId) {
+                const repliedMessage = historial.find(m => m.id === item.replyToId);
+                if (repliedMessage) {
+                  message.replyTo = {
+                    id: item.replyToId,
+                    message: repliedMessage.mensaje,
+                    user: this.usuarios[repliedMessage.idRemitente] || `usuario_${repliedMessage.idRemitente}@uteq.edu.ec`
+                  };
+                }
               }
-            }
 
-            return message;
+              return message;
+            });
+
+            this.cdr.detectChanges();
+            this.scrollToBottom();
           });
+        },
+        error: (error) => {
+          console.error('❌ Error cargando historial:', error);
+        }
+      });
+  }
 
-          // ✅ Fuerza repintado y scroll al fondo
-          this.cdr.detectChanges();
-          this.scrollToBottom();
-        });
-      },
-      error: (error) => {
-        console.error('❌ Error cargando historial:', error);
-      }
-    });
-}
-
-// ✅ Nuevo método
-private scrollToBottom() {
-  setTimeout(() => {
-    const area = document.querySelector('.messages-area');
-    if (area) area.scrollTop = area.scrollHeight;
-  }, 50);
-}
+  private scrollToBottom() {
+    setTimeout(() => {
+      const area = document.querySelector('.messages-area');
+      if (area) area.scrollTop = area.scrollHeight;
+    }, 50);
+  }
 
   async connectToChat() {
     try {
       await this.chatService.initConnectionSocket();
-
-      //  ngZone + cdr.detectChanges() garantizan que Angular pinte el cambio
       this.ngZone.run(() => {
         this.isConnected = true;
         this.connectionError = '';
         this.cdr.detectChanges();
       });
-
       this.joinRoom();
     } catch (error) {
       console.error('Error de conexión:', error);
@@ -134,6 +132,9 @@ private scrollToBottom() {
       ['student', 'coordinator', 'general'].forEach(sala => {
         this.chatService.joinRoom(sala, (message: ChatMessage) => {
           this.ngZone.run(() => {
+            if (message.user !== this.userName) {
+              this.chatService.incrementUnread(message);
+            }
             this.messages = [...this.messages, message];
           });
         });
@@ -141,6 +142,9 @@ private scrollToBottom() {
     } else {
       this.chatService.joinRoom(this.roomId, (message: ChatMessage) => {
         this.ngZone.run(() => {
+          if (message.user !== this.userName) {
+            this.chatService.incrementUnread(message);
+          }
           this.messages = [...this.messages, message];
         });
       });
@@ -197,10 +201,11 @@ private scrollToBottom() {
   }
 
   ngOnDestroy() {
-    this.chatService.disconnect();
+    // No desconectar para mantener notificaciones activas en background
+    // this.chatService.disconnect();
   }
-  
+
   goBack(): void {
-  this.location.back();
-}
+    this.location.back();
+  }
 }

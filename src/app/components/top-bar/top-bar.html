@@ -18,32 +18,62 @@
             {{ periodo.name }}
           </li>
         </ul>
-
         <ng-template #emptyPeriods>
-          <div class="empty-message">
-            No hay períodos aceptados disponibles
-          </div>
+          <div class="empty-message">No hay períodos aceptados disponibles</div>
         </ng-template>
       </div>
     </div>
 
-    <button class="notification-btn" type="button">
-      <span class="material-symbols-outlined">notifications</span>
-      <span class="badge">5</span>
-    </button>
+    <!-- Campana con dropdown de notificaciones -->
+    <div class="notification-wrapper" (click)="$event.stopPropagation()">
+      <button class="notification-btn" type="button" (click)="toggleNotifications($event)">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="badge" *ngIf="unreadMessages_count > 0">{{ unreadMessages_count }}</span>
+      </button>
+
+      <div class="dropdown-menu notification-dropdown" *ngIf="showNotificationDropdown">
+        <div class="menu-section-title">
+          <span class="material-symbols-outlined icon-tiny">notifications</span>
+          NOTIFICACIONES
+        </div>
+
+        <ul *ngIf="unreadMessages.length > 0; else noNotifications">
+          <li *ngFor="let msg of unreadMessages" (click)="goToChat()">
+            <span class="material-symbols-outlined icon-small">chat</span>
+            <div class="notification-content">
+              <span class="notification-user">{{ msg.user }}</span>
+              <span class="notification-text">{{ msg.message }}</span>
+              <span class="notification-time">
+                {{ msg.timestamp ? (msg.timestamp | date:'HH:mm') : '' }}
+              </span>
+            </div>
+          </li>
+        </ul>
+
+        <ng-template #noNotifications>
+          <div class="empty-message">No tienes notificaciones nuevas</div>
+        </ng-template>
+
+        <hr>
+        <ul>
+          <li (click)="goToChat()">
+            <span class="material-symbols-outlined icon-small">open_in_new</span>
+            Ir al chat
+          </li>
+        </ul>
+      </div>
+    </div>
 
     <div class="user-profile" (click)="toggleProfileMenu($event)">
       <div class="user-info hide-on-mobile">
         <span class="user-name">Juan Pérez</span>
         <span class="user-role">Estudiante</span>
       </div>
-
       <img
         src="https://ui-avatars.com/api/?name=Juan+Perez&background=e9ecef&color=1a5d43"
         alt="Avatar"
         class="avatar"
       >
-
       <span class="material-symbols-outlined icon-small hide-on-mobile">expand_more</span>
 
       <div class="dropdown-menu profile-menu" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
@@ -51,16 +81,13 @@
           <span class="material-symbols-outlined icon-tiny">person</span>
           PERFILES DISPONIBLES
         </div>
-
         <ul>
           <li class="active">
             <span class="material-symbols-outlined icon-small">check</span>
             ESTUDIANTE
           </li>
         </ul>
-
         <hr>
-
         <ul>
           <li>
             <span class="material-symbols-outlined icon-small">person_outline</span>
@@ -75,9 +102,7 @@
             Cambio de clave
           </li>
         </ul>
-
         <hr>
-
         <ul class="logout-menu">
           <li class="logout-item">
             <span class="material-symbols-outlined icon-small">logout</span>
