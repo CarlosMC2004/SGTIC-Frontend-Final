@@ -79,7 +79,7 @@ export class LoginComponent {
         } else if (roles.includes('coordinador_facultad')) {
           this.router.navigate(['/coordinator/faculty']);
         } else if (roles.includes('coordinador_carrera')) {
-          this.router.navigate(['/coordinator/StudentRequests']);
+          this.router.navigate(['/coordinator/Inicio']);
         } else if (roles.includes('docente') || roles.includes('director_trabajo_titulacion')) {
           this.router.navigate(['/director/dashboard']);
         } else if (roles.includes('estudiante')) {
