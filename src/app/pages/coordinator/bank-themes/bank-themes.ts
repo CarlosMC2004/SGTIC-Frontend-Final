@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router'; // 1. IMPORTANTE: Para que funcione routerLink
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { ModalNewTheme } from '../../../components/modal-new-theme/modal-new-theme';
 import { BanckTemaDTO } from '../../../models/banck-tema.model';
 import { BanckTemaService } from '../../../services/banck-tema/banck-tema.service';
@@ -15,7 +15,7 @@ import { PendingProposalService } from '../../../services/pending-proposal/pendi
   standalone: true,
   imports: [
     SidebarComponent,
-    HeaderComponent,
+    Topbar,
     ModalNewTheme,
     CommonModule,
     FormsModule,

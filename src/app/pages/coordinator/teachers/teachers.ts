@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {TeacherService} from '../../../services/teachers/teachers';
 import {SidebarComponent} from '../../../components/sidebar/sidebar';
-import {HeaderComponent} from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import {ModalEditTeacher} from '../../../components/modal-edit-teacher/modal-edit-teacher';
 
 @Component({
   selector: 'app-teachers',
   standalone: true,
-  imports: [CommonModule, FormsModule, SidebarComponent, HeaderComponent, ModalEditTeacher],
+  imports: [CommonModule, FormsModule, SidebarComponent, Topbar, ModalEditTeacher],
   templateUrl: './teachers.html',
   styleUrl: './teachers.css',
 })

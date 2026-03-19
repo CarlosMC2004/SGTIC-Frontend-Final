@@ -5,6 +5,9 @@ import { PeriodoService, Periodo } from '../../services/modelo-service/periodo.s
 import { ChatService } from '../../services/chat';
 import { ChatMessage } from '../../models/chat-message';
 import { AuthService } from '../../services/auth.service';
+import { AdmissionRequestsService } from '../../services/admission-requests.service';
+import { PendingProposalService } from '../../services/pending-proposal/pending-proposal';
+import { TeacherAssignmentService } from '../../services/teacher-assignment/teacher-assignment.service';
 
 @Component({
   selector: 'app-topbar',
@@ -22,8 +25,13 @@ export class Topbar implements OnInit {
   isPeriodMenuOpen = false;
   showNotificationDropdown = false;
   showChatAlert = false;
+  
+  // Variables de notificaciones
   unreadMessages_count = 0;
   unreadMessages: ChatMessage[] = [];
+  pendingRequestsCount = 0; 
+  pendingProposalsCount = 0; 
+  pendingAssignmentsCount = 0; // NUEVO: Contador de proyectos por asignar
 
   // Variables dinámicas para el usuario
   userName: string = 'Usuario';
@@ -34,16 +42,29 @@ export class Topbar implements OnInit {
     private periodoService: PeriodoService,
     private chatService: ChatService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private admissionRequestsService: AdmissionRequestsService,
+    private pendingProposalService: PendingProposalService,
+    private teacherAssignmentService: TeacherAssignmentService // NUEVO: Inyectamos el servicio
   ) {}
+
+  // AHORA SUMA LAS 4 COSAS (Chat + Solicitudes + Propuestas + Asignaciones)
+  get totalNotifications(): number {
+    return this.unreadMessages_count + this.pendingRequestsCount + this.pendingProposalsCount + this.pendingAssignmentsCount;
+  }
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
     this.cargarPeriodos();
+    
+    // Llamadas para llenar la campana
+    this.cargarSolicitudesPendientes();
+    this.cargarPropuestasPendientes(); 
+    this.cargarAsignacionesPendientes(); // NUEVO: Llamamos al método de asignaciones
 
     this.chatService.unreadCount$.subscribe(count => {
       this.unreadMessages_count = count;
-      this.showChatAlert = count > 0;
+      this.showChatAlert = this.totalNotifications > 0;
     });
 
     this.chatService.unreadMessages$.subscribe(messages => {
@@ -69,6 +90,50 @@ export class Topbar implements OnInit {
     }
   }
 
+  cargarSolicitudesPendientes(): void {
+    if (this.isCoordinator) {
+      const userId = this.authService.getUserId();
+      if (userId) {
+        this.admissionRequestsService.getRequestsByCoordinator(userId).subscribe({
+          next: (requests: any) => {
+            const pendientes = requests.filter((r: any) => r.estado?.toLowerCase() === 'pendiente');
+            this.pendingRequestsCount = pendientes.length;
+          },
+          error: (err: any) => console.error('Error al cargar solicitudes:', err)
+        });
+      }
+    }
+  }
+
+  cargarPropuestasPendientes(): void {
+    if (this.isCoordinator) {
+      const userId = this.authService.getUserId();
+      if (userId) {
+        this.pendingProposalService.getPendientes(userId).subscribe({
+          next: (propuestas: any) => {
+            this.pendingProposalsCount = propuestas ? propuestas.length : 0;
+          },
+          error: (err: any) => console.error('Error al cargar propuestas de temas:', err)
+        });
+      }
+    }
+  }
+
+  // NUEVO: Método para buscar proyectos que necesitan director
+  cargarAsignacionesPendientes(): void {
+    if (this.isCoordinator) {
+      const userId = this.authService.getUserId();
+      if (userId) {
+        this.teacherAssignmentService.getPendingProjects(userId).subscribe({
+          next: (proyectos: any) => {
+            this.pendingAssignmentsCount = proyectos ? proyectos.length : 0;
+          },
+          error: (err: any) => console.error('Error al cargar proyectos por asignar:', err)
+        });
+      }
+    }
+  }
+
   goToChat() {
     this.chatService.clearUnread();
     this.showNotificationDropdown = false;
@@ -79,6 +144,23 @@ export class Topbar implements OnInit {
     }
   }
 
+  goToSolicitudes() {
+    this.showNotificationDropdown = false;
+    this.router.navigate(['coordinator/StudentRequests']); 
+  }
+
+  goToPropuestas() {
+    this.showNotificationDropdown = false;
+    this.router.navigate(['coordinator/BankThemes']); 
+  }
+
+  // NUEVO: Navegar a la pantalla de asignaciones
+  goToAsignaciones() {
+    this.showNotificationDropdown = false;
+    // Ajusta esta ruta según cómo se llame en tu app.routes.ts (ej: '/asignaciones' o '/assignments')
+    this.router.navigate(['coordinator/Assignments']); 
+  }
+
   toggleNotifications(event: Event) {
     event.stopPropagation();
     this.showNotificationDropdown = !this.showNotificationDropdown;
@@ -87,7 +169,6 @@ export class Topbar implements OnInit {
   }
 
   cargarPeriodos(): void {
-    // TODOS los roles consultan la misma ruta para el periodo activo
     this.periodoService.getPeriodosActivos().subscribe({
       next: (data: Periodo[]) => {
         this.periodosAceptados = data ?? [];

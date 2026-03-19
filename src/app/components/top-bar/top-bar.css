@@ -10,13 +10,22 @@
   z-index: 50;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin: -24px -32px 32px -32px;
+  margin-top: 0px;
 }
-
+.topbar-background {
+  margin-left: 23px;
+}
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 20px;
 }
+/* Forzamos la fuente moderna para todo el contenido de la barra */
+.topbar {
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+/* Si el texto está dentro de una etiqueta específica (como h1, span, o .header-title), puedes asegurarlo aquí: */
 
 .empty-message {
   padding: 16px;

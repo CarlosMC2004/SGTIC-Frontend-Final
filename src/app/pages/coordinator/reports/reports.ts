@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { StatisticsReport } from '../../../services/statistics-report/statistics-report';
 import { AuthService } from '../../../services/auth.service';
@@ -12,7 +12,7 @@ import html2canvas from 'html2canvas';
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [HeaderComponent, SidebarComponent, CommonModule, FormsModule],
+  imports: [Topbar, SidebarComponent, CommonModule, FormsModule],
   templateUrl: './reports.html',
   styleUrl: './reports.css',
 })

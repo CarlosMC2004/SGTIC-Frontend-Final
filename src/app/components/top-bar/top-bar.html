@@ -27,7 +27,7 @@
     <div class="notification-wrapper" (click)="$event.stopPropagation()">
       <button class="notification-btn" type="button" (click)="toggleNotifications($event)">
         <span class="material-symbols-outlined">notifications</span>
-        <span class="badge" *ngIf="unreadMessages_count > 0">{{ unreadMessages_count }}</span>
+        <span class="badge" *ngIf="totalNotifications > 0">{{ totalNotifications }}</span>
       </button>
 
       <div class="dropdown-menu notification-dropdown" *ngIf="showNotificationDropdown">
@@ -36,7 +36,32 @@
           NOTIFICACIONES
         </div>
 
-        <ul *ngIf="unreadMessages.length > 0; else noNotifications">
+        <ul *ngIf="totalNotifications > 0; else noNotifications">
+          
+          <li *ngIf="pendingRequestsCount > 0" (click)="goToSolicitudes()">
+            <span class="material-symbols-outlined icon-small text-orange" style="color: #f97316;">assignment_ind</span>
+            <div class="notification-content">
+              <span class="notification-user">Sistema SGTIC</span>
+              <span class="notification-text">Tienes <b>{{ pendingRequestsCount }}</b> solicitud(es) de titulación pendiente(s) por revisar.</span>
+            </div>
+          </li>
+
+          <li *ngIf="pendingProposalsCount > 0" (click)="goToPropuestas()">
+            <span class="material-symbols-outlined icon-small text-blue" style="color: #2563eb;">topic</span>
+            <div class="notification-content">
+              <span class="notification-user">Sistema SGTIC</span>
+              <span class="notification-text">Tienes <b>{{ pendingProposalsCount }}</b> propuesta(s) de tema pendiente(s) por evaluar.</span>
+            </div>
+          </li>
+
+          <li *ngIf="pendingAssignmentsCount > 0" (click)="goToAsignaciones()">
+            <span class="material-symbols-outlined icon-small text-purple" style="color: #9333ea;">person_add</span>
+            <div class="notification-content">
+              <span class="notification-user">Sistema SGTIC</span>
+              <span class="notification-text">Tienes <b>{{ pendingAssignmentsCount }}</b> proyecto(s) pendiente(s) por asignar director.</span>
+            </div>
+          </li>
+
           <li *ngFor="let msg of unreadMessages" (click)="goToChat()">
             <span class="material-symbols-outlined icon-small">chat</span>
             <div class="notification-content">
