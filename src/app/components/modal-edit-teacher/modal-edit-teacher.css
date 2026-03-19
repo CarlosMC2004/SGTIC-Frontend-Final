@@ -1,35 +1,31 @@
-/* --- FUNDAMENTO DE CENTRADO (Adiós Scroll) --- */
 .modal-overlay {
   position: fixed;
-  inset: 0; /* Es lo mismo que top:0, left:0, right:0, bottom:0 */
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
   z-index: 998;
 
-  /* Flexbox se encarga de centrar sin desbordar la pantalla */
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px; /* Margen de seguridad para que no choque con los bordes en laptops pequeñas */
+  padding: 20px;
   box-sizing: border-box;
 }
 
-/* --- CONTENEDOR DEL MODAL --- */
 .modal-container {
   background: white;
   border-radius: 12px;
   width: 100%;
   max-width: 720px;
-  max-height: calc(100vh - 40px); /* Respeta el padding del overlay */
+  max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   z-index: 999;
   font-family: 'Public Sans', sans-serif;
-  overflow: hidden; /* Mata cualquier scroll horizontal rebelde */
+  overflow: hidden;
 }
 
-/* --- CABECERA --- */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -69,11 +65,10 @@
   color: #4b5563;
 }
 
-/* --- CUERPO --- */
 .modal-body {
   flex: 1;
-  overflow-y: auto; /* Solo hace scroll vertical aquí adentro si el contenido es muy largo */
-  overflow-x: hidden; /* Bloquea el scroll horizontal */
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 32px;
   display: flex;
   flex-direction: column;
@@ -120,7 +115,7 @@
   transition: all 0.2s ease;
   width: 100%;
   background-color: #f9fafb;
-  box-sizing: border-box; /* Asegura que el padding no engorde el input */
+  box-sizing: border-box;
 }
 
 .form-input:focus {
@@ -129,7 +124,6 @@
   box-shadow: 0 0 0 3px rgba(39, 104, 74, 0.1);
 }
 
-/* --- PIE DEL MODAL --- */
 .modal-footer {
   padding: 20px 32px;
   background-color: #f9fafb;

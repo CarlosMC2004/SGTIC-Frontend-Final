@@ -106,10 +106,8 @@ export class Teachers implements OnInit {
   }
 
   guardarDocente(docenteData: any) {
-    // Obtenemos el ID del coordinador que inició sesión
     const idUsuario = this.authService.getUserId();
 
-    // Inyectamos ese ID en los datos que van al backend
     const datosParaBackend = {
       ...docenteData,
       idUsuarioLogueado: idUsuario
