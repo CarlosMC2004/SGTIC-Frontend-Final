@@ -3,19 +3,16 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface DashboardStatus {
-  estaMatriculado: boolean; // <-- NUEVO: Nos dice si tiene matrícula en este periodo
-
+  estaMatriculado: boolean;
   prerequisitosNivel1: boolean;
   temaSeleccionado: boolean;
   directorAsignado: boolean;
   reunionesMinimas: boolean;
   defensaAnteproyecto: boolean;
-
   prerequisitosNivel2: boolean;
   asistenciaTutorias: boolean;
   predefensa: boolean;
   defensaFinal: boolean;
-
   nombreTema?: string;
   nombreDirector?: string;
   nombreOpcion?: string;
@@ -28,18 +25,16 @@ export interface DashboardStatus {
 export class StudentDashboard {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:8080/api/student/dashboard';
-  private readonly matriculaUrl = 'http://localhost:8080/api/titulacion/matriculas'; // <-- Endpoint del nuevo controlador
+  private readonly matriculaUrl = 'http://localhost:8080/api/titulacion/matriculas';
 
-  // 1. Obtiene el estado del dashboard para un periodo específico
   getStatus(periodoId: number, estudianteId: number): Observable<DashboardStatus> {
     const params = new HttpParams()
       .set('periodoId', periodoId)
-      .set('estudianteId', estudianteId); // Es importante enviar ambos al backend
+      .set('estudianteId', estudianteId);
 
     return this.http.get<DashboardStatus>(`${this.apiUrl}/status`, { params });
   }
 
-  // 2. Ejecuta la matriculación en un nuevo periodo
   matricularEstudiante(payload: { studentId: number; periodId: number }): Observable<any> {
     return this.http.post(`${this.matriculaUrl}/matricular`, payload);
   }

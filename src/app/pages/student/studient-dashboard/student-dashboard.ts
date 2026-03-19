@@ -39,7 +39,11 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   isLoading = true;
   mostrarModalMatricula = false;
   isEnrolling = false;
-  estudianteId = 7;
+  
+  // Variables dinámicas para el usuario actual
+  estudianteId: number = 0;
+  usuarioActualEmail: string = '';
+  
   periodoSeleccionado = 1;
   totalTutoriasObligatorias = 5;
   tutoriasObligatoriasPeriodo: TutoriaObligatoria[] = [];
@@ -54,15 +58,25 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Obtenemos los datos dinámicos de la sesión actual (Ajusta las claves según tu login)
+    this.estudianteId = Number(localStorage.getItem('student_id')) || 0;
+    this.usuarioActualEmail = localStorage.getItem('user_email') || '';
+
+    if (this.estudianteId === 0) {
+      console.warn('SGTIC: No se encontró el ID del estudiante en localStorage. Verifica el login.');
+      // Opcional: Redirigir al login si no hay ID
+    }
+
     this.cargarDashboard(this.periodoSeleccionado);
 
-    //  Usar flag del servicio para no suscribirse más de una vez
+    // Usar flag del servicio para no suscribirse más de una vez
     if (!this.chatService.isBackgroundSubscribed()) {
       this.chatService.setBackgroundSubscribed(true);
       this.chatService.initConnectionSocket().then(() => {
         ['student', 'coordinator'].forEach(sala => {
           this.chatService.joinRoom(sala, (message) => {
-            if (message.user !== 'jperezg@uteq.edu.ec') {
+            // Validación dinámica con el correo del usuario actual
+            if (message.user !== this.usuarioActualEmail) {
               this.chatService.incrementUnread(message);
             }
           });
@@ -84,6 +98,14 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   }
 
   cargarDashboard(periodoId: number): void {
+    // CORRECCIÓN 1: Apagar el loader si no hay ID válido
+    if (!this.estudianteId || this.estudianteId === 0) {
+      this.isLoading = false;
+      this.status = this.getEmptyStatus();
+      this.cdr.detectChanges();
+      return; 
+    }
+
     this.isLoading = true;
     this.cdr.detectChanges();
 
@@ -129,6 +151,8 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   }
 
   confirmarMatricula(): void {
+    if (this.estudianteId === 0) return;
+
     this.isEnrolling = true;
     const payload = {
       studentId: this.estudianteId,

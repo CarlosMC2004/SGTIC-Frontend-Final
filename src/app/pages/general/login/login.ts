@@ -49,8 +49,20 @@ export class LoginComponent {
     this.isLoading = true;
 
     this.authService.login(this.loginForm.value).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         this.isLoading = false;
+
+        // ==========================================
+        // GUARDAR DATOS EN LOCALSTORAGE PARA EL DASHBOARD
+        // ==========================================
+        if (response.email) {
+          localStorage.setItem('user_email', response.email);
+        }
+
+        if (response.context && response.context.idStudent) {
+          localStorage.setItem('student_id', response.context.idStudent.toString());
+        }
+        // ==========================================
 
         if (response.primerIngreso === false) {
           this.router.navigate(['/change-password']).catch(err => {
@@ -60,7 +72,7 @@ export class LoginComponent {
           return;
         }
 
-        const roles = response.roles;
+        const roles = response.roles || [];
 
         if (roles.includes('administrador_sgtic')) {
           this.router.navigate(['/admin/dashboard']);
@@ -77,7 +89,6 @@ export class LoginComponent {
         }
       },
       error: (error) => {
-
         this.isLoading = false;
 
         if (error.status === 401 || error.status === 403) {
@@ -90,6 +101,7 @@ export class LoginComponent {
       }
     });
   }
+
   openModal(event: Event) {
     event.preventDefault();
     this.isModalOpen = true;
