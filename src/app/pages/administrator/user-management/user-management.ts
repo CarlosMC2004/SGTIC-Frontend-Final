@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
 import { UserModalComponent } from '../../../components/modal-user/modal-user';
 import { User } from '../../../models/user.model';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-user-management',
@@ -19,7 +20,7 @@ export class UserManagementComponent implements OnInit {
   selectedUser: User | null = null;
   searchText = '';
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   ngOnInit() {
     this.loadUsers();
@@ -29,7 +30,7 @@ export class UserManagementComponent implements OnInit {
     this.loading = true;
     this.userService.getUsers().subscribe({
       next: (users) => {
-        this.users = users;
+        this.users = [...users];
         this.loading = false;
       },
       error: (err) => {
@@ -41,13 +42,12 @@ export class UserManagementComponent implements OnInit {
 
   get filteredUsers() {
     if (!this.searchText) return this.users;
-
     const term = this.searchText.toLowerCase();
     return this.users.filter(u =>
       u.firstName?.toLowerCase().includes(term) ||
       u.lastName?.toLowerCase().includes(term) ||
       u.identification?.includes(term) ||
-      u.email?.toLowerCase().includes(term)
+      u.email?.toLowerCase().includes(term),
     );
   }
 

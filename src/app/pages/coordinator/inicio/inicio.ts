@@ -19,7 +19,6 @@ import Chart from 'chart.js/auto';
 })
 export class Inicio implements OnInit {
 
-  // Variables para las tarjetas (KPIs)
   estadisticas: any = {
     temasAprobados: 0,
     temasPendientes: 0,

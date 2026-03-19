@@ -50,6 +50,7 @@ export class ChatService {
       try {
         console.log('Inicializando conexión WebSocket...');
         const SockJS = (await import('sockjs-client')).default;
+      
         const { Client } = await import('@stomp/stompjs');
 
         this.stompClient = new Client({
@@ -57,16 +58,19 @@ export class ChatService {
           reconnectDelay: 5000,
           debug: () => {},
           onConnect: () => {
+            
             console.log('Conectado al WebSocket');
             this.isConnected = true;
             resolve();
           },
           onStompError: (frame) => {
             console.error('Error STOMP:', frame);
+            console.error('Error STOMP:', frame);
             this.isConnected = false;
             reject(frame);
           },
           onWebSocketError: (ev) => {
+            console.error('Error WebSocket:', ev);
             console.error('Error WebSocket:', ev);
             this.isConnected = false;
             reject(ev);
@@ -111,6 +115,8 @@ export class ChatService {
           console.error('Error parsing message:', error);
         }
       });
+
+      console.log(`Suscrito a sala: ${roomId}`);
       console.log(`Suscrito a sala: ${roomId}`);
     }
   }
@@ -120,6 +126,7 @@ export class ChatService {
       await this.initConnectionSocket();
     }
     if (this.stompClient && this.isConnected) {
+      console.log(`Enviando mensaje a sala ${roomId}:`, chatMessage);
       console.log(`Enviando mensaje a sala ${roomId}:`, chatMessage);
       this.stompClient.publish({
         destination: `/app/chat/${roomId}`,
