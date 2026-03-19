@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { TeacherAssignmentService } from '../../../services/teacher-assignment/teacher-assignment.service';
 import { TeacherAssignment } from '../../../models/teacher-assignment.model';
 import { PendingProject } from '../../../models/pending-project.model';
@@ -11,7 +11,7 @@ import { AuthService } from '../../../services/auth.service';
 @Component({
   selector: 'app-assignments',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, HeaderComponent],
+  imports: [CommonModule, SidebarComponent, Topbar],
   templateUrl: './assignments.html',
   styleUrl: './assignments.css',
 })

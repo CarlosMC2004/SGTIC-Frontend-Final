@@ -10,13 +10,22 @@
   z-index: 50;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   margin: -24px -32px 32px -32px;
+  margin-top: 0px;
 }
-
+.topbar-background {
+  margin-left: 23px;
+}
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 20px;
 }
+/* Forzamos la fuente moderna para todo el contenido de la barra */
+.topbar {
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+/* Si el texto está dentro de una etiqueta específica (como h1, span, o .header-title), puedes asegurarlo aquí: */
 
 .empty-message {
   padding: 16px;
@@ -251,4 +260,83 @@
   .period-selector {
     padding: 8px;
   }
+}
+.chat-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d9fdd3;
+  border: 1px solid #00a884;
+  color: #075e54;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-alert:hover {
+  background: #c5f5bc;
+}
+
+.close-alert {
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-dropdown {
+  min-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notification-user {
+  font-weight: 600;
+  font-size: 12px;
+  color: #128C7E;
+}
+
+.notification-text {
+  font-size: 13px;
+  color: #333;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #999;
+}
+
+.chat-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d9fdd3;
+  border: 1px solid #00a884;
+  color: #075e54;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-alert:hover {
+  background: #c5f5bc;
+}
+
+.close-alert {
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
 }

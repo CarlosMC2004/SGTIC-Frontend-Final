@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { DegreeOptionService } from '../../../services/degree-option/degree-option.service';
 import {OptionCareerModel} from '../../../models/option-career-model';
 import {AuthService} from '../../../services/auth.service';
@@ -14,7 +14,7 @@ import {AuthService} from '../../../services/auth.service';
     CommonModule,
     FormsModule,
     SidebarComponent,
-    HeaderComponent
+    Topbar
   ],
   templateUrl: './degree-options.html',
   styleUrl: './degree-options.css'

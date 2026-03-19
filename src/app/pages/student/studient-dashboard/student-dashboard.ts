@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { Topbar } from '../../../components/top-bar/top-bar';
 import { StudentDashboard, DashboardStatus } from '../../../services/student-dashboard/student-dashboard';
+import { ChatService } from '../../../services/chat';
 
 export interface TutoriaObligatoria {
   id: number;
@@ -27,20 +28,18 @@ interface Tutoria {
   templateUrl: './student-dashboard.html',
   styleUrls: ['./student-dashboard.css']
 })
-export class StudentDashboardd implements OnInit {
+export class StudentDashboardd implements OnInit, OnDestroy {
+
   private readonly dashboardService = inject(StudentDashboard);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
+  private readonly chatService = inject(ChatService);
 
   status: DashboardStatus | null = null;
   isLoading = true;
-  
-  // -- Variables para la Matrícula --
   mostrarModalMatricula = false;
   isEnrolling = false;
-  estudianteId = 7; // TODO: Obtener dinámicamente del AuthService (ej. currentUser.id)
-  
-  // -- Variables del Dashboard --
+  estudianteId = 7;
   periodoSeleccionado = 1;
   totalTutoriasObligatorias = 5;
   tutoriasObligatoriasPeriodo: TutoriaObligatoria[] = [];
@@ -56,6 +55,26 @@ export class StudentDashboardd implements OnInit {
 
   ngOnInit(): void {
     this.cargarDashboard(this.periodoSeleccionado);
+
+    //  Usar flag del servicio para no suscribirse más de una vez
+    if (!this.chatService.isBackgroundSubscribed()) {
+      this.chatService.setBackgroundSubscribed(true);
+      this.chatService.initConnectionSocket().then(() => {
+        ['student', 'coordinator'].forEach(sala => {
+          this.chatService.joinRoom(sala, (message) => {
+            if (message.user !== 'jperezg@uteq.edu.ec') {
+              this.chatService.incrementUnread(message);
+            }
+          });
+        });
+      }).catch(err => {
+        console.warn('WebSocket no disponible en background:', err);
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    // No desconectar para mantener suscripción activa
   }
 
   onPeriodoChange(periodoId: number): void {
@@ -72,12 +91,9 @@ export class StudentDashboardd implements OnInit {
       next: (data) => {
         this.ngZone.run(() => {
           this.status = data;
-          
-          // Solo generamos las tutorías visuales si ESTÁ matriculado
           if (this.status.estaMatriculado) {
             this.generarTutoriasObligatorias(data.totalTutorias ?? 0);
           }
-          
           this.isLoading = false;
           this.cdr.detectChanges();
         });
@@ -85,7 +101,7 @@ export class StudentDashboardd implements OnInit {
       error: (err) => {
         console.error('Error al cargar el progreso:', err);
         this.ngZone.run(() => {
-          this.status = this.getEmptyStatus(); // Si falla, asumimos que no está matriculado
+          this.status = this.getEmptyStatus();
           this.generarTutoriasObligatorias(0);
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -94,21 +110,15 @@ export class StudentDashboardd implements OnInit {
     });
   }
 
-  // --- MÉTODOS PARA ACCIONES REQUERIDAS (NUEVOS) ---
-
   abrirModalTema(): void {
-    // TODO: Aquí abriremos el modal o navegaremos a la pantalla de temas
     console.log('Solicitud para abrir el gestor de temas');
-    alert('El gestor de temas está en construcción. ¡Aquí seleccionaremos la modalidad y el tema!');
+    alert('El gestor de temas está en construcción.');
   }
 
   abrirModalAnteproyecto(): void {
-    // TODO: Aquí abriremos el modal para subir el documento
     console.log('Solicitud para entregar anteproyecto');
     alert('El gestor de entregables está en construcción.');
   }
-
-  // --- MÉTODOS DEL MODAL DE MATRÍCULA ---
 
   abrirModalMatricula(): void {
     this.mostrarModalMatricula = true;
@@ -120,7 +130,6 @@ export class StudentDashboardd implements OnInit {
 
   confirmarMatricula(): void {
     this.isEnrolling = true;
-    
     const payload = {
       studentId: this.estudianteId,
       periodId: this.periodoSeleccionado
@@ -130,7 +139,6 @@ export class StudentDashboardd implements OnInit {
       next: () => {
         this.isEnrolling = false;
         this.cerrarModalMatricula();
-        // ¡Éxito! Recargamos el dashboard para mostrar el stepper ahora sí
         this.cargarDashboard(this.periodoSeleccionado);
       },
       error: (err) => {
@@ -140,13 +148,12 @@ export class StudentDashboardd implements OnInit {
     });
   }
 
-  // --- HELPERS ---
-
   private getEmptyStatus(): DashboardStatus {
     return {
       estaMatriculado: false,
-      prerequisitosNivel1: false, temaSeleccionado: false, directorAsignado: false, reunionesMinimas: false, defensaAnteproyecto: false,
-      prerequisitosNivel2: false, asistenciaTutorias: false, predefensa: false, defensaFinal: false,
+      prerequisitosNivel1: false, temaSeleccionado: false, directorAsignado: false,
+      reunionesMinimas: false, defensaAnteproyecto: false, prerequisitosNivel2: false,
+      asistenciaTutorias: false, predefensa: false, defensaFinal: false,
       nombreTema: '', nombreDirector: '', nombreOpcion: '', totalTutorias: 0
     };
   }
