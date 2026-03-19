@@ -1,11 +1,12 @@
 export interface ChatMessage {
-  id?: number;              // ID del mensaje en BD
-  message: string;
-  user: string;
-  timestamp?: Date;
-  replyTo?: {               // Mensaje al que se responde
-    id: number;
+    id?: number;
     message: string;
     user: string;
-  };
+    timestamp?: Date;
+    idConversacion?: number; // <--- AGREGAR ESTO
+    replyTo?: {
+        id: number;
+        message: string;
+        user: string;
+    };
 }

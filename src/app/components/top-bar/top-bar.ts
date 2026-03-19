@@ -1,6 +1,7 @@
 import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { PeriodoService, Periodo } from '../../services/modelo-service/periodo.service';
 import { ChatService } from '../../services/chat';
 import { ChatMessage } from '../../models/chat-message';
@@ -13,7 +14,7 @@ import { ChangePasswordModal } from '../modal-change-password/modal-change-passw
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule,ChangePasswordModal],
+  imports: [CommonModule, ChangePasswordModal],
   templateUrl: './top-bar.html',
   styleUrls: ['./top-bar.css']
 })
@@ -26,15 +27,13 @@ export class Topbar implements OnInit {
   isPeriodMenuOpen = false;
   showNotificationDropdown = false;
   showChatAlert = false;
-  
-  // Variables de notificaciones
+
   unreadMessages_count = 0;
   unreadMessages: ChatMessage[] = [];
-  pendingRequestsCount = 0; 
-  pendingProposalsCount = 0; 
-  pendingAssignmentsCount = 0; // NUEVO: Contador de proyectos por asignar
+  pendingRequestsCount = 0;
+  pendingProposalsCount = 0;
+  pendingAssignmentsCount = 0;
 
-  // Variables dinámicas para el usuario
   userName: string = 'Usuario';
   userRole: string = 'Rol no definido';
   isCoordinator: boolean = false;
@@ -46,22 +45,22 @@ export class Topbar implements OnInit {
     private authService: AuthService,
     private admissionRequestsService: AdmissionRequestsService,
     private pendingProposalService: PendingProposalService,
-    private teacherAssignmentService: TeacherAssignmentService // NUEVO: Inyectamos el servicio
+    private teacherAssignmentService: TeacherAssignmentService,
+    private http: HttpClient
   ) {}
 
-  // AHORA SUMA LAS 4 COSAS (Chat + Solicitudes + Propuestas + Asignaciones)
   get totalNotifications(): number {
-    return this.unreadMessages_count + this.pendingRequestsCount + this.pendingProposalsCount + this.pendingAssignmentsCount;
+    return this.unreadMessages_count + this.pendingRequestsCount
+      + this.pendingProposalsCount + this.pendingAssignmentsCount;
   }
 
   ngOnInit(): void {
     this.cargarDatosUsuario();
     this.cargarPeriodos();
-    
-    // Llamadas para llenar la campana
     this.cargarSolicitudesPendientes();
-    this.cargarPropuestasPendientes(); 
-    this.cargarAsignacionesPendientes(); // NUEVO: Llamamos al método de asignaciones
+    this.cargarPropuestasPendientes();
+    this.cargarAsignacionesPendientes();
+    this.suscribirseConversacionesBackground(); // ← nuevo
 
     this.chatService.unreadCount$.subscribe(count => {
       this.unreadMessages_count = count;
@@ -73,16 +72,61 @@ export class Topbar implements OnInit {
     });
   }
 
+  // ← nuevo: conecta y escucha todas las conversaciones del usuario en background
+  async suscribirseConversacionesBackground() {
+    const user = this.authService.getCurrentUser();
+    if (!user?.email) return;
+
+    await this.chatService.initConnectionSocket();
+
+    const emailEncoded = encodeURIComponent(user.email);
+    const roles: string[] = user?.roles?.map((r: any) =>
+      typeof r === 'string' ? r : r.name || r.nombre || ''
+    ) || [];
+
+    const esCoordinadorODirector = roles.some(r =>
+      r === 'coordinador_facultad' ||
+      r === 'coordinador_carrera' ||
+      r === 'director_trabajo_titulacion'
+    );
+
+    const url = esCoordinadorODirector
+      ? `http://localhost:8080/api/usuarios/mis-estudiantes?emailCoordinador=${emailEncoded}`
+      : `http://localhost:8080/api/usuarios/coordinadores?emailEstudiante=${emailEncoded}`;
+
+    this.http.get<any[]>(url).subscribe({
+      next: async (contactos) => {
+        for (const contacto of contactos) {
+          if (contacto.idConversacion) {
+            const roomId = `conv_${contacto.idConversacion}`;
+            await this.chatService.subscribeToRoomBackground(roomId);
+          }
+        }
+        this.chatService.setBackgroundSubscribed(true);
+      },
+      error: (err) => console.error('Error cargando conversaciones background:', err)
+    });
+  }
+
   cargarDatosUsuario(): void {
     const user = this.authService.getCurrentUser();
-    
     if (user) {
       this.userName = user.fullName || 'Usuario';
-      
-      if (this.authService.hasRole('COORDINADOR') || this.authService.hasRole('COORDINATOR') || this.authService.hasRole('ROLE_COORDINATOR') || this.authService.hasRole('administrador_sgtic') || this.authService.hasRole('coordinador_carrera')) {
+      if (
+        this.authService.hasRole('COORDINADOR') ||
+        this.authService.hasRole('COORDINATOR') ||
+        this.authService.hasRole('ROLE_COORDINATOR') ||
+        this.authService.hasRole('administrador_sgtic') ||
+        this.authService.hasRole('coordinador_carrera')
+      ) {
         this.userRole = 'Coordinador';
         this.isCoordinator = true;
-      } else if (this.authService.hasRole('ESTUDIANTE') || this.authService.hasRole('STUDENT') || this.authService.hasRole('ROLE_STUDENT') || this.authService.hasRole('estudiante')) {
+      } else if (
+        this.authService.hasRole('ESTUDIANTE') ||
+        this.authService.hasRole('STUDENT') ||
+        this.authService.hasRole('ROLE_STUDENT') ||
+        this.authService.hasRole('estudiante')
+      ) {
         this.userRole = 'Estudiante';
         this.isCoordinator = false;
       } else if (user.roles && user.roles.length > 0) {
@@ -97,7 +141,9 @@ export class Topbar implements OnInit {
       if (userId) {
         this.admissionRequestsService.getRequestsByCoordinator(userId).subscribe({
           next: (requests: any) => {
-            const pendientes = requests.filter((r: any) => r.estado?.toLowerCase() === 'pendiente');
+            const pendientes = requests.filter((r: any) =>
+              r.estado?.toLowerCase() === 'pendiente'
+            );
             this.pendingRequestsCount = pendientes.length;
           },
           error: (err: any) => console.error('Error al cargar solicitudes:', err)
@@ -114,13 +160,12 @@ export class Topbar implements OnInit {
           next: (propuestas: any) => {
             this.pendingProposalsCount = propuestas ? propuestas.length : 0;
           },
-          error: (err: any) => console.error('Error al cargar propuestas de temas:', err)
+          error: (err: any) => console.error('Error al cargar propuestas:', err)
         });
       }
     }
   }
 
-  // NUEVO: Método para buscar proyectos que necesitan director
   cargarAsignacionesPendientes(): void {
     if (this.isCoordinator) {
       const userId = this.authService.getUserId();
@@ -129,7 +174,7 @@ export class Topbar implements OnInit {
           next: (proyectos: any) => {
             this.pendingAssignmentsCount = proyectos ? proyectos.length : 0;
           },
-          error: (err: any) => console.error('Error al cargar proyectos por asignar:', err)
+          error: (err: any) => console.error('Error al cargar proyectos:', err)
         });
       }
     }
@@ -137,9 +182,11 @@ export class Topbar implements OnInit {
 
   goToChat() {
     this.chatService.clearUnread();
+    // ← limpiar sala activa al salir del chat
+    this.chatService.setActiveChatRoom(null);
     this.showNotificationDropdown = false;
     if (this.isCoordinator) {
-      this.router.navigate(['/chat/coordinator']); 
+      this.router.navigate(['/chat/coordinator']);
     } else {
       this.router.navigate(['/chat/student']);
     }
@@ -147,19 +194,17 @@ export class Topbar implements OnInit {
 
   goToSolicitudes() {
     this.showNotificationDropdown = false;
-    this.router.navigate(['coordinator/StudentRequests']); 
+    this.router.navigate(['coordinator/StudentRequests']);
   }
 
   goToPropuestas() {
     this.showNotificationDropdown = false;
-    this.router.navigate(['coordinator/BankThemes']); 
+    this.router.navigate(['coordinator/BankThemes']);
   }
 
-  // NUEVO: Navegar a la pantalla de asignaciones
   goToAsignaciones() {
     this.showNotificationDropdown = false;
-    // Ajusta esta ruta según cómo se llame en tu app.routes.ts (ej: '/asignaciones' o '/assignments')
-    this.router.navigate(['coordinator/Assignments']); 
+    this.router.navigate(['coordinator/Assignments']);
   }
 
   toggleNotifications(event: Event) {
@@ -169,22 +214,19 @@ export class Topbar implements OnInit {
     this.isPeriodMenuOpen = false;
   }
 
- cargarPeriodos(): void {
-    // Si es coordinador llama a getPeriodos() (Trae TODOS). 
-    // Si no lo es, llama a getPeriodosActivos() (Trae SOLO el actual).
-    const peticion = this.isCoordinator 
-      ? this.periodoService.getPeriodos() 
+  cargarPeriodos(): void {
+    const peticion = this.isCoordinator
+      ? this.periodoService.getPeriodos()
       : this.periodoService.getPeriodosActivos();
 
     peticion.subscribe({
       next: (data: Periodo[]) => {
         this.periodosAceptados = data ?? [];
         if (this.periodosAceptados.length > 0) {
-          // Buscamos cuál es el periodo "Activo" para dejarlo seleccionado por defecto
-          // al iniciar sesión, sin importar cuántos periodos inactivos haya en la lista.
           const periodoActivo = this.periodosAceptados.find(p => p.active);
-          this.periodoSeleccionado = periodoActivo ? periodoActivo : this.periodosAceptados[0];
-          
+          this.periodoSeleccionado = periodoActivo
+            ? periodoActivo
+            : this.periodosAceptados[0];
           this.periodoChange.emit(this.periodoSeleccionado.idPeriod);
         } else {
           this.periodoSeleccionado = null;
@@ -232,16 +274,14 @@ export class Topbar implements OnInit {
     this.isPeriodMenuOpen = false;
     this.showNotificationDropdown = false;
   }
-  // Variable para controlar si el modal se ve o no
+
   showPasswordModal = false;
 
-  // Método para abrir el modal
   openPasswordModal() {
     this.showPasswordModal = true;
-    this.isProfileMenuOpen = false; // Cierra el menú desplegable al hacer clic
+    this.isProfileMenuOpen = false;
   }
 
-  // Método para cerrar el modal
   closePasswordModal() {
     this.showPasswordModal = false;
   }

@@ -1,7 +1,8 @@
 import { Injectable, NgZone } from '@angular/core';
 import { ChatMessage } from '../models/chat-message';
 import { BehaviorSubject } from 'rxjs';
-import { AuthService } from './auth.service'; // <--- NUEVO: Importamos el servicio de auth
+import { AuthService } from './auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +10,12 @@ import { AuthService } from './auth.service'; // <--- NUEVO: Importamos el servi
 export class ChatService {
   private stompClient: any = null;
   private isConnected: boolean = false;
-  private subscribedRooms: Set<string> = new Set();
+  private subscribedRooms: Map<string, any> = new Map();
   private backgroundSubscribed = false;
   private messageCallbacks: Map<string, ((message: ChatMessage) => void)[]> = new Map();
+
+  // ← nueva variable para saber qué sala está abierta actualmente
+  private activeChatRoomId: string | null = null;
 
   private unreadCount = new BehaviorSubject<number>(0);
   unreadCount$ = this.unreadCount.asObservable();
@@ -19,29 +23,31 @@ export class ChatService {
   private unreadMessagesList = new BehaviorSubject<ChatMessage[]>([]);
   unreadMessages$ = this.unreadMessagesList.asObservable();
 
-  // Inyectamos el AuthService en el constructor
-  constructor(private ngZone: NgZone, private authService: AuthService) {}
+  constructor(
+    private ngZone: NgZone,
+    private authService: AuthService,
+    private http: HttpClient
+  ) {}
 
-  isBackgroundSubscribed(): boolean {
-    return this.backgroundSubscribed;
+  isBackgroundSubscribed(): boolean { return this.backgroundSubscribed; }
+  setBackgroundSubscribed(value: boolean): void { this.backgroundSubscribed = value; }
+
+  // ← llamar esto cuando el usuario abre una sala
+  setActiveChatRoom(roomId: string | null) {
+    this.activeChatRoomId = roomId;
   }
 
-  setBackgroundSubscribed(value: boolean): void {
-    this.backgroundSubscribed = value;
-  }
-
-  incrementUnread(message?: ChatMessage) {
-    // --- FILTRO DE SEGURIDAD ---
+  incrementUnread(message?: ChatMessage, roomId?: string) {
     if (message) {
       const currentUser = this.authService.getCurrentUser();
-      const myEmail = currentUser?.email || currentUser?.fullName;
+      const myEmail = currentUser?.email;
 
-      // Si el que mandó el mensaje soy YO, salimos de la función sin contar nada
-      if (message.user === myEmail) {
-        return;
-      }
+      // No contar si el mensaje es mío
+      if (message.user === myEmail) return;
+
+      // No contar si el chat de esa sala está abierto actualmente
+      if (roomId && roomId === this.activeChatRoomId) return;
     }
-    // ---------------------------
 
     this.unreadCount.next(this.unreadCount.value + 1);
     if (message) {
@@ -54,8 +60,6 @@ export class ChatService {
     this.unreadMessagesList.next([]);
   }
 
-  // ... (Resto del código initConnectionSocket, joinRoom, sendMessage, etc., se mantienen igual)
-
   async initConnectionSocket(): Promise<void> {
     if (this.isConnected && this.stompClient) {
       console.log('Ya conectado, reutilizando conexión');
@@ -64,7 +68,6 @@ export class ChatService {
 
     return new Promise(async (resolve, reject) => {
       try {
-        console.log('Inicializando conexión WebSocket...');
         const SockJS = (await import('sockjs-client')).default;
         const { Client } = await import('@stomp/stompjs');
 
@@ -73,17 +76,17 @@ export class ChatService {
           reconnectDelay: 5000,
           debug: () => {},
           onConnect: () => {
-            console.log('Conectado al WebSocket');
+            console.log('✅ Conectado al WebSocket');
             this.isConnected = true;
             resolve();
           },
-          onStompError: (frame) => {
-            console.error('Error STOMP:', frame);
+          onStompError: (frame: any) => {
+            console.error('❌ Error STOMP:', frame);
             this.isConnected = false;
             reject(frame);
           },
-          onWebSocketError: (ev) => {
-            console.error('Error WebSocket:', ev);
+          onWebSocketError: (ev: any) => {
+            console.error('❌ Error WebSocket:', ev);
             this.isConnected = false;
             reject(ev);
           }
@@ -97,37 +100,51 @@ export class ChatService {
     });
   }
 
-  async joinRoom(roomId: string, callback: (message: ChatMessage) => void) {
-    // 1. Registro de callbacks para que el componente vea el mensaje
-    if (!this.messageCallbacks.has(roomId)) {
-      this.messageCallbacks.set(roomId, []);
-    }
-    
-    // Solo agregamos el callback si no existe ya uno igual (o limpiamos los anteriores)
-    this.messageCallbacks.set(roomId, [callback]);
-
+  // ← suscripción en background para la campana (sin callback de UI)
+  async subscribeToRoomBackground(roomId: string) {
     if (!this.stompClient || !this.isConnected) {
       await this.initConnectionSocket();
     }
 
-    // 2. LA CLAVE: Evitar múltiples suscripciones al mismo tópico de red
-    if (this.subscribedRooms.has(roomId)) {
-      console.log(`Ya escuchando en red la sala: ${roomId}. No duplicamos.`);
-      return; 
-    }
+    if (this.subscribedRooms.has(roomId)) return;
 
-    this.subscribedRooms.add(roomId);
-
-    this.stompClient.subscribe(`/topic/${roomId}`, (message: any) => {
+    const subscription = this.stompClient.subscribe(`/topic/${roomId}`, (message: any) => {
       try {
         const messageContent: ChatMessage = JSON.parse(message.body);
-        
         this.ngZone.run(() => {
-          // AQUÍ es donde se debe incrementar, UNA SOLA VEZ por mensaje de red
-          // El filtro de "si soy yo" que pusimos antes evitará que tú te cuentes.
-          this.incrementUnread(messageContent);
+          this.incrementUnread(messageContent, roomId);
+        });
+      } catch (error) {
+        console.error('Error parsing message background:', error);
+      }
+    });
 
-          // Notificar a los componentes que estén abiertos
+    this.subscribedRooms.set(roomId, subscription);
+    console.log(`🔔 Escuchando en background sala: ${roomId}`);
+  }
+
+  async joinRoom(roomId: string, callback: (message: ChatMessage) => void) {
+    if (!this.stompClient || !this.isConnected) {
+      await this.initConnectionSocket();
+    }
+
+    // Marcar esta sala como activa
+    this.setActiveChatRoom(roomId);
+
+    if (this.subscribedRooms.has(roomId)) {
+      const sub = this.subscribedRooms.get(roomId);
+      sub?.unsubscribe();
+      this.subscribedRooms.delete(roomId);
+    }
+
+    this.messageCallbacks.set(roomId, [callback]);
+
+    const subscription = this.stompClient.subscribe(`/topic/${roomId}`, (message: any) => {
+      try {
+        const messageContent: ChatMessage = JSON.parse(message.body);
+        this.ngZone.run(() => {
+          // roomId activo → no cuenta en campana, solo muestra en chat
+          this.incrementUnread(messageContent, roomId);
           const callbacks = this.messageCallbacks.get(roomId) || [];
           callbacks.forEach(cb => cb(messageContent));
         });
@@ -135,6 +152,8 @@ export class ChatService {
         console.error('Error parsing message:', error);
       }
     });
+
+    this.subscribedRooms.set(roomId, subscription);
   }
 
   async sendMessage(roomId: string, chatMessage: ChatMessage) {
@@ -156,11 +175,10 @@ export class ChatService {
       this.subscribedRooms.clear();
       this.messageCallbacks.clear();
       this.backgroundSubscribed = false;
+      this.activeChatRoomId = null;
       console.log('Desconectado');
     }
   }
 
-  getConnectionStatus(): boolean {
-    return this.isConnected;
-  }
+  getConnectionStatus(): boolean { return this.isConnected; }
 }
