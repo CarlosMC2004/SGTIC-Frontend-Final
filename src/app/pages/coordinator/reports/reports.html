@@ -84,7 +84,7 @@
 
         <div class="card chart-box">
           <h3 class="card-subtitle">Origen de Temas</h3>
-          <div class="donut-container">
+          <div class="donut-container" id="donutChart">
             <div class="donut-visual">
               <div class="donut-circle">
                 <div class="donut-inner-text">
@@ -132,7 +132,7 @@
               <tbody>
               <tr *ngFor="let docente of docentesTable">
                 <td class="font-medium text-dark">{{ docente.nombreCompleto }}</td>
-                <td class="text-light">{{ docente.especializacionPrincipal || 'Sin especialidad asignada' }}</td>
+                <td class="text-light">{{ docente.especializacion || 'Sin especialidad asignada' }}</td>
                 <td class="text-center">
                   <div class="box-badge" [ngClass]="docente.proyectosAsignados >= 5 ? 'box-yellow' : 'box-green'">
                     {{ docente.proyectosAsignados }}

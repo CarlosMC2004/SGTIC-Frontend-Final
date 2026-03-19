@@ -70,7 +70,7 @@
       </td>
       <td>
         <div class="role-tags">
-            <span *ngFor="let role of u.roles" class="role-badge" [ngClass]="role.toLowerCase()">
+            <span *ngFor="let role of u.roles" class="role-badge" [ngClass]="role?.toLowerCase()">
               {{ role }}
             </span>
           <span *ngIf="u.roles.length === 0" class="text-muted text-small">Sin roles</span>
