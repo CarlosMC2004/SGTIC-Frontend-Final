@@ -1,12 +1,15 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+// src/app/components/history-modal/history-modal.ts
+import { Component, EventEmitter, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import Swal from 'sweetalert2';
 
 import {
   BackupAdminService,
   BackupExecutionResponse
 } from '../../services/backup-dashboard/backup-dashboard';
+import { AuthService } from '../../services/auth.service';
 
 type StatusFilter = 'ALL' | 'SUCCESS' | 'FAILED' | 'RUNNING';
 
@@ -34,7 +37,11 @@ export class HistoryModal implements OnInit {
 
   readonly typeOptions = ['ALL', 'FULL', 'DIFFERENTIAL', 'INCREMENTAL'];
 
-  constructor(private readonly backupAdminService: BackupAdminService) {}
+  constructor(
+    private readonly backupAdminService: BackupAdminService,
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef // <-- INYECTADO AQUÍ
+  ) {}
 
   ngOnInit(): void {
     this.loadHistory();
@@ -47,25 +54,28 @@ export class HistoryModal implements OnInit {
   loadHistory(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges(); // Forzar loader
 
     this.backupAdminService.getExecutionHistory().subscribe({
       next: (data: BackupExecutionResponse[]) => {
         this.executions = [...data].sort(
           (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
         );
-
         this.selectedExecution = this.executions.length ? this.executions[0] : null;
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- LA MAGIA
       },
       error: (error: HttpErrorResponse) => {
         this.errorMessage = this.extractErrorMessage(error);
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- LA MAGIA
       }
     });
   }
 
   selectExecution(item: BackupExecutionResponse): void {
     this.selectedExecution = item;
+    this.cdr.detectChanges(); // Seleccionar fila visualmente
   }
 
   clearFilters(): void {
@@ -74,87 +84,85 @@ export class HistoryModal implements OnInit {
     this.typeFilter = 'ALL';
     this.dateFrom = '';
     this.dateTo = '';
+    this.cdr.detectChanges();
   }
 
   get filteredExecutions(): BackupExecutionResponse[] {
     return this.executions.filter((item) => {
       const matchesSearch = this.matchesSearch(item);
-      const matchesStatus =
-        this.statusFilter === 'ALL' || item.status === this.statusFilter;
-      const matchesType =
-        this.typeFilter === 'ALL' || item.backupType === this.typeFilter;
+      const matchesStatus = this.statusFilter === 'ALL' || item.status === this.statusFilter;
+      const matchesType = this.typeFilter === 'ALL' || item.backupType === this.typeFilter;
       const matchesFrom = this.matchesDateFrom(item.startedAt);
       const matchesTo = this.matchesDateTo(item.startedAt);
-
       return matchesSearch && matchesStatus && matchesType && matchesFrom && matchesTo;
     });
   }
 
+  // --- RESTAURACIÓN ---
+  restoreDatabase(execution: BackupExecutionResponse): void {
+    const adminId = this.authService.getUserId() || 3;
+
+    Swal.fire({
+      title: '¡PELIGRO DE SOBREESCRITURA!',
+      html: `Está a punto de restaurar la base de datos usando el archivo:<br><br><b>${execution.fileName}</b><br><br>Esto reemplazará todos los datos actuales. ¿Está completamente seguro?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, ¡Restaurar ahora!',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        
+        Swal.fire({
+          title: 'Restaurando Sistema...',
+          text: 'Este proceso puede tardar varios minutos. NO CIERRE el navegador.',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        this.backupAdminService.restoreDatabase(execution.id, adminId).subscribe({
+          next: (res) => {
+            Swal.fire('¡Restauración Completa!', res.message || 'La base de datos fue recuperada con éxito.', 'success');
+            this.loadHistory(); // Recarga y ejecuta su propio detectChanges
+          },
+          error: (err) => {
+            Swal.fire('Fallo Crítico', this.extractErrorMessage(err), 'error');
+            this.loadHistory(); // Recarga y ejecuta su propio detectChanges
+          }
+        });
+      }
+    });
+  }
+  // ----------------------
+
   getStatusLabel(status: BackupExecutionResponse['status']): string {
-    switch (status) {
-      case 'SUCCESS':
-        return 'Completado';
-      case 'FAILED':
-        return 'Fallido';
-      default:
-        return 'En ejecución';
-    }
+    switch (status) { case 'SUCCESS': return 'Completado'; case 'FAILED': return 'Fallido'; default: return 'En ejecución'; }
   }
 
   getStatusClass(status: BackupExecutionResponse['status']): string {
-    switch (status) {
-      case 'SUCCESS':
-        return 'success';
-      case 'FAILED':
-        return 'danger';
-      default:
-        return 'neutral';
-    }
+    switch (status) { case 'SUCCESS': return 'success'; case 'FAILED': return 'danger'; default: return 'neutral'; }
   }
 
   formatDateTime(value?: string | null): string {
     if (!value) return '--';
-
-    return new Intl.DateTimeFormat('es-EC', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }).format(new Date(value));
+    return new Intl.DateTimeFormat('es-EC', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(value));
   }
 
   formatBytes(bytes?: number | null): string {
     if (!bytes || bytes <= 0) return '--';
-
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    let value = bytes;
-    let unitIndex = 0;
-
-    while (value >= 1024 && unitIndex < units.length - 1) {
-      value /= 1024;
-      unitIndex++;
-    }
-
+    const units = ['B', 'KB', 'MB', 'GB', 'TB']; let value = bytes; let unitIndex = 0;
+    while (value >= 1024 && unitIndex < units.length - 1) { value /= 1024; unitIndex++; }
     return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[unitIndex]}`;
   }
 
   getDuration(startedAt?: string | null, finishedAt?: string | null): string {
     if (!startedAt || !finishedAt) return '--';
-
-    const start = new Date(startedAt).getTime();
-    const end = new Date(finishedAt).getTime();
-
+    const start = new Date(startedAt).getTime(); const end = new Date(finishedAt).getTime();
     if (Number.isNaN(start) || Number.isNaN(end) || end < start) return '--';
-
-    const diffMs = end - start;
-    const totalSeconds = Math.floor(diffMs / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-
-    if (minutes <= 0) return `${seconds}s`;
-    return `${minutes}m ${seconds}s`;
+    const diffMs = end - start; const totalSeconds = Math.floor(diffMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60); const seconds = totalSeconds % 60;
+    if (minutes <= 0) return `${seconds}s`; return `${minutes}m ${seconds}s`;
   }
 
   openDriveLink(link?: string | null): void {
@@ -167,60 +175,31 @@ export class HistoryModal implements OnInit {
     navigator.clipboard.writeText(value).catch(() => {});
   }
 
-  trackByExecution(_: number, item: BackupExecutionResponse): number {
-    return item.id;
-  }
+  trackByExecution(_: number, item: BackupExecutionResponse): number { return item.id; }
 
   private matchesSearch(item: BackupExecutionResponse): boolean {
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) return true;
-
-    const haystack = [
-      item.fileName,
-      item.filePath,
-      item.message,
-      item.backupType,
-      item.triggeredBy,
-      item.driveFileName,
-      item.driveMessage
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
-
+    const haystack = [item.fileName, item.filePath, item.message, item.backupType, item.triggeredBy, item.driveFileName, item.driveMessage].filter(Boolean).join(' ').toLowerCase();
     return haystack.includes(term);
   }
-
   private matchesDateFrom(startedAt: string): boolean {
     if (!this.dateFrom) return true;
-
-    const start = new Date(startedAt);
-    const from = new Date(`${this.dateFrom}T00:00:00`);
-
+    const start = new Date(startedAt); const from = new Date(`${this.dateFrom}T00:00:00`);
     return start.getTime() >= from.getTime();
   }
-
   private matchesDateTo(startedAt: string): boolean {
     if (!this.dateTo) return true;
-
-    const start = new Date(startedAt);
-    const to = new Date(`${this.dateTo}T23:59:59`);
-
+    const start = new Date(startedAt); const to = new Date(`${this.dateTo}T23:59:59`);
     return start.getTime() <= to.getTime();
   }
-
   private extractErrorMessage(error: HttpErrorResponse): string {
     const backendError = error.error as { message?: string; error?: string } | string | null | undefined;
-
-    if (typeof backendError === 'string' && backendError.trim()) {
-      return backendError;
-    }
-
+    if (typeof backendError === 'string' && backendError.trim()) return backendError;
     if (backendError && typeof backendError === 'object') {
       if (backendError.message) return backendError.message;
       if (backendError.error) return backendError.error;
     }
-
     return error.message || 'No se pudo cargar el historial.';
   }
 }

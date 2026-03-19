@@ -16,7 +16,7 @@ export class ChatService {
         console.log(' Inicializando conexión WebSocket...');
 
         const SockJS = (await import('sockjs-client')).default;
-        const { Client } = await import('@stomp/stompjs');  // 👈 Client, no Stomp
+        const { Client } = await import('@stomp/stompjs');
 
         this.stompClient = new Client({
           webSocketFactory: () => new SockJS('http://localhost:8080/chat-socket'),

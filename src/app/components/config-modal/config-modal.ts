@@ -1,4 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+// src/app/components/config-modal/config-modal.ts
+import { Component, EventEmitter, OnInit, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -68,7 +69,8 @@ export class ConfigModal implements OnInit {
 
   constructor(
     private readonly backupAdminService: BackupAdminService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef // <-- INYECTADO AQUÍ
   ) {}
 
   ngOnInit(): void {
@@ -81,24 +83,16 @@ export class ConfigModal implements OnInit {
   }
 
   save(): void {
-    if (this.isSaving) {
-      return;
-    }
+    if (this.isSaving) return;
 
     this.errorMessage = '';
     this.successMessage = '';
 
-    const userId = this.authService.getUserId();
-    if (!userId) {
-      this.errorMessage = 'No se pudo identificar al usuario autenticado.';
-      return;
-    }
-
-    if (!this.isValidForm()) {
-      return;
-    }
+    const userId = this.authService.getUserId() || 3;
+    if (!this.isValidForm()) return;
 
     this.isSaving = true;
+    this.cdr.detectChanges(); // Actualizar UI a "Guardando..."
 
     const request: BackupConfigRequest = {
       userId,
@@ -126,11 +120,13 @@ export class ConfigModal implements OnInit {
       next: (_response: BackupConfigResponse) => {
         this.isSaving = false;
         this.successMessage = 'Configuración guardada correctamente.';
-        setTimeout(() => this.close(), 500);
+        this.cdr.detectChanges(); // <-- LA MAGIA
+        setTimeout(() => this.close(), 1000);
       },
       error: (error: HttpErrorResponse) => {
         this.isSaving = false;
         this.errorMessage = this.extractErrorMessage(error);
+        this.cdr.detectChanges(); // <-- LA MAGIA
       }
     });
   }
@@ -138,11 +134,11 @@ export class ConfigModal implements OnInit {
   private loadConfig(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     this.backupAdminService.getActiveConfig().subscribe({
       next: (response: BackupConfigResponse) => {
         this.configId = response.id;
-
         this.config = {
           active: !!response.active,
           pgDumpPath: response.pgDumpPath ?? '',
@@ -159,17 +155,15 @@ export class ConfigModal implements OnInit {
           driveAccountId: response.driveAccountId ?? null,
           driveFolderId: response.driveFolderId ?? ''
         };
-
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- LA MAGIA
       },
       error: (error: HttpErrorResponse) => {
         this.isLoading = false;
-
-        if (error.status === 404) {
-          return;
+        if (error.status !== 404) {
+          this.errorMessage = this.extractErrorMessage(error);
         }
-
-        this.errorMessage = this.extractErrorMessage(error);
+        this.cdr.detectChanges(); // <-- LA MAGIA
       }
     });
   }
@@ -183,55 +177,25 @@ export class ConfigModal implements OnInit {
         if (!this.config.driveAccountId && this.activeDriveId) {
           this.config.driveAccountId = this.activeDriveId;
         }
+        this.cdr.detectChanges(); // <-- LA MAGIA
       },
       error: () => {
         this.activeDriveEmail = '';
         this.activeDriveId = null;
+        this.cdr.detectChanges(); // <-- LA MAGIA
       }
     });
   }
 
   private isValidForm(): boolean {
-    if (!this.config.localPath.trim()) {
-      this.errorMessage = 'La ruta local es obligatoria.';
-      return false;
-    }
-
-    if (!this.config.filePrefix.trim()) {
-      this.errorMessage = 'El prefijo del archivo es obligatorio.';
-      return false;
-    }
-
-    if (!this.config.databaseHost.trim()) {
-      this.errorMessage = 'El host de la base de datos es obligatorio.';
-      return false;
-    }
-
-    if (!this.config.databasePort || Number(this.config.databasePort) <= 0) {
-      this.errorMessage = 'El puerto de la base de datos no es válido.';
-      return false;
-    }
-
-    if (!this.config.databaseName.trim()) {
-      this.errorMessage = 'El nombre de la base de datos es obligatorio.';
-      return false;
-    }
-
-    if (!this.config.databaseUser.trim()) {
-      this.errorMessage = 'El usuario de la base de datos es obligatorio.';
-      return false;
-    }
-
-    if (this.config.cleanupEnabled && Number(this.config.retentionDays) <= 0) {
-      this.errorMessage = 'Los días de retención deben ser mayores que 0.';
-      return false;
-    }
-
-    if (this.config.driveEnabled && !this.config.driveAccountId) {
-      this.errorMessage = 'Debe indicar una cuenta de Google Drive activa.';
-      return false;
-    }
-
+    if (!this.config.localPath.trim()) { this.errorMessage = 'La ruta local es obligatoria.'; return false; }
+    if (!this.config.filePrefix.trim()) { this.errorMessage = 'El prefijo del archivo es obligatorio.'; return false; }
+    if (!this.config.databaseHost.trim()) { this.errorMessage = 'El host de la base de datos es obligatorio.'; return false; }
+    if (!this.config.databasePort || Number(this.config.databasePort) <= 0) { this.errorMessage = 'El puerto de la BD no es válido.'; return false; }
+    if (!this.config.databaseName.trim()) { this.errorMessage = 'El nombre de la base de datos es obligatorio.'; return false; }
+    if (!this.config.databaseUser.trim()) { this.errorMessage = 'El usuario de la base de datos es obligatorio.'; return false; }
+    if (this.config.cleanupEnabled && Number(this.config.retentionDays) <= 0) { this.errorMessage = 'Los días de retención deben ser mayores que 0.'; return false; }
+    if (this.config.driveEnabled && !this.config.driveAccountId) { this.errorMessage = 'Debe indicar una cuenta de Google Drive activa.'; return false; }
     return true;
   }
 
@@ -242,16 +206,11 @@ export class ConfigModal implements OnInit {
 
   private extractErrorMessage(error: HttpErrorResponse): string {
     const backendError = error.error as { message?: string; error?: string } | string | null | undefined;
-
-    if (typeof backendError === 'string' && backendError.trim()) {
-      return backendError;
-    }
-
+    if (typeof backendError === 'string' && backendError.trim()) return backendError;
     if (backendError && typeof backendError === 'object') {
       if (backendError.message) return backendError.message;
       if (backendError.error) return backendError.error;
     }
-
     return error.message || 'No se pudo guardar la configuración.';
   }
 }

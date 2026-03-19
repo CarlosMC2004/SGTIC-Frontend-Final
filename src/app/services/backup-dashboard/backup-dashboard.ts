@@ -172,6 +172,20 @@ export class BackupAdminService {
     return this.http.get<BackupExecutionResponse[]>(`${this.backupBaseUrl}/executions`);
   }
 
+  // --- NUEVOS MÉTODOS PARA BACKUP MANUAL Y RESTORE ---
+  runManualBackup(type: string, adminId: number): Observable<BackupMessageResponse> {
+    return this.http.post<BackupMessageResponse>(`${this.backupBaseUrl}/run`, null, {
+      params: { type, adminId: adminId.toString() }
+    });
+  }
+
+  restoreDatabase(executionId: number, adminId: number): Observable<BackupMessageResponse> {
+    return this.http.post<BackupMessageResponse>(`${this.backupBaseUrl}/executions/${executionId}/restore`, null, {
+      params: { adminId: adminId.toString() }
+    });
+  }
+  // ---------------------------------------------------
+
   getSchedules(): Observable<BackupScheduleResponse[]> {
     return this.http.get<BackupScheduleResponse[]>(this.scheduleBaseUrl);
   }
@@ -198,20 +212,6 @@ export class BackupAdminService {
 
   deleteSchedule(id: number): Observable<BackupMessageResponse> {
     return this.http.delete<BackupMessageResponse>(`${this.scheduleBaseUrl}/${id}`);
-  }
-
-  runBackupNow(): Observable<BackupMessageResponse> {
-    return this.getSchedules().pipe(
-      switchMap((schedules) => {
-        const activeSchedules = schedules.filter(s => s.active);
-
-        if (!activeSchedules.length) {
-          return throwError(() => new Error('No hay tareas activas para ejecutar.'));
-        }
-
-        return this.runScheduleNow(activeSchedules[0].id);
-      })
-    );
   }
 
   getDriveAuthUrl(userId: number): Observable<DriveAuthUrlResponse> {
@@ -247,17 +247,13 @@ export class BackupAdminService {
         return {
           systemStatusText: config.active ? 'Activo' : 'Inactivo',
           systemStatusClass: config.active ? 'status-active' : 'status-inactive',
-
           lastBackupDate: lastSuccess ? this.formatDate(lastSuccess.finishedAt || lastSuccess.startedAt) : '--',
           lastBackupTime: lastSuccess ? this.formatTime(lastSuccess.finishedAt || lastSuccess.startedAt) : 'Sin registros',
-
           nextExecutionValue: nextRun ? this.formatDate(nextRun.toISOString()) : 'Sin tarea',
           nextExecutionSubtext: nextRun ? this.formatTime(nextRun.toISOString()) : 'No programada',
-
           activeTasks: schedules.filter(s => s.active).length,
           retentionText: `${config.retentionDays} día${config.retentionDays === 1 ? '' : 's'}`,
           retentionSubtext: config.cleanupEnabled ? 'Limpieza automática activa' : 'Limpieza desactivada',
-
           recentActivity: sortedExecutions.slice(0, 5).map(e => ({
             id: `BK-${e.id}`,
             time: this.timeAgo(e.startedAt),
@@ -265,7 +261,6 @@ export class BackupAdminService {
             size: this.formatBytes(e.fileSizeBytes),
             status: this.mapStatus(e.status)
           })),
-
           nodeTitle: config.localPath || 'Servidor local',
           nodeStatus: config.active ? 'Online' : 'Offline',
           nodeProgress: config.active ? 80 : 0
@@ -276,59 +271,36 @@ export class BackupAdminService {
 
   private mapStatus(status: BackupExecutionResponse['status']): 'COMPLETADO' | 'FALLIDO' | 'EN EJECUCIÓN' {
     switch (status) {
-      case 'SUCCESS':
-        return 'COMPLETADO';
-      case 'FAILED':
-        return 'FALLIDO';
-      default:
-        return 'EN EJECUCIÓN';
+      case 'SUCCESS': return 'COMPLETADO';
+      case 'FAILED': return 'FALLIDO';
+      default: return 'EN EJECUCIÓN';
     }
   }
 
   private formatDate(value: string | null | undefined): string {
     if (!value) return '--';
-
-    return new Intl.DateTimeFormat('es-EC', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).format(new Date(value));
+    return new Intl.DateTimeFormat('es-EC', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value));
   }
 
   private formatTime(value: string | null | undefined): string {
     if (!value) return '--';
-
-    return new Intl.DateTimeFormat('es-EC', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }).format(new Date(value));
+    return new Intl.DateTimeFormat('es-EC', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(value));
   }
 
   private formatBytes(bytes?: number | null): string {
     if (!bytes || bytes <= 0) return '--';
-
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
     let value = bytes;
     let unitIndex = 0;
-
-    while (value >= 1024 && unitIndex < units.length - 1) {
-      value /= 1024;
-      unitIndex++;
-    }
-
+    while (value >= 1024 && unitIndex < units.length - 1) { value /= 1024; unitIndex++; }
     return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[unitIndex]}`;
   }
 
   private timeAgo(value: string): string {
-    const now = new Date().getTime();
-    const then = new Date(value).getTime();
-    const diffMs = now - then;
-
+    const diffMs = new Date().getTime() - new Date(value).getTime();
     const minutes = Math.floor(diffMs / 60000);
     const hours = Math.floor(diffMs / 3600000);
     const days = Math.floor(diffMs / 86400000);
-
     if (minutes < 1) return 'Hace unos segundos';
     if (minutes < 60) return `Hace ${minutes} min`;
     if (hours < 24) return `Hace ${hours} h`;
@@ -338,14 +310,8 @@ export class BackupAdminService {
 
   private calculateNextRun(activeSchedules: BackupScheduleResponse[]): Date | null {
     if (!activeSchedules.length) return null;
-
     const now = new Date();
-
-    const candidates = activeSchedules
-      .map(schedule => this.getNextExecutionDate(schedule, now))
-      .filter((date): date is Date => date !== null)
-      .sort((a, b) => a.getTime() - b.getTime());
-
+    const candidates = activeSchedules.map(schedule => this.getNextExecutionDate(schedule, now)).filter((date): date is Date => date !== null).sort((a, b) => a.getTime() - b.getTime());
     return candidates[0] ?? null;
   }
 
@@ -354,52 +320,29 @@ export class BackupAdminService {
     const hour = Number(hourStr ?? 0);
     const minute = Number(minuteStr ?? 0);
     const second = Number(secondStr ?? 0);
-
     if (schedule.frequency === 'DAILY') {
       const next = new Date(from);
       next.setHours(hour, minute, second, 0);
-
-      if (next <= from) {
-        next.setDate(next.getDate() + 1);
-      }
-
+      if (next <= from) next.setDate(next.getDate() + 1);
       return next;
     }
-
     if (schedule.frequency === 'WEEKLY') {
       const targetDay = this.mapDayOfWeek(schedule.dayOfWeek);
       if (targetDay === null) return null;
-
       const next = new Date(from);
       next.setHours(hour, minute, second, 0);
-
       const currentDay = next.getDay();
       let diff = targetDay - currentDay;
-
-      if (diff < 0 || (diff === 0 && next <= from)) {
-        diff += 7;
-      }
-
+      if (diff < 0 || (diff === 0 && next <= from)) diff += 7;
       next.setDate(next.getDate() + diff);
       return next;
     }
-
     return null;
   }
 
   private mapDayOfWeek(day?: string | null): number | null {
     if (!day) return null;
-
-    const map: Record<string, number> = {
-      SUNDAY: 0,
-      MONDAY: 1,
-      TUESDAY: 2,
-      WEDNESDAY: 3,
-      THURSDAY: 4,
-      FRIDAY: 5,
-      SATURDAY: 6
-    };
-
+    const map: Record<string, number> = { SUNDAY: 0, MONDAY: 1, TUESDAY: 2, WEDNESDAY: 3, THURSDAY: 4, FRIDAY: 5, SATURDAY: 6 };
     return map[day] ?? null;
   }
 }

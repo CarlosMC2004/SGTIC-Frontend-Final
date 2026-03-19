@@ -53,13 +53,21 @@
 
           <div class="form-row two-columns">
             <div class="form-group">
-              <label>Ruta local</label>
-              <input type="text" [(ngModel)]="config.localPath" placeholder="C:\SGTIC\backups">
+              <label>Directorio Local de Destino</label>
+              <div style="display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 10px; background: #ffffff; padding-left: 10px;">
+                <span class="material-symbols-outlined" style="color: #94a3b8;">snippet_folder</span>
+                <input type="text" [(ngModel)]="config.localPath" placeholder="C:\SGTIC\backups" style="border: none; box-shadow: none; flex-grow: 1; outline: none;">
+              </div>
+              <small style="font-size: 11px; color: #64748b; margin-top: 4px;">Ruta física en el servidor donde se guardarán los .zip</small>
             </div>
 
             <div class="form-group">
-              <label>Ruta pg_dump</label>
-              <input type="text" [(ngModel)]="config.pgDumpPath" placeholder="C:\Program Files\PostgreSQL\18\bin\pg_dump.exe">
+              <label>Ejecutable pg_dump</label>
+              <div style="display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 10px; background: #ffffff; padding-left: 10px;">
+                <span class="material-symbols-outlined" style="color: #94a3b8;">terminal</span>
+                <input type="text" [(ngModel)]="config.pgDumpPath" placeholder="C:\Program Files\...\pg_dump.exe" style="border: none; box-shadow: none; flex-grow: 1; outline: none;">
+              </div>
+              <small style="font-size: 11px; color: #64748b; margin-top: 4px;">Ruta al binario del motor de base de datos</small>
             </div>
           </div>
         </div>
