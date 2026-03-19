@@ -8,11 +8,12 @@ import { AuthService } from '../../services/auth.service';
 import { AdmissionRequestsService } from '../../services/admission-requests.service';
 import { PendingProposalService } from '../../services/pending-proposal/pending-proposal';
 import { TeacherAssignmentService } from '../../services/teacher-assignment/teacher-assignment.service';
+import { ChangePasswordModal } from '../modal-change-password/modal-change-password';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,ChangePasswordModal],
   templateUrl: './top-bar.html',
   styleUrls: ['./top-bar.css']
 })
@@ -168,19 +169,29 @@ export class Topbar implements OnInit {
     this.isPeriodMenuOpen = false;
   }
 
-  cargarPeriodos(): void {
-    this.periodoService.getPeriodosActivos().subscribe({
+ cargarPeriodos(): void {
+    // Si es coordinador llama a getPeriodos() (Trae TODOS). 
+    // Si no lo es, llama a getPeriodosActivos() (Trae SOLO el actual).
+    const peticion = this.isCoordinator 
+      ? this.periodoService.getPeriodos() 
+      : this.periodoService.getPeriodosActivos();
+
+    peticion.subscribe({
       next: (data: Periodo[]) => {
         this.periodosAceptados = data ?? [];
         if (this.periodosAceptados.length > 0) {
-          this.periodoSeleccionado = this.periodosAceptados[0];
+          // Buscamos cuál es el periodo "Activo" para dejarlo seleccionado por defecto
+          // al iniciar sesión, sin importar cuántos periodos inactivos haya en la lista.
+          const periodoActivo = this.periodosAceptados.find(p => p.active);
+          this.periodoSeleccionado = periodoActivo ? periodoActivo : this.periodosAceptados[0];
+          
           this.periodoChange.emit(this.periodoSeleccionado.idPeriod);
         } else {
           this.periodoSeleccionado = null;
         }
       },
       error: (error) => {
-        console.error('Error al cargar periodos activos:', error);
+        console.error('Error al cargar periodos:', error);
         this.periodosAceptados = [];
         this.periodoSeleccionado = null;
       }
@@ -220,5 +231,18 @@ export class Topbar implements OnInit {
     this.isProfileMenuOpen = false;
     this.isPeriodMenuOpen = false;
     this.showNotificationDropdown = false;
+  }
+  // Variable para controlar si el modal se ve o no
+  showPasswordModal = false;
+
+  // Método para abrir el modal
+  openPasswordModal() {
+    this.showPasswordModal = true;
+    this.isProfileMenuOpen = false; // Cierra el menú desplegable al hacer clic
+  }
+
+  // Método para cerrar el modal
+  closePasswordModal() {
+    this.showPasswordModal = false;
   }
 }
