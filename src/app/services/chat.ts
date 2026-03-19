@@ -14,7 +14,6 @@ export class ChatService {
   private backgroundSubscribed = false;
   private messageCallbacks: Map<string, ((message: ChatMessage) => void)[]> = new Map();
 
-  // ← nueva variable para saber qué sala está abierta actualmente
   private activeChatRoomId: string | null = null;
 
   private unreadCount = new BehaviorSubject<number>(0);
@@ -32,7 +31,6 @@ export class ChatService {
   isBackgroundSubscribed(): boolean { return this.backgroundSubscribed; }
   setBackgroundSubscribed(value: boolean): void { this.backgroundSubscribed = value; }
 
-  // ← llamar esto cuando el usuario abre una sala
   setActiveChatRoom(roomId: string | null) {
     this.activeChatRoomId = roomId;
   }
@@ -42,10 +40,7 @@ export class ChatService {
       const currentUser = this.authService.getCurrentUser();
       const myEmail = currentUser?.email;
 
-      // No contar si el mensaje es mío
       if (message.user === myEmail) return;
-
-      // No contar si el chat de esa sala está abierto actualmente
       if (roomId && roomId === this.activeChatRoomId) return;
     }
 
@@ -100,24 +95,32 @@ export class ChatService {
     });
   }
 
-  // ← suscripción en background para la campana (sin callback de UI)
-  async subscribeToRoomBackground(roomId: string) {
+  // ← ahora acepta callback opcional para el badge por sala
+  async subscribeToRoomBackground(
+    roomId: string,
+    callback?: (message: ChatMessage) => void
+  ) {
     if (!this.stompClient || !this.isConnected) {
       await this.initConnectionSocket();
     }
 
     if (this.subscribedRooms.has(roomId)) return;
 
-    const subscription = this.stompClient.subscribe(`/topic/${roomId}`, (message: any) => {
-      try {
-        const messageContent: ChatMessage = JSON.parse(message.body);
-        this.ngZone.run(() => {
-          this.incrementUnread(messageContent, roomId);
-        });
-      } catch (error) {
-        console.error('Error parsing message background:', error);
+    const subscription = this.stompClient.subscribe(
+      `/topic/${roomId}`,
+      (message: any) => {
+        try {
+          const messageContent: ChatMessage = JSON.parse(message.body);
+          this.ngZone.run(() => {
+            this.incrementUnread(messageContent, roomId);
+            // ← llama al callback si existe (badge por sala en el componente)
+            if (callback) callback(messageContent);
+          });
+        } catch (error) {
+          console.error('Error parsing message background:', error);
+        }
       }
-    });
+    );
 
     this.subscribedRooms.set(roomId, subscription);
     console.log(`🔔 Escuchando en background sala: ${roomId}`);
@@ -128,7 +131,6 @@ export class ChatService {
       await this.initConnectionSocket();
     }
 
-    // Marcar esta sala como activa
     this.setActiveChatRoom(roomId);
 
     if (this.subscribedRooms.has(roomId)) {
@@ -139,19 +141,21 @@ export class ChatService {
 
     this.messageCallbacks.set(roomId, [callback]);
 
-    const subscription = this.stompClient.subscribe(`/topic/${roomId}`, (message: any) => {
-      try {
-        const messageContent: ChatMessage = JSON.parse(message.body);
-        this.ngZone.run(() => {
-          // roomId activo → no cuenta en campana, solo muestra en chat
-          this.incrementUnread(messageContent, roomId);
-          const callbacks = this.messageCallbacks.get(roomId) || [];
-          callbacks.forEach(cb => cb(messageContent));
-        });
-      } catch (error) {
-        console.error('Error parsing message:', error);
+    const subscription = this.stompClient.subscribe(
+      `/topic/${roomId}`,
+      (message: any) => {
+        try {
+          const messageContent: ChatMessage = JSON.parse(message.body);
+          this.ngZone.run(() => {
+            this.incrementUnread(messageContent, roomId);
+            const callbacks = this.messageCallbacks.get(roomId) || [];
+            callbacks.forEach(cb => cb(messageContent));
+          });
+        } catch (error) {
+          console.error('Error parsing message:', error);
+        }
       }
-    });
+    );
 
     this.subscribedRooms.set(roomId, subscription);
   }

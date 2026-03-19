@@ -16,6 +16,9 @@
           <span class="contact-name">{{ coord.fullName }}</span>
           <span class="contact-email">{{ coord.email }}</span>
         </div>
+        <span class="unread-badge" *ngIf="getUnreadCount(coord.idConversacion) > 0">
+          {{ getUnreadCount(coord.idConversacion) }}
+        </span>
       </div>
 
       <div *ngIf="coordinadores.length === 0" class="no-contacts">
@@ -30,7 +33,9 @@
       <button class="btn-back" (click)="goBack()">←</button>
       <div class="header-info">
         <h4>{{ nombreDestinatario }}</h4>
-        <span class="status-badge">Chat de Tutoría</span>
+        <span class="status-badge">
+          <span class="online-dot"></span>Chat de Tutoría
+        </span>
       </div>
     </div>
 

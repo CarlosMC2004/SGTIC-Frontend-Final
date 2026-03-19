@@ -28,6 +28,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   idConversacionActual: number = 0;
   replyToMessage: ChatMessage | null = null;
 
+  // ← contador de no leídos por sala
+  private unreadPerRoom: Map<number, number> = new Map();
+
   constructor(
     private chatService: ChatService,
     private http: HttpClient,
@@ -42,7 +45,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.connectToChat();
   }
 
-  // ← al salir del chat, limpia la sala activa para que la campana vuelva a funcionar
   ngOnDestroy() {
     this.chatService.setActiveChatRoom(null);
   }
@@ -68,7 +70,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     );
 
     const emailEncoded = encodeURIComponent(this.userName);
-
     const url = esCoordinadorODirector
       ? `http://localhost:8080/api/usuarios/mis-estudiantes?emailCoordinador=${emailEncoded}`
       : `http://localhost:8080/api/usuarios/coordinadores?emailEstudiante=${emailEncoded}`;
@@ -76,14 +77,40 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.http.get<any[]>(url).subscribe({
       next: (data) => {
         this.coordinadores = data.filter(c => c.idConversacion !== null);
+        this.suscribirseEnBackground();
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Error al cargar contactos:', err)
     });
   }
 
+  async suscribirseEnBackground() {
+    await this.connectToChat();
+
+    for (const contacto of this.coordinadores) {
+      const roomId = `conv_${contacto.idConversacion}`;
+      const idConv = contacto.idConversacion;
+
+      this.chatService.subscribeToRoomBackground(roomId, (message: ChatMessage) => {
+        this.ngZone.run(() => {
+          if (message.user === this.userName) return;
+          if (idConv === this.idConversacionActual) return;
+
+          const actual = this.unreadPerRoom.get(idConv) || 0;
+          this.unreadPerRoom.set(idConv, actual + 1);
+          this.cdr.detectChanges();
+        });
+      });
+    }
+  }
+
+  getUnreadCount(idConversacion: number): number {
+    return this.unreadPerRoom.get(idConversacion) || 0;
+  }
+
   seleccionarConversacion(idConv: number, nombre: string) {
-    // Limpiar notificaciones al abrir una conversación
+    // limpiar badge al abrir la conversación
+    this.unreadPerRoom.set(idConv, 0);
     this.chatService.clearUnread();
 
     this.idConversacionActual = idConv;
@@ -94,7 +121,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.cargarHistorial(idConv);
 
-    // joinRoom marca esta sala como activa → campana no cuenta mensajes de esta sala
     this.chatService.joinRoom(this.roomId, (message: ChatMessage) => {
       this.ngZone.run(() => {
         this.messages = [...this.messages, message];
