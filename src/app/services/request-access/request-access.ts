@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -9,12 +9,12 @@ export interface RequestAccessDTO {
   apellidos: string;
   idFacultad: number;
   idCarrera: number;
+  idPeriodo: number; // <--- ¡DATO FALTANTE AGREGADO!
 }
 
 @Injectable({
   providedIn: 'root',
 })
-
 export class RequestAccess {
   private apiUrl = 'http://localhost:8080/api/request-access';
 
