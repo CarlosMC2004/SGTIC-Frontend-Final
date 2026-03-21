@@ -226,4 +226,47 @@ export class BackupDashboard implements OnInit, AfterViewInit, OnDestroy {
     }
     return 'No se pudo completar la operación.';
   }
+
+  isSyncing = false;
+
+  syncToSecondary(): void {
+    if (this.isRunningBackup || this.isSyncing) return;
+
+    Swal.fire({
+      title: 'Sincronizar Base de Datos',
+      text: 'Esto tomará una copia exacta de los datos actuales y los inyectará en la base de datos secundaria (Azure). ¿Desea continuar?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      confirmButtonText: 'Sí, Sincronizar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isSyncing = true;
+        this.cdr.detectChanges();
+
+        Swal.fire({
+          title: 'Sincronizando Réplica...',
+          text: 'Esto puede tardar varios minutos dependiendo del tamaño de la base de datos. No cierre esta ventana.',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        const adminId = this.authService.getUserId() || 3;
+
+        this.backupAdminService.syncDatabase(adminId).subscribe({
+          next: (res) => {
+            this.isSyncing = false;
+            Swal.fire('¡Sincronizado!', res.message, 'success');
+            this.loadDashboard(true, true);
+          },
+          error: (err) => {
+            this.isSyncing = false;
+            Swal.fire('Error', this.extractErrorMessage(err), 'error');
+            this.loadDashboard(true, true);
+          }
+        });
+      }
+    });
+  }
 }

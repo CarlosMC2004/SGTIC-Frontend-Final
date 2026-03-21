@@ -29,15 +29,27 @@
       </p>
     </div>
 
-    <button
-      type="button"
-      class="btn-primary"
-      (click)="executeBackupNow()"
-      [disabled]="isRunningBackup || isLoading"
-    >
-      <span class="material-symbols-outlined">cloud_upload</span>
-      {{ isRunningBackup ? 'Ejecutando...' : 'Ejecutar Respaldo Ahora' }}
-    </button>
+    <div class="header-action-buttons">
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="syncToSecondary()"
+        [disabled]="isRunningBackup || isSyncing || isLoading"
+      >
+        <span class="material-symbols-outlined">sync</span>
+        {{ isSyncing ? 'Sincronizando...' : 'Sincronizar Réplica' }}
+      </button>
+
+      <button
+        type="button"
+        class="btn-primary"
+        (click)="executeBackupNow()"
+        [disabled]="isRunningBackup || isSyncing || isLoading"
+      >
+        <span class="material-symbols-outlined">cloud_upload</span>
+        {{ isRunningBackup ? 'Ejecutando...' : 'Ejecutar Respaldo' }}
+      </button>
+    </div>
   </section>
 
   <section class="metrics-grid">
