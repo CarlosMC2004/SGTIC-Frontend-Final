@@ -112,6 +112,14 @@ export interface StudentProposalHistoryItemDTO {
   motivo: string;
 }
 
+// NUEVA INTERFAZ PARA EL HISTORIAL DE CAMBIOS
+export interface TopicSelectionHistoryItem {
+  accion: string;
+  tituloTema: string;
+  modalidad: string;
+  fecha: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -190,6 +198,12 @@ export class ProcessSetupService {
       `${this.temasUrl}/propuestas-estudiante/${idPropuesta}`,
       formData
     );
+  }
+
+  // NUEVO MÉTODO PARA CARGAR EL HISTORIAL REAL
+  getTopicSelectionHistory(idPeriodo: number): Observable<TopicSelectionHistoryItem[]> {
+    const params = new HttpParams().set('idPeriodo', String(idPeriodo));
+    return this.http.get<TopicSelectionHistoryItem[]>(`${this.temasUrl}/historial-selecciones`, { params });
   }
 
   extractErrorMessage(error: unknown): string {

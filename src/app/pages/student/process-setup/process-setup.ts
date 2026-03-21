@@ -12,7 +12,8 @@ import {
   TopicSelectionStatusDTO,
   StudentProposalSummaryDTO,
   StudentProposalHistoryItemDTO,
-  UpdateStudentProposalRequestDTO
+  UpdateStudentProposalRequestDTO,
+  TopicSelectionHistoryItem // <-- Asegúrate de importar la interfaz
 } from '../../../services/process-setup/process-setup';
 
 interface TemaViewModel {
@@ -21,13 +22,6 @@ interface TemaViewModel {
   descripcion: string;
   profesor: string;
   tags: string[];
-}
-
-interface TopicSelectionHistoryItem {
-  accion: string;
-  tituloTema: string;
-  modalidad: string;
-  fecha: string;
 }
 
 @Component({
@@ -342,27 +336,29 @@ export class ProcessSetup implements OnInit {
     });
   }
 
+  // MÉTODO ACTUALIZADO SIN DATOS QUEMADOS
   loadTopicSelectionHistory(): void {
+    if (!this.selectedPeriodoId) return;
+
     this.isLoadingSelectionsHistory = true;
 
-    setTimeout(() => {
-      this.topicSelectionHistory = [
-        {
-          accion: 'Cambio de Tema y Modalidad',
-          tituloTema: 'Implementación de IA en la Agricultura',
-          modalidad: 'Proyecto Tecnológico',
-          fecha: '2026-03-20 10:30 AM'
-        },
-        {
-          accion: 'Selección Inicial',
-          tituloTema: 'Desarrollo de Software Educativo',
-          modalidad: 'Desarrollo de Software',
-          fecha: '2026-03-15 08:15 AM'
-        }
-      ];
-      this.isLoadingSelectionsHistory = false;
-      this.refreshView();
-    }, 500);
+    this.processService.getTopicSelectionHistory(this.selectedPeriodoId).subscribe({
+      next: (data: TopicSelectionHistoryItem[]) => {
+        this.ngZone.run(() => {
+          this.topicSelectionHistory = data ?? [];
+          this.isLoadingSelectionsHistory = false;
+          this.refreshView();
+        });
+      },
+      error: (err: any) => {
+        this.ngZone.run(() => {
+          this.topicSelectionHistory = [];
+          this.isLoadingSelectionsHistory = false;
+          this.refreshView();
+          console.error('Error al cargar historial de selecciones:', err);
+        });
+      }
+    });
   }
 
   selectProposal(proposal: StudentProposalSummaryDTO): void {
