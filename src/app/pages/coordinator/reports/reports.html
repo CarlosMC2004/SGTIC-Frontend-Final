@@ -35,7 +35,7 @@
           </div>
 
           <div class="filter-group">
-            <label>Estado de Tesis</label>
+            <label>Estado de Trabajos</label>
             <select [(ngModel)]="filtroEstado" (change)="cargarDatosReporte()" class="form-select">
               <option value="">Todos los estados</option>
               <option *ngFor="let estado of listadoEstados" [value]="estado">
@@ -47,7 +47,7 @@
           <div class="filter-group">
             <label>Director / Docente</label>
             <select [(ngModel)]="filtroDirector" (change)="cargarDatosReporte()" class="form-select">
-              <option [ngValue]="0">Todos los docentes</option>
+              <option [ngValue]="0">Todos los Director / Docente</option>
               <option *ngFor="let d of listadoDocentes" [ngValue]="d.idDocente">
                 {{ d.nombreCompleto }}
               </option>
@@ -150,6 +150,7 @@
         <div class="card table-wrapper">
           <div class="table-header bg-gray-light">
             <h3 class="card-title-table">Estudiantes en Proceso de Titulación</h3>
+            <p class="footer-text">Total de registros: <strong>{{ estudiantesTable.length }}</strong></p>
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -191,9 +192,6 @@
               </tr>
               </tbody>
             </table>
-          </div>
-          <div class="table-footer">
-            <p class="footer-text">Total de registros: <strong>{{ estudiantesTable.length }}</strong></p>
           </div>
         </div>
 

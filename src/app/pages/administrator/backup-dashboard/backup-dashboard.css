@@ -100,6 +100,38 @@
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
+.header-action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Estilos para el botón de los respaldos secundario */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #1e293b;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .btn-primary:hover:not(:disabled) {
   background: #059669;
   transform: translateY(-1px);

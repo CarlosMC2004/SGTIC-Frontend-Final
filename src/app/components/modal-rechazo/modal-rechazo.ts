@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -10,6 +10,10 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './modal-rechazo.css',
 })
 export class ModalRechazo {
+  @Input() titulo: string = 'Rechazar Solicitud';
+  @Input() descripcion: string = 'Indique las razones específicas por las cuales esta solicitud no cumple con los requisitos. Este mensaje será enviado al estudiante.';
+  @Input() labelMotivo: string = 'Motivo del rechazo';
+  @Input() placeholderMotivo: string = 'Escriba aquí las razones por las cuales se rechaza la propuesta de tesis...';
 
   motivoRechazo: string = '';
 

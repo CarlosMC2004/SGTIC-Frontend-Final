@@ -8,15 +8,10 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export type StudentReportType =
-  | 'GENERAL_STATUS'
+  | 'STATUS'
+  | 'PROPOSALS'
   | 'TITULATION_OPTION'
-  | 'TOPIC_OR_PROPOSAL'
-  | 'TOPIC_CHANGE_HISTORY'
-  | 'PROPOSAL_VERSION_HISTORY'
-  | 'DIRECTOR_ASSIGNMENT'
-  | 'THESIS_PROGRESS'
-  | 'TUTORING_HISTORY'
-  | 'ADMISSION_REQUEST';
+  | 'GENERAL_STATUS'; // Agregué los de la base de datos y mantuve algunos tuyos por si los usas luego
 
 export interface ReportCatalogItemDTO {
   type: StudentReportType;
@@ -31,7 +26,8 @@ export interface ReportCatalogItemDTO {
 })
 export class StudentReportsService {
   private readonly apiBase = 'http://localhost:8080';
-  private readonly baseUrl = `${this.apiBase}/api/student/reports`;
+  // CORRECCIÓN: La ruta correcta del backend
+  private readonly baseUrl = `${this.apiBase}/api/student-reports`;
 
   constructor(private readonly http: HttpClient) {}
 

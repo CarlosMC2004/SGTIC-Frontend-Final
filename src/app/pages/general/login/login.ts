@@ -23,7 +23,7 @@ export class LoginComponent {
   isLoading = false;
   errorMessage = '';
   isModalOpen = false;
-  
+
   private requestAccess = inject(RequestAccess);
   // --- INYECCIÓN DEL NUEVO SERVICIO ---
   private registrationService = inject(ManageRegistrationService);
@@ -89,13 +89,13 @@ export class LoginComponent {
         } else if (roles.includes('docente') || roles.includes('director_trabajo_titulacion')) {
           this.isLoading = false;
           this.router.navigate(['/director/dashboard']);
-        
+
         // ==============================================================
         // LÓGICA DE ESTUDIANTE: AUTO-MATRÍCULA ANTES DE IR AL DASHBOARD
         // ==============================================================
         } else if (roles.includes('estudiante')) {
           const studentId = response.context?.idStudent;
-          
+
           if (studentId) {
             // No detenemos el 'isLoading' porque seguimos procesando
             this.registrationService.autoEnroll(studentId).subscribe({
@@ -107,12 +107,12 @@ export class LoginComponent {
               error: (err) => {
                 console.error('Error en proceso de matrícula:', err);
                 this.isLoading = false;
-                
+
                 // Extraemos el mensaje de la base de datos (ej. "No hay periodo activo")
                 const errorMsg = err.error?.message || err.error?.error || 'No se pudo verificar su matrícula actual.';
-                
+
                 // Mostramos el mensaje, pero le permitimos ir al dashboard de todas formas
-                alert(errorMsg); 
+                alert(errorMsg);
                 this.router.navigate(['/student/dashboard']);
               }
             });

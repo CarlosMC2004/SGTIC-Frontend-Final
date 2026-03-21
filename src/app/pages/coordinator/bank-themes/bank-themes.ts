@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router'; // 1. IMPORTANTE: Para que funcione routerLink
+import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { Topbar } from '../../../components/top-bar/top-bar';
 import { ModalNewTheme } from '../../../components/modal-new-theme/modal-new-theme';

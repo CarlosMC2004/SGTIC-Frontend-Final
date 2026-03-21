@@ -12,8 +12,8 @@
       
       <div class="glass-card">
         <h3 class="section-title">
-          <span class="material-symbols-outlined">timeline</span>
-          Línea de Avance de Tutorías
+          <span class="material-symbols-outlined">donut_large</span>
+          Estadísticas del Reporte
         </h3>
         <div class="chart-container">
           <canvas id="studentActivityChart"></canvas>
@@ -41,8 +41,8 @@
               <span class="material-symbols-outlined">inventory_2</span>
             </div>
             <div class="stat-info">
-              <span class="label">Versión de Anteproyecto</span>
-              <div class="value">v{{ previewCount > 0 ? previewCount : '1.0' }}</div>
+              <span class="label">Total de Registros</span>
+              <div class="value">{{ previewCount }}</div>
             </div>
           </div>
 
@@ -73,26 +73,41 @@
           </div>
           <div>
             <h4 style="margin:0; font-size: 1rem; color: #1e293b;">{{ item.title }}</h4>
-            <p style="margin:0; font-size: 0.85rem; color: #64748b;">Generar archivo PDF</p>
+            <p style="margin:0; font-size: 0.85rem; color: #64748b;">Generar reporte oficial</p>
           </div>
         </div>
         
-        <button 
-          class="btn-download-circle" 
-          (click)="downloadPdf(item, $event)"
-          [disabled]="isDownloadingPdf"
-          title="Descargar PDF"
-        >
-          <span class="material-symbols-outlined">download</span>
-        </button>
+        <div style="display: flex; gap: 8px;">
+          <button 
+            class="btn-download-circle" 
+            (click)="downloadPdf(item, $event)"
+            [disabled]="isDownloadingPdf || isLoadingPreview"
+            title="Descargar PDF"
+          >
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="preview-section" *ngIf="selectedReport">
-      <h3 class="section-title">
-        <span class="material-symbols-outlined">visibility</span>
-        Vista previa: {{ selectedReport.title }}
-      </h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 class="section-title" style="margin: 0;">
+          <span class="material-symbols-outlined">visibility</span>
+          Vista previa: {{ selectedReport.title }}
+        </h3>
+        
+        <button 
+          class="btn-download-circle" 
+          style="background: #10b981; border-radius: 12px; width: auto; padding: 0 16px; display: flex; gap: 8px;"
+          (click)="exportToCsv()"
+          [disabled]="previewRows.length === 0 || isLoadingPreview"
+          title="Exportar a Excel/CSV"
+        >
+          <span class="material-symbols-outlined" style="font-size: 20px;">grid_on</span>
+          <span style="font-size: 0.9rem; font-weight: 600;">Exportar a Excel</span>
+        </button>
+      </div>
       
       <div class="table-wrapper">
         <div *ngIf="isLoadingPreview" style="padding: 3rem; text-align: center; color: #64748b;">
@@ -108,12 +123,19 @@
           </thead>
           <tbody>
             <tr *ngFor="let row of previewRows">
-              <td *ngFor="let col of previewColumns">{{ row[col.key] }}</td>
+              <td *ngFor="let col of previewColumns">
+                <span *ngIf="isStatusColumn(row[col.key])" [ngClass]="getStatusClass(row[col.key])">
+                  {{ row[col.key] }}
+                </span>
+                <span *ngIf="!isStatusColumn(row[col.key])">
+                  {{ row[col.key] }}
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
 
-        <div *ngIf="!isLoadingPreview && previewRows.length === 0 && previewMode === 'array'" style="padding: 2rem; text-align: center; color: #64748b;">
+        <div *ngIf="!isLoadingPreview && previewRows.length === 0 && previewMode === 'empty'" style="padding: 2rem; text-align: center; color: #64748b;">
           No se encontraron registros para este reporte.
         </div>
       </div>
