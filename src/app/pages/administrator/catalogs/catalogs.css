@@ -42,7 +42,7 @@ td .text-center:contains('-') {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #998dea 0%, #a479ce 100%);
   border-radius: 12px;
   padding: 20px;
   color: white;
@@ -62,7 +62,7 @@ td .text-center:contains('-') {
 }
 
 .stat-card.inactive-card {
-  background: linear-gradient(135deg, #f44336 0%, #b71c1c 100%);
+  background: linear-gradient(135deg, #f44336 0%, #6b1414 100%);
 }
 
 .stat-icon {

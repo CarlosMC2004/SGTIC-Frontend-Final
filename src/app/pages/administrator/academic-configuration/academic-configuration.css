@@ -373,3 +373,118 @@
   margin: 0;
   line-height: 1.5;
 }
+/* ── MODO OSCURO ── */
+:host-context(body.dark) {
+  color: #e5e7eb;
+}
+
+:host-context(body.dark) .page-title,
+:host-context(body.dark) .section-title,
+:host-context(body.dark) .info-title,
+:host-context(body.dark) .modality-title {
+  color: #f3f4f6;
+}
+
+:host-context(body.dark) .page-subtitle,
+:host-context(body.dark) .section-subtitle,
+:host-context(body.dark) .info-text,
+:host-context(body.dark) .modality-subtitle {
+  color: #9ca3af;
+}
+
+:host-context(body.dark) .card-container,
+:host-context(body.dark) .areas-card,
+:host-context(body.dark) .info-card {
+  background-color: #1a2420;
+  border-color: #2d3d36;
+}
+
+:host-context(body.dark) .modality-item {
+  border-bottom-color: #2d3d36;
+}
+
+:host-context(body.dark) .modality-item:hover {
+  background-color: #1f2e28;
+}
+
+:host-context(body.dark) .modality-icon {
+  background-color: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+}
+
+:host-context(body.dark) .tabs-container {
+  border-bottom-color: #2d3d36;
+}
+
+:host-context(body.dark) .tab-btn {
+  color: #6b7280;
+}
+
+:host-context(body.dark) .tab-btn:hover {
+  color: #d1d5db;
+}
+
+:host-context(body.dark) .tab-btn.active {
+  color: #4ade80;
+}
+
+:host-context(body.dark) .tab-btn.active::after {
+  background-color: #4ade80;
+}
+
+:host-context(body.dark) .search-box input {
+  background-color: #1f2e28;
+  color: #e5e7eb;
+}
+
+:host-context(body.dark) .search-box input::placeholder {
+  color: #6b7280;
+}
+
+:host-context(body.dark) .search-box .icon {
+  color: #6b7280;
+}
+
+:host-context(body.dark) .tag {
+  background-color: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.25);
+  color: #4ade80;
+}
+
+:host-context(body.dark) .btn-add-tag {
+  border-color: #2d3d36;
+  color: #9ca3af;
+}
+
+:host-context(body.dark) .btn-add-tag:hover {
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+:host-context(body.dark) .info-footer {
+  border-top-color: #2d3d36;
+}
+
+:host-context(body.dark) .toggle-switch {
+  background-color: #2d3d36;
+}
+
+:host-context(body.dark) .btn-icon {
+  color: #6b7280;
+}
+
+:host-context(body.dark) .btn-icon:hover {
+  color: #4ade80;
+}
+
+:host-context(body.dark) .status-label {
+  color: #4ade80;
+}
+
+:host-context(body.dark) .btn-primary {
+  background-color: #166534;
+}
+
+:host-context(body.dark) .btn-primary:hover {
+  background-color: #14532d;
+}

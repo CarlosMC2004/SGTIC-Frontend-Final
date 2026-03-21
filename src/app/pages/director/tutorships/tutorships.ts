@@ -1,6 +1,6 @@
 import {Component, inject, OnInit, ChangeDetectorRef, forwardRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { ScheduleTutorshipModalComponent, AssignedWorkOption } from '../../../components/modal-schedule-tutorship/modal-schedule-tutorship';
 import { TutorshipService } from '../../../services/tutorship/tutorship';
@@ -10,7 +10,7 @@ import {FormBuilder} from '@angular/forms';
 @Component({
   selector: 'app-director-tutorships',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, SidebarComponent, ScheduleTutorshipModalComponent],
+  imports: [CommonModule, Topbar, SidebarComponent, ScheduleTutorshipModalComponent],
   templateUrl: './tutorships.html',
   styleUrls: ['./tutorships.css']
 })

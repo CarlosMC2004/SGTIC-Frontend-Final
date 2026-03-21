@@ -11,21 +11,21 @@
 
 /* Botones y Tabs */
 .btn-primary {
-  background-color: #2563eb; color: white; border: none; padding: 0.6rem 1.2rem;
+  background-color: #188140; color: white; border: none; padding: 0.6rem 1.2rem;
   border-radius: 8px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
   transition: background-color 0.2s;
 }
-.btn-primary:hover { background-color: #1d4ed8; }
+.btn-primary:hover { background-color: #188140; }
 
 .tabs-container {
   display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0;
 }
 .tab-btn {
   background: none; border: none; padding: 0.75rem 1.5rem; font-size: 1rem;
-  font-weight: 500; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent;
+  font-weight: 500; color: #188140; cursor: pointer; border-bottom: 2px solid transparent;
   transition: all 0.2s;
 }
-.tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+.tab-btn.active { color: #188140; border-bottom-color: #188140; }
 .tab-btn:hover:not(.active) { color: #0f172a; border-bottom-color: #cbd5e1; }
 
 /* Lista de Tutorías (Cards) */
