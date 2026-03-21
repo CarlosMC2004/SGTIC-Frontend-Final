@@ -89,63 +89,82 @@
         </div>
       </div>
 
-      <div class="form-section">
-        <h3>Roles del Sistema <span class="required">*</span></h3>
-        <p class="section-desc">Selecciona uno o más roles para este usuario</p>
+      <div class="form-section section-roles">
+        <div class="section-header">
+          <h3>Roles del Sistema</h3>
+          <span class="required-badge">* Seleccione al menos uno</span>
+        </div>
 
-        <div class="roles-grid">
-          <div
-            *ngFor="let role of availableRoles"
-            class="role-card"
-            [class.selected]="isRoleSelected(role.id)"
-            (click)="toggleRole(role.id)">
-            <div class="role-checkbox">
-              <span class="material-symbols-outlined" *ngIf="isRoleSelected(role.id)">check</span>
+        <div class="roles-cards-grid">
+          <label class="role-card"
+                 *ngFor="let role of availableRoles"
+                 [class.checked]="userData.roleIds.includes(role.id)"
+                 [class.disabled]="role.name.toLowerCase() === 'docente' && isDocenteForced()">
+
+            <input
+              type="checkbox"
+              [checked]="userData.roleIds.includes(role.id)"
+              (change)="toggleRole(role)"
+              [disabled]="role.name.toLowerCase() === 'docente' && isDocenteForced()"
+              class="hidden-checkbox"
+            >
+
+            <div class="card-content">
+              <div class="card-icon">
+                <span class="material-symbols-outlined">{{ getRoleIcon(role.name) }}</span>
+              </div>
+              <div class="card-info">
+                <span class="role-name">{{ role.name }}</span>
+                <span *ngIf="role.name.toLowerCase() === 'docente' && isDocenteForced()" class="role-hint">Requerido automáticamente</span>
+              </div>
+              <div class="card-check">
+                <span class="material-symbols-outlined check-icon">check_circle</span>
+              </div>
             </div>
-            <div class="role-info">
-              <span class="role-name">{{ role.name }}</span>
-            </div>
-          </div>
+          </label>
         </div>
       </div>
 
-      <div class="student-section" *ngIf="isStudentSelected">
-        <h3>Información Académica</h3>
+      <div class="form-section" *ngIf="showFacultySelect">
+        <h3>Asignación Institucional</h3>
 
-        <div class="student-fields">
-          <div class="form-group">
-            <label for="career">
-              Carrera <span class="required">*</span>
-              <span class="hint-optional">(Requerido para estudiantes)</span>
-            </label>
-            <select
-              id="career"
-              [(ngModel)]="userData.idCareer"
-              name="career"
-              [class.error]="!userData.idCareer && errorMessage">
-              <option [ngValue]="null">Seleccione una carrera...</option>
-              <option *ngFor="let career of availableCareers" [ngValue]="career.idCareer">
-                {{ career.name }} <ng-container *ngIf="career.facultyName">({{ career.facultyName }})</ng-container>
+        <div class="form-row">
+
+          <div class="form-group" *ngIf="showFacultySelect">
+            <label>Facultad <span class="required">*</span></label>
+            <select [(ngModel)]="userData.idFaculty" name="faculty" (change)="onFacultyChange()"
+                    [class.error]="errorMessage && !userData.idFaculty">
+              <option [ngValue]="null">Seleccione una facultad...</option>
+              <option *ngFor="let fac of availableFaculties" [ngValue]="fac.id">
+                {{ fac.nombre }}
               </option>
             </select>
           </div>
 
-          <div class="form-group">
-            <label for="period">
-              Período Académico <span class="required">*</span>
-              <span class="hint-optional">(Ciclo de ingreso)</span>
-            </label>
-            <select
-              id="period"
-              [(ngModel)]="userData.idPeriod"
-              name="period"
-              [class.error]="!userData.idPeriod && errorMessage">
+          <div class="form-group" *ngIf="showCareerSelect">
+            <label>Carrera <span class="required">*</span></label>
+            <select [(ngModel)]="userData.idCareer" name="career"
+                    [disabled]="!userData.idFaculty"
+                    [class.error]="errorMessage && !userData.idCareer">
+              <option [ngValue]="null">
+                {{ !userData.idFaculty ? 'Primero seleccione facultad...' : 'Seleccione una carrera...' }}
+              </option>
+              <option *ngFor="let car of availableCareers" [ngValue]="car.id">
+                {{ car.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group" *ngIf="showPeriodSelect">
+            <label>Período Académico (Cohorte) <span class="required">*</span></label>
+            <select [(ngModel)]="userData.idPeriod" name="period" [class.error]="errorMessage && !userData.idPeriod">
               <option [ngValue]="null">Seleccione un período...</option>
               <option *ngFor="let period of availablePeriods" [ngValue]="period.idPeriod">
                 {{ period.name }}
               </option>
             </select>
           </div>
+
         </div>
       </div>
 
@@ -167,7 +186,6 @@
       <button class="btn-primary" (click)="onSave()" [disabled]="loading">
         <span *ngIf="loading" class="spinner">⟳</span>
         <span *ngIf="!loading">
-          <span class="material-symbols-outlined">save</span>
           {{ isEditing ? 'Guardar Cambios' : 'Crear Usuario' }}
         </span>
       </button>

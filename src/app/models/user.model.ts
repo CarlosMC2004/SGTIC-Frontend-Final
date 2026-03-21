@@ -48,11 +48,21 @@ export interface CareerDTO {
   facultyName?: string;
 }
 
+export interface FacultyDTO {
+  idFaculty: number;
+  name: string;
+}
+
 export interface AcademicPeriodDTO {
   idPeriod: number;
   name: string;
   startDate: string;
   endDate: string;
+}
+
+export interface SelectionItemDTO {
+  id: number;
+  nombre: string;
 }
 
 export interface CreateUserRequest {

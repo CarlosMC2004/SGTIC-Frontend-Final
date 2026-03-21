@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
@@ -19,6 +19,7 @@ export class UserManagementComponent implements OnInit {
   showModal = false;
   selectedUser: User | null = null;
   searchText = '';
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(private userService: UserService) { }
 
@@ -32,6 +33,7 @@ export class UserManagementComponent implements OnInit {
       next: (users) => {
         this.users = [...users];
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando usuarios:', err);
