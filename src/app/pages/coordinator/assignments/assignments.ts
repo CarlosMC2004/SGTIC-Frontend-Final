@@ -115,7 +115,6 @@ export class Assignments implements OnInit {
     }
   }
 
-  // 4. BUSCADOR DE DOCENTES
   onSearch(event: any): void {
     const term = event.target.value.toLowerCase().trim();
     if (!term) {
@@ -128,29 +127,24 @@ export class Assignments implements OnInit {
     );
   }
 
-  // 5. MAGIA DE LA INTELIGENCIA ARTIFICIAL
   solicitarSugerenciasIA(): void {
     if (!this.selectedProjectId) {
       alert('Por favor, selecciona un proyecto primero para que la IA lo analice.');
       return;
     }
 
-    // Buscamos los detalles del proyecto que seleccionaste
     const proyectoSeleccionado: any = this.pendingProjects.find(p => p.idPropuesta === this.selectedProjectId);
     if (!proyectoSeleccionado) return;
 
-    // Asegúrate de que las propiedades se llamen así en tu base de datos (tema/titulo y descripcion/resumen)
     const titulo = proyectoSeleccionado.tema || proyectoSeleccionado.titulo || 'Sin título';
     const descripcion = proyectoSeleccionado.descripcion || proyectoSeleccionado.resumen || 'Sin descripción';
 
-    this.loadingAi = true; // Encendemos el estado de carga
+    this.loadingAi = true;
 
     this.assignmentService.getAiSuggestions(titulo, descripcion, this.allTeachers).subscribe({
       next: (resultados: AiMatchResult[]) => {
 
-        // Mezclamos los resultados de la IA con nuestros docentes
         this.allTeachers = this.allTeachers.map(docente => {
-          // Buscamos qué puntaje le dio la IA a este docente en particular
           const sugerencia = resultados.find(r => r.idDocente === docente.idDocente);
           return {
             ...docente,
@@ -159,12 +153,10 @@ export class Assignments implements OnInit {
           };
         });
 
-        // Ordenamos la lista de mayor a menor porcentaje
         this.allTeachers.sort((a, b) => b.matchScore - a.matchScore);
 
-        // Actualizamos las tarjetas en la pantalla
         this.teachers = [...this.allTeachers];
-        this.loadingAi = false; // Apagamos el estado de carga
+        this.loadingAi = false;
         this.cdr.detectChanges();
       },
       error: (err: any) => {
