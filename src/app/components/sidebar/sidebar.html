@@ -37,11 +37,7 @@
         <span class="material-symbols-outlined">database</span>
         <span>Gestión de Respaldos</span>
       </a>
-      <!-- Chat Admin -->
-      <a class="menu-item" routerLink="/chat/admin" routerLinkActive="active">
-        <span class="material-symbols-outlined">chat</span>
-        <span>Chat</span>
-      </a>
+     
     </ng-container>
 
     <ng-container *ngIf="role === 'coordinador'">
@@ -73,11 +69,7 @@
         <span class="material-symbols-outlined">bar_chart</span>
         <span>Reportes</span>
       </a>
-      <!-- Chat Coordinador -->
-      <a class="menu-item" routerLink="/chat/coordinator" routerLinkActive="active">
-        <span class="material-symbols-outlined">chat</span>
-        <span>Chat</span>
-      </a>
+     
     </ng-container>
 
     <ng-container *ngIf="role === 'estudiante'">
@@ -93,7 +85,7 @@
         <span class="material-symbols-outlined">description</span>
         <span>Reportes</span>
       </a>
-      <!-- 👇 Chat Estudiante -->
+      <!--  Chat Estudiante -->
       <a class="menu-item" routerLink="/chat/student" routerLinkActive="active">
         <span class="material-symbols-outlined">chat</span>
         <span>Chat</span>

@@ -7,10 +7,19 @@ import { Observable } from 'rxjs';
 })
 export class TeacherService {
 
-  private apiUrl = 'http://localhost:8080/api/docentes';
+  private apiUrl = 'http://localhost:8080/api/teachers';
+
   constructor(private http: HttpClient) { }
 
-  buscarDocentes(termino: string = ''): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/buscar?termino=${termino}`);
+  getDocentesPorFacultad(idUsuario: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/facultad/${idUsuario}`);
+  }
+
+  actualizarEstado(idDocente: number, estado: string) {
+    return this.http.put(`${this.apiUrl}/${idDocente}/estado`, { estado }, { responseType: 'text' });
+  }
+
+  guardarDocente(docenteData: any) {
+    return this.http.post(`${this.apiUrl}/save`, docenteData, { responseType: 'text' });
   }
 }

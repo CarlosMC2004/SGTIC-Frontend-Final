@@ -19,11 +19,14 @@ export interface Periodo {
 export class PeriodoService {
   private apiUrl = 'http://localhost:8080/api/admin/catalog/periods';
   private studentApiUrl = 'http://localhost:8080/api/student/periodos';
+  // NUEVA RUTA COMÚN PARA TODOS LOS ROLES
+  private commonApiUrl = 'http://localhost:8080/api/common/periods';
 
   constructor(private http: HttpClient) { }
 
   private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('auth_token');
+    // Usamos sessionStorage para que funcione correctamente con tu AuthService
+    const token = sessionStorage.getItem('auth_token');
     return new HttpHeaders({
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -35,9 +38,10 @@ export class PeriodoService {
     return this.http.get<Periodo[]>(this.apiUrl, { headers });
   }
 
+  // ESTE ES EL MÉTODO QUE USARÁ EL TOP-BAR PARA TODOS
   getPeriodosActivos(): Observable<Periodo[]> {
     const headers = this.getHeaders();
-    return this.http.get<Periodo[]>(`${this.apiUrl}/active`, { headers });
+    return this.http.get<Periodo[]>(`${this.commonApiUrl}/active`, { headers });
   }
 
   getPeriodosAceptados(): Observable<Periodo[]> {

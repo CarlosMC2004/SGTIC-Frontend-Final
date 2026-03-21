@@ -7,7 +7,7 @@ import {
   ProcessSetupService,
   DegreeOptionDTO,
   TemaDTO,
-  SaveTopicSelectionRequestDTO,
+  TopicSelectionRequestDTO,
   RegisterProposalStudentTopicRequestDTO,
   TopicSelectionStatusDTO,
   StudentProposalSummaryDTO,
@@ -21,6 +21,13 @@ interface TemaViewModel {
   descripcion: string;
   profesor: string;
   tags: string[];
+}
+
+interface TopicSelectionHistoryItem {
+  accion: string;
+  tituloTema: string;
+  modalidad: string;
+  fecha: string;
 }
 
 @Component({
@@ -68,9 +75,15 @@ export class ProcessSetup implements OnInit {
 
   selectionStatus: TopicSelectionStatusDTO | null = null;
 
+  isHistoryModalOpen = false;
+  activeHistoryTab: 'propuestas' | 'selecciones' = 'propuestas';
+
   studentProposals: StudentProposalSummaryDTO[] = [];
   selectedProposal: StudentProposalSummaryDTO | null = null;
   selectedProposalHistory: StudentProposalHistoryItemDTO[] = [];
+
+  topicSelectionHistory: TopicSelectionHistoryItem[] = [];
+  isLoadingSelectionsHistory = false;
 
   isLoadingOptions = false;
   isLoadingTopics = false;
@@ -81,47 +94,24 @@ export class ProcessSetup implements OnInit {
   isUpdatingProposal = false;
   isEditingProposal = false;
 
-  ngOnInit(): void {
-    this.loadDegreeOptions();
-  }
+  ngOnInit(): void {}
 
   get canUseBankTab(): boolean {
-    if (!this.selectedPeriodoId) {
-      return false;
-    }
-
-    if (!this.selectionStatus) {
-      return true;
-    }
-
+    if (!this.selectedPeriodoId) return false;
+    if (!this.selectionStatus) return true;
     return this.selectionStatus.puedeSeleccionar || this.selectionStatus.puedeCambiarTema;
   }
 
   get canUseProposalTab(): boolean {
-    if (!this.selectedPeriodoId) {
-      return false;
-    }
-
-    if (!this.selectionStatus) {
-      return true;
-    }
-
+    if (!this.selectedPeriodoId) return false;
+    if (!this.selectionStatus) return true;
     return this.selectionStatus.puedeProponer;
   }
 
   get canSave(): boolean {
-    if (this.isSaving || !this.selectedModalityId || !this.selectedPeriodoId) {
-      return false;
-    }
-
-    if (this.selectionStatus?.desactivadoPorPlazo) {
-      return false;
-    }
-
-    if (this.activeTab === 'banco') {
-      return false;
-    }
-
+    if (this.isSaving || !this.selectedModalityId || !this.selectedPeriodoId) return false;
+    if (this.selectionStatus?.desactivadoPorPlazo) return false;
+    if (this.activeTab === 'banco') return false;
     return this.proposeForm.valid && this.canUseProposalTab;
   }
 
@@ -130,40 +120,77 @@ export class ProcessSetup implements OnInit {
   }
 
   onPeriodoChange(periodoId: number): void {
-    if (!periodoId) {
-      return;
-    }
+    if (!periodoId) return;
 
     this.ngZone.run(() => {
       this.selectedPeriodoId = periodoId;
+
+      this.selectedModalityId = null;
+      this.modalityOptions = [];
+
       this.selectedTopicId = null;
       this.isSelectingTopicId = null;
+
+      this.bancoTemas = [];
+      this.filteredTemas = [];
+      this.searchTerm = '';
+
+      this.selectionStatus = null;
+
       this.selectedProposal = null;
       this.selectedProposalHistory = [];
+      this.studentProposals = [];
+
       this.isEditingProposal = false;
       this.editProposalForm.reset();
       this.editSelectedFile = null;
       this.editSelectedFileName = null;
 
+      this.topicSelectionHistory = [];
+
+      this.loadDegreeOptionsByPeriodo();
       this.loadSelectionStatus();
       this.loadStudentProposals();
-
-      if (this.selectedModalityId) {
-        this.loadTemas(this.selectedModalityId);
-      }
+      this.loadTopicSelectionHistory();
 
       this.refreshView();
     });
   }
 
-  loadDegreeOptions(): void {
-    this.isLoadingOptions = true;
+  openHistoryModal(): void {
+    this.isHistoryModalOpen = true;
+    if (this.studentProposals.length > 0 && !this.selectedProposal) {
+      this.selectProposal(this.studentProposals[0]);
+    }
     this.refreshView();
+  }
 
-    this.processService.getActiveOptions().subscribe({
+  closeHistoryModal(): void {
+    this.isHistoryModalOpen = false;
+    if (this.isEditingProposal) {
+      this.cancelEditProposal();
+    }
+    this.refreshView();
+  }
+
+  switchHistoryTab(tab: 'propuestas' | 'selecciones'): void {
+    this.activeHistoryTab = tab;
+    if (tab === 'selecciones' && this.topicSelectionHistory.length === 0) {
+      this.loadTopicSelectionHistory();
+    }
+    this.refreshView();
+  }
+
+  loadDegreeOptionsByPeriodo(): void {
+    if (!this.selectedPeriodoId) return;
+
+    this.isLoadingOptions = true;
+
+    this.processService.getDegreeOptionsByPeriodo(this.selectedPeriodoId).subscribe({
       next: (data) => {
         this.ngZone.run(() => {
           this.modalityOptions = data ?? [];
+          this.isLoadingOptions = false;
 
           if (this.modalityOptions.length > 0) {
             this.selectedModalityId = this.modalityOptions[0].idOption;
@@ -174,13 +201,16 @@ export class ProcessSetup implements OnInit {
             this.filteredTemas = [];
           }
 
-          this.isLoadingOptions = false;
           this.refreshView();
         });
       },
       error: (err) => {
         this.ngZone.run(() => {
           this.isLoadingOptions = false;
+          this.modalityOptions = [];
+          this.selectedModalityId = null;
+          this.bancoTemas = [];
+          this.filteredTemas = [];
           this.refreshView();
           alert(this.processService.extractErrorMessage(err));
         });
@@ -189,22 +219,15 @@ export class ProcessSetup implements OnInit {
   }
 
   loadTemas(idOpcion: number): void {
-    if (!idOpcion) {
-      this.bancoTemas = [];
-      this.filteredTemas = [];
-      this.refreshView();
-      return;
-    }
+    if (!idOpcion || !this.selectedPeriodoId) return;
 
     this.isLoadingTopics = true;
     this.selectedTopicId = null;
-    this.isSelectingTopicId = null;
     this.bancoTemas = [];
     this.filteredTemas = [];
     this.searchTerm = '';
-    this.refreshView();
 
-    this.processService.getTemasDisponibles(idOpcion).subscribe({
+    this.processService.getTemasDisponibles(this.selectedPeriodoId, idOpcion).subscribe({
       next: (data) => {
         this.ngZone.run(() => {
           this.bancoTemas = (data ?? []).map((t: TemaDTO) => ({
@@ -214,7 +237,6 @@ export class ProcessSetup implements OnInit {
             profesor: t.profesor || 'Por definir',
             tags: [t.area || 'General', t.duracion || 'Duración no especificada']
           }));
-
           this.filteredTemas = [...this.bancoTemas];
           this.isLoadingTopics = false;
           this.refreshView();
@@ -222,8 +244,6 @@ export class ProcessSetup implements OnInit {
       },
       error: (err) => {
         this.ngZone.run(() => {
-          this.bancoTemas = [];
-          this.filteredTemas = [];
           this.isLoadingTopics = false;
           this.refreshView();
           alert(this.processService.extractErrorMessage(err));
@@ -233,14 +253,9 @@ export class ProcessSetup implements OnInit {
   }
 
   loadSelectionStatus(): void {
-    if (!this.selectedPeriodoId) {
-      this.selectionStatus = null;
-      this.refreshView();
-      return;
-    }
+    if (!this.selectedPeriodoId) return;
 
     this.isLoadingStatus = true;
-    this.refreshView();
 
     this.processService.getTopicSelectionStatus(this.selectedPeriodoId).subscribe({
       next: (data) => {
@@ -261,16 +276,9 @@ export class ProcessSetup implements OnInit {
   }
 
   loadStudentProposals(selectProposalId?: number): void {
-    if (!this.selectedPeriodoId) {
-      this.studentProposals = [];
-      this.selectedProposal = null;
-      this.selectedProposalHistory = [];
-      this.refreshView();
-      return;
-    }
+    if (!this.selectedPeriodoId) return;
 
     this.isLoadingProposalList = true;
-    this.refreshView();
 
     this.processService.getStudentProposals(this.selectedPeriodoId).subscribe({
       next: (data) => {
@@ -278,31 +286,20 @@ export class ProcessSetup implements OnInit {
           this.studentProposals = data ?? [];
           this.isLoadingProposalList = false;
 
-          if (this.studentProposals.length === 0) {
+          if (this.studentProposals.length > 0) {
+            let targetProposal = this.studentProposals[0];
+
+            if (selectProposalId) {
+              const found = this.studentProposals.find(p => p.idPropuesta === selectProposalId);
+              if (found) {
+                targetProposal = found;
+              }
+            }
+
+            this.selectProposal(targetProposal);
+          } else {
             this.selectedProposal = null;
             this.selectedProposalHistory = [];
-            this.refreshView();
-            return;
-          }
-
-          if (selectProposalId) {
-            const found = this.studentProposals.find(p => p.idPropuesta === selectProposalId);
-
-            if (found) {
-              this.selectProposal(found);
-              this.refreshView();
-              return;
-            }
-          }
-
-          const sameSelected = this.selectedProposal
-            ? this.studentProposals.find(p => p.idPropuesta === this.selectedProposal?.idPropuesta)
-            : null;
-
-          if (sameSelected) {
-            this.selectProposal(sameSelected);
-          } else {
-            this.selectProposal(this.studentProposals[0]);
           }
 
           this.refreshView();
@@ -322,14 +319,9 @@ export class ProcessSetup implements OnInit {
   }
 
   loadProposalHistory(idPropuesta: number): void {
-    if (!idPropuesta) {
-      this.selectedProposalHistory = [];
-      this.refreshView();
-      return;
-    }
+    if (!idPropuesta) return;
 
     this.isLoadingProposalDetail = true;
-    this.refreshView();
 
     this.processService.getStudentProposalHistory(idPropuesta).subscribe({
       next: (data) => {
@@ -350,6 +342,29 @@ export class ProcessSetup implements OnInit {
     });
   }
 
+  loadTopicSelectionHistory(): void {
+    this.isLoadingSelectionsHistory = true;
+
+    setTimeout(() => {
+      this.topicSelectionHistory = [
+        {
+          accion: 'Cambio de Tema y Modalidad',
+          tituloTema: 'Implementación de IA en la Agricultura',
+          modalidad: 'Proyecto Tecnológico',
+          fecha: '2026-03-20 10:30 AM'
+        },
+        {
+          accion: 'Selección Inicial',
+          tituloTema: 'Desarrollo de Software Educativo',
+          modalidad: 'Desarrollo de Software',
+          fecha: '2026-03-15 08:15 AM'
+        }
+      ];
+      this.isLoadingSelectionsHistory = false;
+      this.refreshView();
+    }, 500);
+  }
+
   selectProposal(proposal: StudentProposalSummaryDTO): void {
     this.selectedProposal = proposal;
     this.isEditingProposal = false;
@@ -357,14 +372,10 @@ export class ProcessSetup implements OnInit {
     this.editSelectedFile = null;
     this.editSelectedFileName = null;
     this.loadProposalHistory(proposal.idPropuesta);
-    this.refreshView();
   }
 
   startEditProposal(proposal: StudentProposalSummaryDTO): void {
-    if (!proposal.editable) {
-      alert('Solo se puede modificar una propuesta pendiente.');
-      return;
-    }
+    if (!proposal.editable) return;
 
     this.selectedProposal = proposal;
     this.isEditingProposal = true;
@@ -379,7 +390,6 @@ export class ProcessSetup implements OnInit {
     });
 
     this.loadProposalHistory(proposal.idPropuesta);
-    this.refreshView();
   }
 
   cancelEditProposal(): void {
@@ -387,7 +397,6 @@ export class ProcessSetup implements OnInit {
     this.editProposalForm.reset();
     this.editSelectedFile = null;
     this.editSelectedFileName = null;
-    this.refreshView();
   }
 
   onSearch(value: string): void {
@@ -395,56 +404,228 @@ export class ProcessSetup implements OnInit {
 
     if (!this.searchTerm) {
       this.filteredTemas = [...this.bancoTemas];
-      this.refreshView();
-      return;
+    } else {
+      this.filteredTemas = this.bancoTemas.filter((tema) =>
+        tema.titulo.toLowerCase().includes(this.searchTerm) ||
+        tema.descripcion.toLowerCase().includes(this.searchTerm) ||
+        tema.profesor.toLowerCase().includes(this.searchTerm) ||
+        tema.tags.some(tag => tag.toLowerCase().includes(this.searchTerm))
+      );
     }
-
-    this.filteredTemas = this.bancoTemas.filter((tema) =>
-      tema.titulo.toLowerCase().includes(this.searchTerm) ||
-      tema.descripcion.toLowerCase().includes(this.searchTerm) ||
-      tema.profesor.toLowerCase().includes(this.searchTerm) ||
-      tema.tags.some(tag => tag.toLowerCase().includes(this.searchTerm))
-    );
 
     this.refreshView();
   }
 
+  selectModality(idOption: number): void {
+    if (this.selectedModalityId === idOption) return;
+
+    this.ngZone.run(() => {
+      this.selectedModalityId = idOption;
+      this.selectedTopicId = null;
+
+      if (this.selectedPeriodoId) {
+        this.loadTemas(idOption);
+      }
+
+      this.refreshView();
+    });
+  }
+
+  switchTab(tab: 'banco' | 'proponer'): void {
+    this.activeTab = tab;
+
+    if (tab === 'banco' && this.selectedModalityId) {
+      this.loadTemas(this.selectedModalityId);
+    }
+
+    this.refreshView();
+  }
+
+  selectTopic(id: number): void {
+    if (!this.selectedModalityId || !this.selectedPeriodoId) return;
+    if (!this.canUseBankTab) return;
+
+    const previousSelected = this.selectedTopicId;
+
+    const payload: TopicSelectionRequestDTO = {
+      idTema: id,
+      idOpcion: this.selectedModalityId,
+      idPeriodo: this.selectedPeriodoId,
+      motivo: this.selectionStatus?.puedeCambiarTema ? 'Cambio de tema' : 'Selección inicial'
+    };
+
+    this.selectedTopicId = id;
+    this.isSelectingTopicId = id;
+
+    this.processService.saveTopicSelection(payload).subscribe({
+      next: (response) => {
+        this.ngZone.run(() => {
+          this.isSelectingTopicId = null;
+
+          if (!response.exito) {
+            this.selectedTopicId = previousSelected;
+            alert(response.mensaje || 'No se pudo guardar la selección.');
+            return;
+          }
+
+          alert(response.mensaje || 'Selección guardada correctamente.');
+          this.loadSelectionStatus();
+          this.loadTopicSelectionHistory();
+        });
+      },
+      error: (err) => {
+        this.ngZone.run(() => {
+          this.selectedTopicId = previousSelected;
+          this.isSelectingTopicId = null;
+          alert(this.processService.extractErrorMessage(err));
+          this.loadSelectionStatus();
+        });
+      }
+    });
+  }
+
+  clearProposal(): void {
+    this.proposeForm.reset();
+    this.selectedFile = null;
+    this.selectedFileName = null;
+    this.refreshView();
+  }
+
+  submitProposal(): void {
+    if (this.proposeForm.invalid || !this.selectedModalityId || !this.selectedPeriodoId || !this.canUseProposalTab) {
+      this.proposeForm.markAllAsTouched();
+      return;
+    }
+
+    const payload: RegisterProposalStudentTopicRequestDTO = {
+      idOpcion: this.selectedModalityId,
+      idPeriodo: this.selectedPeriodoId,
+      titulo: this.proposeForm.get('titulo')?.value?.trim() || '',
+      descripcion: this.proposeForm.get('descripcion')?.value?.trim() || '',
+      documento: this.selectedFile
+    };
+
+    this.isSaving = true;
+
+    this.processService.registerProposalStudentTopic(payload).subscribe({
+      next: (response) => {
+        this.ngZone.run(() => {
+          this.isSaving = false;
+          alert(response.mensaje || 'Propuesta registrada correctamente.');
+          this.clearProposal();
+          this.activeTab = 'banco';
+          this.loadSelectionStatus();
+          this.loadStudentProposals();
+        });
+      },
+      error: (err) => {
+        this.ngZone.run(() => {
+          this.isSaving = false;
+          alert(this.processService.extractErrorMessage(err));
+        });
+      }
+    });
+  }
+
+  saveProposalEdition(): void {
+    if (this.editProposalForm.invalid) {
+      this.editProposalForm.markAllAsTouched();
+      return;
+    }
+
+    const idPropuesta = this.editProposalForm.get('idPropuesta')?.value;
+    if (!idPropuesta) return;
+
+    const payload: UpdateStudentProposalRequestDTO = {
+      idOpcion: this.editProposalForm.get('idOpcion')?.value,
+      titulo: this.editProposalForm.get('titulo')?.value?.trim() || '',
+      descripcion: this.editProposalForm.get('descripcion')?.value?.trim() || '',
+      documento: this.editSelectedFile
+    };
+
+    this.isUpdatingProposal = true;
+
+    this.processService.updateStudentProposal(idPropuesta, payload).subscribe({
+      next: (response) => {
+        this.ngZone.run(() => {
+          this.isUpdatingProposal = false;
+          alert(response.mensaje || 'Propuesta actualizada correctamente.');
+          this.cancelEditProposal();
+          this.loadStudentProposals(idPropuesta);
+          this.loadSelectionStatus();
+        });
+      },
+      error: (err) => {
+        this.ngZone.run(() => {
+          this.isUpdatingProposal = false;
+          alert(this.processService.extractErrorMessage(err));
+        });
+      }
+    });
+  }
+
+  openFilePicker(fileInput: HTMLInputElement): void {
+    if (this.canUseProposalTab) {
+      fileInput.click();
+    }
+  }
+
+  openEditFilePicker(fileInput: HTMLInputElement): void {
+    if (this.isEditingProposal) {
+      fileInput.click();
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const result = this.validateSelectedFile(event);
+    this.selectedFile = result.file;
+    this.selectedFileName = result.fileName;
+  }
+
+  onEditFileSelected(event: Event): void {
+    const result = this.validateSelectedFile(event);
+    this.editSelectedFile = result.file;
+    this.editSelectedFileName = result.fileName;
+  }
+
+  private validateSelectedFile(event: Event): { file: File | null; fileName: string | null } {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) {
+      return { file: null, fileName: null };
+    }
+
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+
+    if (!['pdf', 'doc', 'docx'].includes(extension)) {
+      alert('Solo se permiten archivos PDF, DOC o DOCX.');
+      input.value = '';
+      return { file: null, fileName: null };
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('El archivo supera el tamaño máximo permitido de 10 MB.');
+      input.value = '';
+      return { file: null, fileName: null };
+    }
+
+    return { file, fileName: file.name };
+  }
+
   getIconForOption(name: string): string {
-    const nameLower = name.toLowerCase();
+    const lower = name.toLowerCase();
 
-    if (nameLower.includes('investigación') || nameLower.includes('investigacion')) {
-      return 'science';
-    }
-
-    if (nameLower.includes('tecnológico') || nameLower.includes('tecnologico')) {
-      return 'memory';
-    }
-
-    if (nameLower.includes('complexivo')) {
-      return 'quiz';
-    }
-
-    if (nameLower.includes('emprendimiento')) {
-      return 'lightbulb';
-    }
+    if (lower.includes('investigación') || lower.includes('investigacion')) return 'science';
+    if (lower.includes('tecnológico') || lower.includes('tecnologico')) return 'memory';
+    if (lower.includes('complexivo')) return 'quiz';
+    if (lower.includes('emprendimiento')) return 'lightbulb';
 
     return 'library_books';
   }
 
   getSelectedModalityName(): string {
-    if (!this.selectedModalityId) {
-      return '';
-    }
-
-    const selected = this.modalityOptions.find(
-      option => option.idOption === this.selectedModalityId
-    );
-
-    return selected?.name || '';
-  }
-
-  getSaveButtonLabel(): string {
-    return 'Enviar Propuesta';
+    return this.modalityOptions.find(o => o.idOption === this.selectedModalityId)?.name || '';
   }
 
   getProposalStatusLabel(status: string): string {
@@ -466,290 +647,6 @@ export class ProcessSetup implements OnInit {
     if (value === 'correccion') return 'status-warning';
 
     return 'status-neutral-badge';
-  }
-
-  selectModality(idOption: number): void {
-    if (this.selectedModalityId === idOption) {
-      return;
-    }
-
-    this.ngZone.run(() => {
-      this.selectedModalityId = idOption;
-      this.selectedTopicId = null;
-      this.isSelectingTopicId = null;
-
-      this.loadTemas(idOption);
-      this.refreshView();
-    });
-  }
-
-  switchTab(tab: 'banco' | 'proponer'): void {
-    this.activeTab = tab;
-
-    if (tab === 'banco' && this.selectedModalityId) {
-      this.loadTemas(this.selectedModalityId);
-    }
-
-    this.refreshView();
-  }
-
-  selectTopic(id: number): void {
-    if (!this.selectedModalityId) {
-      alert('Debes seleccionar una modalidad de titulación.');
-      return;
-    }
-
-    if (!this.selectedPeriodoId) {
-      alert('Debes seleccionar un período en la barra superior.');
-      return;
-    }
-
-    if (!this.canUseBankTab) {
-      alert(this.selectionStatus?.mensaje || 'No puedes seleccionar o cambiar tema en este momento.');
-      return;
-    }
-
-    const payload: SaveTopicSelectionRequestDTO = {
-      idTema: id,
-      idOpcion: this.selectedModalityId,
-      idPeriodo: this.selectedPeriodoId
-    };
-
-    this.selectedTopicId = id;
-    this.isSelectingTopicId = id;
-    this.refreshView();
-
-    this.processService.saveTopicSelection(payload).subscribe({
-      next: (response) => {
-        this.ngZone.run(() => {
-          this.isSelectingTopicId = null;
-          this.selectedTopicId = id;
-
-          alert(response.message || 'Selección guardada correctamente');
-
-          this.loadSelectionStatus();
-          this.loadStudentProposals();
-          this.refreshView();
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
-          this.isSelectingTopicId = null;
-          this.refreshView();
-          alert(this.processService.extractErrorMessage(err));
-          this.loadSelectionStatus();
-        });
-      }
-    });
-  }
-
-  openFilePicker(fileInput: HTMLInputElement): void {
-    if (!this.canUseProposalTab) {
-      alert(this.selectionStatus?.mensaje || 'No puedes registrar una propuesta en este momento.');
-      return;
-    }
-
-    fileInput.click();
-  }
-
-  openEditFilePicker(fileInput: HTMLInputElement): void {
-    if (!this.isEditingProposal) {
-      return;
-    }
-
-    fileInput.click();
-  }
-
-  onFileSelected(event: Event): void {
-    const result = this.validateSelectedFile(event);
-    this.selectedFile = result.file;
-    this.selectedFileName = result.fileName;
-    this.refreshView();
-  }
-
-  onEditFileSelected(event: Event): void {
-    const result = this.validateSelectedFile(event);
-    this.editSelectedFile = result.file;
-    this.editSelectedFileName = result.fileName;
-    this.refreshView();
-  }
-
-  cancelar(): void {
-    this.selectedTopicId = null;
-    this.isSelectingTopicId = null;
-    this.selectedFile = null;
-    this.selectedFileName = null;
-    this.activeTab = 'banco';
-    this.proposeForm.reset();
-    this.refreshView();
-  }
-
-  guardar(): void {
-    if (!this.selectedModalityId) {
-      alert('Debes seleccionar una modalidad de titulación.');
-      return;
-    }
-
-    if (!this.selectedPeriodoId) {
-      alert('Debes seleccionar un período en la barra superior.');
-      return;
-    }
-
-    if (this.selectionStatus?.desactivadoPorPlazo) {
-      alert(this.selectionStatus.mensaje);
-      return;
-    }
-
-    if (this.activeTab === 'proponer') {
-      this.guardarPropuestaTema();
-      return;
-    }
-
-    alert('Para temas del banco usa el botón "Seleccionar" de cada tema.');
-  }
-
-  saveProposalEdition(): void {
-    if (this.editProposalForm.invalid) {
-      this.editProposalForm.markAllAsTouched();
-      alert('Completa los campos obligatorios de la actualización.');
-      return;
-    }
-
-    const idPropuesta = this.editProposalForm.get('idPropuesta')?.value;
-    if (!idPropuesta) {
-      alert('No se encontró la propuesta a actualizar.');
-      return;
-    }
-
-    const payload: UpdateStudentProposalRequestDTO = {
-      idOpcion: this.editProposalForm.get('idOpcion')?.value,
-      titulo: this.editProposalForm.get('titulo')?.value?.trim() || '',
-      descripcion: this.editProposalForm.get('descripcion')?.value?.trim() || '',
-      documento: this.editSelectedFile
-    };
-
-    this.isUpdatingProposal = true;
-    this.refreshView();
-
-    this.processService.updateStudentProposal(idPropuesta, payload).subscribe({
-      next: (response) => {
-        this.ngZone.run(() => {
-          this.isUpdatingProposal = false;
-          alert(response.mensaje || 'Propuesta actualizada correctamente.');
-          this.cancelEditProposal();
-          this.loadStudentProposals(idPropuesta);
-          this.loadSelectionStatus();
-          this.refreshView();
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
-          this.isUpdatingProposal = false;
-          this.refreshView();
-          alert(this.processService.extractErrorMessage(err));
-        });
-      }
-    });
-  }
-
-  private guardarPropuestaTema(): void {
-    if (this.proposeForm.invalid) {
-      this.proposeForm.markAllAsTouched();
-      alert('Completa los campos obligatorios de la propuesta.');
-      return;
-    }
-
-    if (!this.selectedModalityId) {
-      alert('Debes seleccionar una modalidad de titulación.');
-      return;
-    }
-
-    if (!this.selectedPeriodoId) {
-      alert('Debes seleccionar un período en la barra superior.');
-      return;
-    }
-
-    if (!this.canUseProposalTab) {
-      alert(this.selectionStatus?.mensaje || 'No puedes registrar una propuesta en este momento.');
-      return;
-    }
-
-    const payload: RegisterProposalStudentTopicRequestDTO = {
-      idOpcion: this.selectedModalityId,
-      idPeriodo: this.selectedPeriodoId,
-      titulo: this.proposeForm.get('titulo')?.value?.trim() || '',
-      descripcion: this.proposeForm.get('descripcion')?.value?.trim() || '',
-      documento: this.selectedFile
-    };
-
-    this.isSaving = true;
-    this.refreshView();
-
-    this.processService.registerProposalStudentTopic(payload).subscribe({
-      next: (response) => {
-        this.ngZone.run(() => {
-          this.isSaving = false;
-          alert(response.mensaje || 'Propuesta registrada correctamente.');
-
-          this.resetProposalForm();
-          
-          // OPACIONAL: Enviar de vuelta al dashboard para que vea el stepper actualizado
-          // this.router.navigate(['/dashboard']); 
-          
-          this.activeTab = 'banco';
-          this.loadSelectionStatus();
-          this.loadStudentProposals();
-
-          if (this.selectedModalityId) {
-            this.loadTemas(this.selectedModalityId);
-          }
-
-          this.refreshView();
-        });
-      },
-      error: (err) => {
-        this.ngZone.run(() => {
-          this.isSaving = false;
-          this.refreshView();
-          alert(this.processService.extractErrorMessage(err));
-          this.loadSelectionStatus();
-        });
-      }
-    });
-  }
-
-  private resetProposalForm(): void {
-    this.proposeForm.reset();
-    this.selectedFile = null;
-    this.selectedFileName = null;
-    this.refreshView();
-  }
-
-  private validateSelectedFile(event: Event): { file: File | null; fileName: string | null } {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (!file) {
-      return { file: null, fileName: null };
-    }
-
-    const allowedExtensions = ['pdf', 'doc', 'docx'];
-    const extension = file.name.split('.').pop()?.toLowerCase() || '';
-    const maxBytes = 10 * 1024 * 1024;
-
-    if (!allowedExtensions.includes(extension)) {
-      alert('Solo se permiten archivos PDF, DOC o DOCX.');
-      input.value = '';
-      return { file: null, fileName: null };
-    }
-
-    if (file.size > maxBytes) {
-      alert('El archivo supera el tamaño máximo permitido de 10 MB.');
-      input.value = '';
-      return { file: null, fileName: null };
-    }
-
-    return { file, fileName: file.name };
   }
 
   private refreshView(): void {

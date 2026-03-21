@@ -20,19 +20,17 @@ export interface TemaDTO {
   duracion?: string;
 }
 
-export interface SaveTopicSelectionRequestDTO {
-  idTema: number;
-  idOpcion: number;
+export interface TopicSelectionRequestDTO {
   idPeriodo: number;
+  idOpcion: number;
+  idTema: number | null;
+  idTemaPropuesto?: number | null;
+  motivo?: string | null;
 }
 
-export interface SaveTopicSelectionResponseDTO {
-  message: string;
-  idTema: number;
-  idOpcion: number;
-  idPeriodo: number;
-  fechaLimiteSeleccion: string;
-  cambioTema: boolean;
+export interface TopicSelectionResponseDTO {
+  exito: boolean;
+  mensaje: string;
 }
 
 export interface RegisterProposalStudentTopicRequestDTO {
@@ -123,22 +121,26 @@ export class ProcessSetupService {
 
   constructor(private http: HttpClient) {}
 
-  getActiveOptions(): Observable<DegreeOptionDTO[]> {
-    return this.http.get<DegreeOptionDTO[]>(`${this.degreeOptionsUrl}/active`);
+  getDegreeOptionsByPeriodo(idPeriodo: number): Observable<DegreeOptionDTO[]> {
+    const params = new HttpParams().set('idPeriodo', String(idPeriodo));
+    return this.http.get<DegreeOptionDTO[]>(`${this.degreeOptionsUrl}/by-period`, { params });
   }
 
-  getTemasDisponibles(idOpcion: number): Observable<TemaDTO[]> {
-    const params = new HttpParams().set('idOpcion', idOpcion);
+  getTemasDisponibles(idPeriodo: number, idOpcion: number): Observable<TemaDTO[]> {
+    const params = new HttpParams()
+      .set('idPeriodo', String(idPeriodo))
+      .set('idOpcion', String(idOpcion));
+
     return this.http.get<TemaDTO[]>(`${this.temasUrl}/disponibles`, { params });
   }
 
-  getTopicSelectionStatus(idPeriodo: number): Observable<TopicSelectionStatusDTO> {
-    const params = new HttpParams().set('idPeriodo', idPeriodo);
-    return this.http.get<TopicSelectionStatusDTO>(`${this.temasUrl}/estado`, { params });
+  saveTopicSelection(payload: TopicSelectionRequestDTO): Observable<TopicSelectionResponseDTO> {
+    return this.http.post<TopicSelectionResponseDTO>(`${this.temasUrl}/seleccion`, payload);
   }
 
-  saveTopicSelection(payload: SaveTopicSelectionRequestDTO): Observable<SaveTopicSelectionResponseDTO> {
-    return this.http.post<SaveTopicSelectionResponseDTO>(`${this.temasUrl}/seleccion`, payload);
+  getTopicSelectionStatus(idPeriodo: number): Observable<TopicSelectionStatusDTO> {
+    const params = new HttpParams().set('idPeriodo', String(idPeriodo));
+    return this.http.get<TopicSelectionStatusDTO>(`${this.temasUrl}/estado`, { params });
   }
 
   registerProposalStudentTopic(
@@ -161,7 +163,7 @@ export class ProcessSetupService {
   }
 
   getStudentProposals(idPeriodo: number): Observable<StudentProposalSummaryDTO[]> {
-    const params = new HttpParams().set('idPeriodo', idPeriodo);
+    const params = new HttpParams().set('idPeriodo', String(idPeriodo));
     return this.http.get<StudentProposalSummaryDTO[]>(`${this.temasUrl}/propuestas-estudiante`, { params });
   }
 

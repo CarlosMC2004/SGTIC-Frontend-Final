@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { RequestsTable } from '../../../components/requests-table/requests-table';
 import { StatusCardComponent } from '../../../components/status-card/status-card';
 
@@ -11,7 +11,7 @@ import { StatusCardComponent } from '../../../components/status-card/status-card
   imports: [
     CommonModule,
     SidebarComponent,
-    HeaderComponent,
+    Topbar,
     RequestsTable,
     StatusCardComponent
   ],

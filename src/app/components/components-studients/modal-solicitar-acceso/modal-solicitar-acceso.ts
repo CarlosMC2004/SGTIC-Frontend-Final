@@ -63,7 +63,7 @@ export class SolicitudIngresoModalComponent implements OnInit {
 
   enviarSolicitud() {
     if (this.solicitudForm.valid) {
-      const formValue = this.solicitudForm.value;
+      const formValue = this.solicitudForm.getRawValue(); 
       
       const datosParaBD: RequestAccessDTO = {
         identificacion: formValue.identificacion,
@@ -71,7 +71,7 @@ export class SolicitudIngresoModalComponent implements OnInit {
         nombres: formValue.nombres,
         apellidos: formValue.apellidos,
         idFacultad: Number(formValue.id_facultad),
-        idCarrera: Number(formValue.id_carrera)
+        idCarrera: Number(formValue.id_carrera),
       };
 
       this.onEnviarDatos.emit(datosParaBD);

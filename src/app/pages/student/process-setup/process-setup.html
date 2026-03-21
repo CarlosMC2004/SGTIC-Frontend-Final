@@ -6,8 +6,20 @@
 
     <div class="page-container">
       <div class="page-header">
-        <h1>Configuración de Titulación</h1>
-        <p>Selecciona tu modalidad y define el tema para tu proyecto de grado.</p>
+        <div class="page-header-text">
+          <h1>Configuración de Titulación</h1>
+          <p>Selecciona tu modalidad y define el tema para tu proyecto de grado.</p>
+        </div>
+
+        <button
+          class="history-btn"
+          *ngIf="selectedPeriodoId"
+          (click)="openHistoryModal()"
+        >
+          <span class="material-symbols-outlined">history</span>
+          Historial y Actividad
+          <span class="badge" *ngIf="studentProposals.length > 0">{{ studentProposals.length }}</span>
+        </button>
       </div>
 
       <div class="status-banner status-neutral" *ngIf="!selectedPeriodoId">
@@ -31,7 +43,15 @@
           Modalidad de Titulación
         </h2>
 
-        <div class="modality-grid">
+        <div *ngIf="selectedPeriodoId && isLoadingOptions" class="loading-state">
+          Cargando modalidades de titulación...
+        </div>
+
+        <div *ngIf="selectedPeriodoId && !isLoadingOptions && modalityOptions.length === 0" class="empty-state">
+          No hay modalidades de titulación configuradas para la carrera de este período.
+        </div>
+
+        <div class="modality-grid" *ngIf="modalityOptions.length > 0">
           <div
             class="modality-card"
             *ngFor="let option of modalityOptions"
@@ -42,14 +62,12 @@
               <div class="icon-wrapper">
                 <span class="material-symbols-outlined">{{ getIconForOption(option.name) }}</span>
               </div>
-
               <span
                 class="material-symbols-outlined check-icon"
                 *ngIf="selectedModalityId === option.idOption"
               >
                 check_circle
               </span>
-
               <span
                 class="material-symbols-outlined empty-icon"
                 *ngIf="selectedModalityId !== option.idOption"
@@ -57,7 +75,6 @@
                 radio_button_unchecked
               </span>
             </div>
-
             <h3>{{ option.name }}</h3>
             <p>{{ option.description }}</p>
           </div>
@@ -81,7 +98,6 @@
               <span class="material-symbols-outlined">library_books</span>
               Banco de Temas
             </button>
-
             <button
               type="button"
               class="tab-btn"
@@ -100,8 +116,8 @@
               [class.readonly-panel]="!canUseBankTab"
             >
               <div class="info-note" *ngIf="selectionStatus?.puedeCambiarTema">
-                Ya tienes una selección inicial registrada. Puedes cambiar de tema una sola vez
-                hasta el {{ selectionStatus?.fechaLimiteSeleccion }}.
+                Ya tienes una selección inicial registrada. Puedes cambiar de tema una sola vez hasta el
+                {{ selectionStatus?.fechaLimiteSeleccion }}.
               </div>
 
               <div class="search-bar">
@@ -119,7 +135,10 @@
                 Cargando temas disponibles...
               </div>
 
-              <div *ngIf="!isLoadingTopics && filteredTemas.length === 0" class="empty-state">
+              <div
+                *ngIf="selectedPeriodoId && selectedModalityId && !isLoadingTopics && filteredTemas.length === 0"
+                class="empty-state"
+              >
                 No hay temas disponibles para la modalidad seleccionada.
               </div>
 
@@ -132,16 +151,13 @@
                   <div class="topic-info">
                     <div class="topic-tags">
                       <span class="tag tag-blue">{{ tema.tags[0] }}</span>
-
                       <span class="tag tag-gray">
                         <span class="material-symbols-outlined icon-tiny">schedule</span>
                         {{ tema.tags[1] }}
                       </span>
                     </div>
-
                     <h4>{{ tema.titulo }}</h4>
                     <p>{{ tema.descripcion }}</p>
-
                     <span class="profesor">
                       <span class="material-symbols-outlined icon-tiny">person</span>
                       Propuesto por: {{ tema.profesor }}
@@ -208,9 +224,7 @@
                     class="readonly-input"
                     placeholder="Seleccione una modalidad en el paso 1"
                   >
-                  <small class="text-muted">
-                    Esta opción se toma de la modalidad seleccionada arriba.
-                  </small>
+                  <small class="text-muted">Esta opción se toma de la modalidad seleccionada arriba.</small>
                 </div>
 
                 <div class="form-group">
@@ -239,7 +253,6 @@
                     <span class="material-symbols-outlined upload-icon">cloud_upload</span>
                     <p>Arrastra tu documento aquí o <strong>haz clic para buscar</strong></p>
                     <span class="upload-hint">Tamaño máximo: 10MB (PDF, DOC, DOCX)</span>
-
                     <input
                       type="file"
                       #fileInput
@@ -248,81 +261,103 @@
                       [disabled]="!canUseProposalTab"
                       (change)="onFileSelected($event)"
                     >
-
                     <p *ngIf="selectedFileName" class="file-selected-name">
                       Archivo: {{ selectedFileName }}
                     </p>
                   </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-cancel-inline" (click)="clearProposal()">
+                    Limpiar Formulario
+                  </button>
+                  <button type="button" class="btn-primary" [disabled]="!canSave" (click)="submitProposal()">
+                    {{ isSaving ? 'Guardando...' : 'Enviar Propuesta' }}
+                    <span class="material-symbols-outlined" *ngIf="!isSaving">arrow_forward</span>
+                  </button>
                 </div>
               </form>
             </div>
           </div>
         </div>
       </section>
+    </div>
+  </main>
+</div>
 
-      <section class="config-section">
-        <h2 class="section-title">
-          <span class="step-number">3</span>
-          Historial de Propuestas
-        </h2>
+<div class="custom-modal-overlay" *ngIf="isHistoryModalOpen" (click)="closeHistoryModal()">
+  <div class="custom-modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header-bar">
+      <h2>
+        <span class="material-symbols-outlined">manage_history</span>
+        Historial de Actividad
+      </h2>
+      <button class="btn-icon-close" (click)="closeHistoryModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
 
-        <div *ngIf="!selectedPeriodoId" class="empty-state">
-          Selecciona un período para ver el historial de tus propuestas.
-        </div>
+    <div class="modal-body">
+      <div class="tabs-header modal-tabs">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeHistoryTab === 'propuestas'"
+          (click)="switchHistoryTab('propuestas')"
+        >
+          Mis Propuestas
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeHistoryTab === 'selecciones'"
+          (click)="switchHistoryTab('selecciones')"
+        >
+          Cambios y Selecciones de Tema
+        </button>
+      </div>
 
-        <div *ngIf="selectedPeriodoId && isLoadingProposalList" class="loading-state">
+      <div *ngIf="activeHistoryTab === 'propuestas'">
+        <div *ngIf="isLoadingProposalList" class="loading-state">
           Cargando historial de propuestas...
         </div>
 
-        <div *ngIf="selectedPeriodoId && !isLoadingProposalList && studentProposals.length === 0" class="empty-state">
-          No registras propuestas propias en este período.
+        <div *ngIf="!isLoadingProposalList && studentProposals.length === 0" class="empty-state">
+          No registras propuestas en este período.
         </div>
 
-        <div
-          class="proposal-history-layout"
-          *ngIf="selectedPeriodoId && !isLoadingProposalList && studentProposals.length > 0"
-        >
+        <div class="proposal-history-layout" *ngIf="!isLoadingProposalList && studentProposals.length > 0">
           <div class="proposal-list-column">
             <div
               class="proposal-card"
               *ngFor="let proposal of studentProposals"
               [class.active]="selectedProposal?.idPropuesta === proposal.idPropuesta"
+              (click)="selectProposal(proposal)"
             >
               <div class="proposal-card-header">
                 <div>
                   <h3>{{ proposal.titulo }}</h3>
                   <p>{{ proposal.nombreOpcion || 'Sin opción' }}</p>
                 </div>
-
                 <span class="status-badge" [ngClass]="getProposalStatusClass(proposal.estadoPropuesta)">
                   {{ getProposalStatusLabel(proposal.estadoPropuesta) }}
                 </span>
               </div>
 
               <div class="proposal-card-meta">
-                <span>Versión actual: {{ proposal.numeroVersion }}</span>
-                <span>Total versiones: {{ proposal.totalVersiones }}</span>
+                <span>Versión: {{ proposal.numeroVersion }}</span>
                 <span>Último envío: {{ proposal.fechaEnvio }}</span>
               </div>
 
-              <p class="proposal-snippet">{{ proposal.descripcion }}</p>
-
-              <div class="feedback-box" *ngIf="proposal.feedbackDocente">
-                <strong>Feedback:</strong> {{ proposal.feedbackDocente }}
-              </div>
-
               <div class="proposal-card-actions">
-                <button type="button" class="btn-secondary" (click)="selectProposal(proposal)">
-                  Ver detalle
-                </button>
-
                 <button
                   type="button"
                   class="btn-primary"
+                  style="padding: 6px 12px; font-size: 12px;"
                   *ngIf="proposal.editable"
-                  (click)="startEditProposal(proposal)"
+                  (click)="$event.stopPropagation(); startEditProposal(proposal)"
                 >
-                  Modificar propuesta
+                  Modificar
                 </button>
               </div>
             </div>
@@ -330,7 +365,7 @@
 
           <div class="proposal-detail-column">
             <div *ngIf="!selectedProposal" class="empty-state">
-              Selecciona una propuesta para ver su historial y detalle.
+              Selecciona una propuesta para ver el detalle.
             </div>
 
             <div *ngIf="selectedProposal" class="proposal-detail-card">
@@ -339,7 +374,6 @@
                   <h3>{{ selectedProposal.titulo }}</h3>
                   <p>{{ selectedProposal.nombreOpcion || 'Sin opción' }}</p>
                 </div>
-
                 <span class="status-badge" [ngClass]="getProposalStatusClass(selectedProposal.estadoPropuesta)">
                   {{ getProposalStatusLabel(selectedProposal.estadoPropuesta) }}
                 </span>
@@ -348,49 +382,32 @@
               <div class="proposal-info-grid">
                 <div>
                   <label>Versión actual</label>
-                  <span>{{ selectedProposal.numeroVersion }}</span>
+                  <span>{{ selectedProposal.numeroVersion }} / {{ selectedProposal.totalVersiones }}</span>
                 </div>
-
-                <div>
-                  <label>Total de versiones</label>
-                  <span>{{ selectedProposal.totalVersiones }}</span>
-                </div>
-
                 <div>
                   <label>Último envío</label>
                   <span>{{ selectedProposal.fechaEnvio }}</span>
                 </div>
-
-                <div>
-                  <label>Última actualización</label>
-                  <span>{{ selectedProposal.fechaUltimaActualizacion }}</span>
-                </div>
               </div>
 
               <div class="proposal-content-block">
-                <label>Descripción actual</label>
+                <label>Descripción</label>
                 <p>{{ selectedProposal.descripcion }}</p>
               </div>
 
               <div class="proposal-content-block" *ngIf="selectedProposal.feedbackDocente">
-                <label>Feedback del docente / coordinador</label>
-                <p>{{ selectedProposal.feedbackDocente }}</p>
+                <label>Feedback</label>
+                <div class="feedback-box">{{ selectedProposal.feedbackDocente }}</div>
               </div>
 
-              <div class="proposal-document-row">
-                <a
-                  *ngIf="selectedProposal.urlDocumento"
-                  class="btn-link"
-                  [href]="selectedProposal.urlDocumento"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+              <div class="proposal-document-row" *ngIf="selectedProposal.urlDocumento">
+                <a class="btn-link" [href]="selectedProposal.urlDocumento" target="_blank">
                   Ver documento actual
                 </a>
               </div>
 
               <div class="proposal-edit-panel" *ngIf="isEditingProposal">
-                <h4>Actualizar propuesta pendiente</h4>
+                <h4>Actualizar propuesta</h4>
 
                 <form [formGroup]="editProposalForm" class="form-propose">
                   <div class="form-group">
@@ -414,12 +431,9 @@
                   </div>
 
                   <div class="form-group">
-                    <label>Nuevo documento</label>
+                    <label>Reemplazar documento (Opcional)</label>
                     <div class="upload-zone compact-upload" (click)="openEditFilePicker(editFileInput)">
-                      <span class="material-symbols-outlined upload-icon">cloud_upload</span>
                       <p>Haz clic para reemplazar el documento actual</p>
-                      <span class="upload-hint">Si no subes uno nuevo, se conserva el actual</span>
-
                       <input
                         type="file"
                         #editFileInput
@@ -427,7 +441,6 @@
                         accept=".pdf,.doc,.docx"
                         (change)="onEditFileSelected($event)"
                       >
-
                       <p *ngIf="editSelectedFileName" class="file-selected-name">
                         Archivo: {{ editSelectedFileName }}
                       </p>
@@ -436,9 +449,8 @@
 
                   <div class="edit-actions">
                     <button type="button" class="btn-cancel-inline" (click)="cancelEditProposal()">
-                      Cancelar edición
+                      Cancelar
                     </button>
-
                     <button type="button" class="btn-primary" [disabled]="!canSaveProposalEdit" (click)="saveProposalEdition()">
                       {{ isUpdatingProposal ? 'Actualizando...' : 'Guardar cambios' }}
                     </button>
@@ -446,16 +458,10 @@
                 </form>
               </div>
 
-              <div class="version-section">
-                <h4>Historial de versiones</h4>
+              <div class="version-section" *ngIf="!isEditingProposal">
+                <h4>Historial de versiones de la propuesta</h4>
 
-                <div *ngIf="isLoadingProposalDetail" class="loading-state">
-                  Cargando historial de versiones...
-                </div>
-
-                <div *ngIf="!isLoadingProposalDetail && selectedProposalHistory.length === 0" class="empty-state">
-                  No hay versiones registradas para mostrar.
-                </div>
+                <div *ngIf="isLoadingProposalDetail" class="loading-state">Cargando...</div>
 
                 <div class="version-timeline" *ngIf="!isLoadingProposalDetail && selectedProposalHistory.length > 0">
                   <div class="version-item" *ngFor="let item of selectedProposalHistory">
@@ -464,60 +470,61 @@
                         <span class="version-title">Versión {{ item.numeroVersion }}</span>
                         <span class="current-version-badge" *ngIf="item.esVersionActual">Actual</span>
                       </div>
-
                       <span class="status-badge" [ngClass]="getProposalStatusClass(item.estadoPropuesta)">
                         {{ getProposalStatusLabel(item.estadoPropuesta) }}
                       </span>
                     </div>
 
                     <div class="version-meta">
-                      <span>Opción: {{ item.nombreOpcion || 'Sin opción' }}</span>
-                      <span>Fecha envío: {{ item.fechaEnvio }}</span>
-                      <span>Movimiento: {{ item.fechaMovimiento }}</span>
+                      <span>{{ item.fechaMovimiento || item.fechaEnvio }}</span>
                     </div>
 
                     <h5>{{ item.titulo }}</h5>
-                    <p>{{ item.descripcion }}</p>
 
                     <div class="feedback-box" *ngIf="item.feedbackDocente">
                       <strong>Feedback:</strong> {{ item.feedbackDocente }}
                     </div>
 
-                    <div class="version-reason" *ngIf="item.motivo">
-                      <strong>Motivo / referencia:</strong> {{ item.motivo }}
-                    </div>
-
-                    <a
-                      *ngIf="item.urlDocumento"
-                      class="btn-link"
-                      [href]="item.urlDocumento"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Ver documento de esta versión
+                    <a *ngIf="item.urlDocumento" class="btn-link" [href]="item.urlDocumento" target="_blank">
+                      Ver documento
                     </a>
                   </div>
+                </div>
+
+                <div *ngIf="!isLoadingProposalDetail && selectedProposalHistory.length === 0" class="empty-state">
+                  No hay historial de versiones para esta propuesta.
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <div class="action-bar">
-        <button type="button" class="btn-cancel" (click)="cancelar()">Cancelar</button>
+      <div *ngIf="activeHistoryTab === 'selecciones'">
+        <div *ngIf="isLoadingSelectionsHistory" class="loading-state">
+          Cargando historial de selecciones...
+        </div>
 
-        <button
-          type="button"
-          class="btn-save"
-          [disabled]="!canSave"
-          (click)="guardar()"
-          *ngIf="activeTab === 'proponer'"
-        >
-          {{ isSaving ? 'Guardando...' : getSaveButtonLabel() }}
-          <span class="material-symbols-outlined" *ngIf="!isSaving">arrow_forward</span>
-        </button>
+        <div *ngIf="!isLoadingSelectionsHistory && topicSelectionHistory.length === 0" class="empty-state">
+          No registras cambios de tema en este período.
+        </div>
+
+        <div class="history-simple-list" *ngIf="!isLoadingSelectionsHistory && topicSelectionHistory.length > 0">
+          <div class="history-simple-item" *ngFor="let history of topicSelectionHistory">
+            <div class="history-icon-col">
+              <div class="history-icon-circle">
+                <span class="material-symbols-outlined">swap_horiz</span>
+              </div>
+            </div>
+            <div class="history-content-col">
+              <h4>{{ history.accion }}</h4>
+              <p><strong>Tema seleccionado:</strong> {{ history.tituloTema }}</p>
+              <p><strong>Modalidad:</strong> {{ history.modalidad }}</p>
+              <span class="history-date">{{ history.fecha }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </main>
+  </div>
 </div>

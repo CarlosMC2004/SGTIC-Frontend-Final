@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ChatService } from '../../services/chat';
 import { ChatMessage } from '../../models/chat-message';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-chat',
@@ -15,192 +15,198 @@ import { ChatMessage } from '../../models/chat-message';
   styleUrls: ['./chat.css']
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   messages: ChatMessage[] = [];
   newMessage: string = '';
   userName: string = '';
-  roomId: string = 'general';
-  userRole: string = 'estudiante';
   isConnected: boolean = false;
-  connectionError: string = '';
+  roomId: string = '';
+
+  coordinadores: any[] = [];
+  nombreDestinatario: string = '';
+  idConversacionActual: number = 0;
   replyToMessage: ChatMessage | null = null;
 
-  private usuarios: { [key: number]: string } = {
-    13: 'jperezg@uteq.edu.ec',
-    15: 'coordf1@uteq.edu.ec',
-  };
+  // ← contador de no leídos por sala
+  private unreadPerRoom: Map<number, number> = new Map();
 
   constructor(
     private chatService: ChatService,
-    private route: ActivatedRoute,
     private http: HttpClient,
     private ngZone: NgZone,
-    private location: Location,  //  agregar
-    private cdr: ChangeDetectorRef //  agregado
+    private location: Location,
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.route.params.subscribe(params => {
-      this.roomId = params['id'] || 'general';
+    this.cargarDatosUsuario();
+    this.connectToChat();
+  }
 
-      if (this.roomId === 'coordinator') {
-        this.userName = 'coordf1@uteq.edu.ec';
-        this.userRole = 'coordinador';
-      } else {
-        this.userName = 'jperezg@uteq.edu.ec';
-        this.userRole = 'estudiante';
-      }
+  ngOnDestroy() {
+    this.chatService.setActiveChatRoom(null);
+  }
 
-      this.cargarHistorial();
+  cargarDatosUsuario(): void {
+    const user = this.authService.getCurrentUser();
+    if (user && user.email) {
+      this.userName = user.email;
+      this.cargarListaContactos();
+    }
+  }
 
-      setTimeout(() => {
-        this.connectToChat();
-      }, 0);
+  cargarListaContactos() {
+    const user = this.authService.getCurrentUser();
+    const roles: string[] = user?.roles?.map((r: any) =>
+      typeof r === 'string' ? r : r.name || r.nombre || ''
+    ) || [];
+
+    const esCoordinadorODirector = roles.some(r =>
+      r === 'coordinador_facultad' ||
+      r === 'coordinador_carrera' ||
+      r === 'director_trabajo_titulacion'
+    );
+
+    const emailEncoded = encodeURIComponent(this.userName);
+    const url = esCoordinadorODirector
+      ? `http://localhost:8080/api/usuarios/mis-estudiantes?emailCoordinador=${emailEncoded}`
+      : `http://localhost:8080/api/usuarios/coordinadores?emailEstudiante=${emailEncoded}`;
+
+    this.http.get<any[]>(url).subscribe({
+      next: (data) => {
+        this.coordinadores = data.filter(c => c.idConversacion !== null);
+        this.suscribirseEnBackground();
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error al cargar contactos:', err)
     });
   }
 
-  cargarHistorial() {
-  this.http.get<any[]>('http://localhost:8080/api/chat/historial')
-    .subscribe({
-      next: (historial) => {
+  async suscribirseEnBackground() {
+    await this.connectToChat();
+
+    for (const contacto of this.coordinadores) {
+      const roomId = `conv_${contacto.idConversacion}`;
+      const idConv = contacto.idConversacion;
+
+      this.chatService.subscribeToRoomBackground(roomId, (message: ChatMessage) => {
         this.ngZone.run(() => {
-          this.messages = historial.map(item => {
-            let userEmail = this.usuarios[item.idRemitente] || `usuario_${item.idRemitente}@uteq.edu.ec`;
+          if (message.user === this.userName) return;
+          if (idConv === this.idConversacionActual) return;
 
-            const message: ChatMessage = {
-              id: item.id,
-              message: item.mensaje,
-              user: userEmail,
-              timestamp: new Date(item.fechaEnvio)
-            };
+          const actual = this.unreadPerRoom.get(idConv) || 0;
+          this.unreadPerRoom.set(idConv, actual + 1);
+          this.cdr.detectChanges();
+        });
+      });
+    }
+  }
 
-            if (item.replyToId) {
-              const repliedMessage = historial.find(m => m.id === item.replyToId);
-              if (repliedMessage) {
-                message.replyTo = {
-                  id: item.replyToId,
-                  message: repliedMessage.mensaje,
-                  user: this.usuarios[repliedMessage.idRemitente] || `usuario_${repliedMessage.idRemitente}@uteq.edu.ec`
-                };
-              }
-            }
+  getUnreadCount(idConversacion: number): number {
+    return this.unreadPerRoom.get(idConversacion) || 0;
+  }
 
-            return message;
-          });
+  seleccionarConversacion(idConv: number, nombre: string) {
+    // limpiar badge al abrir la conversación
+    this.unreadPerRoom.set(idConv, 0);
+    this.chatService.clearUnread();
 
-          // ✅ Fuerza repintado y scroll al fondo
+    this.idConversacionActual = idConv;
+    this.nombreDestinatario = nombre;
+    this.roomId = `conv_${idConv}`;
+    this.messages = [];
+    this.replyToMessage = null;
+
+    this.cargarHistorial(idConv);
+
+    this.chatService.joinRoom(this.roomId, (message: ChatMessage) => {
+      this.ngZone.run(() => {
+        this.messages = [...this.messages, message];
+        this.scrollToBottom();
+        this.cdr.detectChanges();
+      });
+    });
+  }
+
+  cargarHistorial(id: number) {
+    this.http.get<any[]>(`http://localhost:8080/api/chat/historial/${id}`)
+      .subscribe({
+        next: (historial) => {
+          this.messages = historial.map(item => ({
+            id: item.id,
+            message: item.mensaje,
+            user: item.correoRemitente,
+            idConversacion: item.idConversacion,
+            timestamp: new Date(item.fechaEnvio),
+            replyTo: item.replyToId ? {
+              id: item.replyToId,
+              message: item.replyToMessage,
+              user: item.replyToUser
+            } : undefined
+          }));
           this.cdr.detectChanges();
           this.scrollToBottom();
-        });
-      },
-      error: (error) => {
-        console.error('❌ Error cargando historial:', error);
-      }
-    });
-}
-
-// ✅ Nuevo método
-private scrollToBottom() {
-  setTimeout(() => {
-    const area = document.querySelector('.messages-area');
-    if (area) area.scrollTop = area.scrollHeight;
-  }, 50);
-}
+        },
+        error: (err) => console.error('Error al cargar historial:', err)
+      });
+  }
 
   async connectToChat() {
     try {
       await this.chatService.initConnectionSocket();
-
-      //  ngZone + cdr.detectChanges() garantizan que Angular pinte el cambio
-      this.ngZone.run(() => {
-        this.isConnected = true;
-        this.connectionError = '';
-        this.cdr.detectChanges();
-      });
-
-      this.joinRoom();
-    } catch (error) {
-      console.error('Error de conexión:', error);
-      this.ngZone.run(() => {
-        this.isConnected = false;
-        this.connectionError = 'No se pudo conectar al servidor.';
-        this.cdr.detectChanges();
-      });
+      this.isConnected = true;
+    } catch (e) {
+      console.error('Error WebSocket:', e);
     }
-  }
-
-  joinRoom() {
-    if (this.userRole === 'coordinador') {
-      ['student', 'coordinator', 'general'].forEach(sala => {
-        this.chatService.joinRoom(sala, (message: ChatMessage) => {
-          this.ngZone.run(() => {
-            this.messages = [...this.messages, message];
-          });
-        });
-      });
-    } else {
-      this.chatService.joinRoom(this.roomId, (message: ChatMessage) => {
-        this.ngZone.run(() => {
-          this.messages = [...this.messages, message];
-        });
-      });
-    }
-  }
-
-  setReplyTo(message: ChatMessage) {
-    this.replyToMessage = message;
-    setTimeout(() => {
-      const input = document.querySelector('.message-input') as HTMLInputElement;
-      if (input) input.focus();
-    }, 100);
-  }
-
-  cancelReply() {
-    this.replyToMessage = null;
-  }
-
-  scrollToMessage(messageId?: number) {
-    if (!messageId) return;
-    setTimeout(() => {
-      const element = document.getElementById(`msg-${messageId}`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        element.classList.add('highlight');
-        setTimeout(() => element.classList.remove('highlight'), 2000);
-      }
-    }, 100);
   }
 
   async sendMessage() {
-    if (this.newMessage.trim() && this.isConnected) {
-      const chatMessage: ChatMessage = {
-        message: this.newMessage,
-        user: this.userName,
-        timestamp: new Date()
+    if (this.idConversacionActual === 0 || !this.newMessage.trim() || !this.isConnected) return;
+
+    const chatMessage: ChatMessage = {
+      message: this.newMessage,
+      user: this.userName,
+      idConversacion: this.idConversacionActual,
+      timestamp: new Date()
+    };
+
+    if (this.replyToMessage) {
+      chatMessage.replyTo = {
+        id: this.replyToMessage.id || 0,
+        message: this.replyToMessage.message,
+        user: this.replyToMessage.user
       };
+    }
 
-      if (this.replyToMessage) {
-        chatMessage.replyTo = {
-          id: this.replyToMessage.id || 0,
-          message: this.replyToMessage.message,
-          user: this.replyToMessage.user
-        };
+    await this.chatService.sendMessage(this.roomId, chatMessage);
+    this.newMessage = '';
+    this.replyToMessage = null;
+    this.scrollToBottom();
+  }
+
+  setReplyTo(message: ChatMessage) { this.replyToMessage = message; }
+  cancelReply() { this.replyToMessage = null; }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      if (this.scrollContainer) {
+        this.scrollContainer.nativeElement.scrollTop =
+          this.scrollContainer.nativeElement.scrollHeight;
       }
+    }, 100);
+  }
 
-      await this.chatService.sendMessage(this.roomId, chatMessage);
-
-      this.ngZone.run(() => {
-        this.newMessage = '';
-        this.replyToMessage = null;
-      });
+  scrollToMessage(id?: number) {
+    if (!id) return;
+    const element = document.getElementById(`msg-${id}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.classList.add('highlight-message');
+      setTimeout(() => element.classList.remove('highlight-message'), 2000);
     }
   }
 
-  ngOnDestroy() {
-    this.chatService.disconnect();
-  }
-  
-  goBack(): void {
-  this.location.back();
-}
+  goBack(): void { this.location.back(); }
 }

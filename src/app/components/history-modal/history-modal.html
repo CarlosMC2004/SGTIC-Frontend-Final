@@ -227,6 +227,24 @@
               </button>
             </div>
           </div>
+
+          <div class="detail-block" style="background-color: #fff1f2; border-color: #fecaca; margin-top: 15px;" 
+               *ngIf="selectedExecution.status === 'SUCCESS' && selectedExecution.backupType === 'FULL' && !selectedExecution.fileDeleted">
+            <span class="label" style="color: #991b1b;">Disaster Recovery</span>
+            <p style="font-size: 13px; color: #7f1d1d; margin: 5px 0 10px;">
+              Este archivo ZIP es un backup completo y válido. Puede utilizarlo para restaurar la base de datos a este punto en el tiempo.
+            </p>
+            <button
+              type="button"
+              class="btn-primary"
+              style="background-color: #dc2626; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"
+              (click)="restoreDatabase(selectedExecution)"
+            >
+              <span class="material-symbols-outlined" style="font-size: 18px;">settings_backup_restore</span>
+              Restaurar Base de Datos
+            </button>
+          </div>
+
         </div>
       </div>
 

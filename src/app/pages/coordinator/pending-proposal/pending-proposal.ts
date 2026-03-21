@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { PendingProposalService } from '../../../services/pending-proposal/pending-proposal';
 import { AuthService } from '../../../services/auth.service';
 import { PendingProposalDTO } from '../../../models/pending-proposal.model';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 
 @Component({
@@ -12,7 +12,7 @@ import { SidebarComponent } from '../../../components/sidebar/sidebar';
   standalone: true,
   imports: [
     CommonModule,
-    HeaderComponent,
+    Topbar,
     SidebarComponent,
     RouterModule
   ],
