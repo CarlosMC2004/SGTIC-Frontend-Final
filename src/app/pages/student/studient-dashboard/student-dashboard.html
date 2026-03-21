@@ -13,14 +13,9 @@
 
     <div class="dashboard-container not-enrolled-state" *ngIf="!isLoading && status && !status.estaMatriculado">
       <div class="empty-state-card text-center">
-        <span class="material-symbols-outlined icon-large-green">school</span>
-        <h2>No estás matriculado en este periodo</h2>
-        <p>Selecciona "Matricularme" para iniciar o continuar tu proceso de titulación en este periodo. El sistema validará tu nivel automáticamente.</p>
-        
-        <button class="btn-submit btn-enroll" (click)="abrirModalMatricula()">
-          <span class="material-symbols-outlined">how_to_reg</span>
-          MATRICULARME EN ESTE PERIODO
-        </button>
+        <span class="material-symbols-outlined icon-large-green">error</span>
+        <h2>No tienes un proceso de titulación activo</h2>
+        <p>No se detectó una matrícula activa en el periodo seleccionado. Si crees que esto es un error, por favor cierra sesión y vuelve a ingresar para forzar la validación, o contacta a coordinación.</p>
       </div>
     </div>
 
@@ -201,40 +196,4 @@
 
     </div>
   </main>
-</div>
-
-<div class="custom-modal-backdrop" *ngIf="mostrarModalMatricula">
-  <div class="custom-modal-container slide-down-animation">
-    
-    <div class="custom-modal-header header-green">
-      <div>
-        <h2>Confirmar Matrícula</h2>
-        <span class="header-subtitle">SGTIC - TITULACIÓN</span>
-      </div>
-      <button class="btn-close-circle" (click)="cerrarModalMatricula()">
-        <span class="material-symbols-outlined icon-small">close</span>
-      </button>
-    </div>
-
-    <div class="custom-modal-body">
-      <div class="modal-icon-wrapper">
-        <span class="material-symbols-outlined icon-modal">article</span>
-      </div>
-      <h3>¿Deseas matricularte en el periodo actual?</h3>
-      <p class="modal-description">
-        Al confirmar, el sistema evaluará tu historial académico para asignarte automáticamente al Nivel 1 (Desarrollo I) o Nivel 2 (Desarrollo II) según corresponda.
-      </p>
-      
-      <div class="modal-actions-flex">
-        <button type="button" class="btn-cancel-modal" (click)="cerrarModalMatricula()">
-          CANCELAR
-        </button>
-        <button type="button" class="btn-confirm-modal" (click)="confirmarMatricula()" [disabled]="isEnrolling">
-          <span class="material-symbols-outlined icon-medium" *ngIf="!isEnrolling">check_circle</span>
-          <span class="material-symbols-outlined icon-medium icon-spin" *ngIf="isEnrolling">autorenew</span>
-          {{ isEnrolling ? 'PROCESANDO...' : 'CONFIRMAR' }}
-        </button>
-      </div>
-    </div>
-  </div>
 </div>

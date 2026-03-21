@@ -37,8 +37,6 @@ export class StudentDashboardd implements OnInit, OnDestroy {
 
   status: DashboardStatus | null = null;
   isLoading = true;
-  mostrarModalMatricula = false;
-  isEnrolling = false;
   
   // Variables dinámicas para el usuario actual
   estudianteId: number = 0;
@@ -58,18 +56,17 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Obtenemos los datos dinámicos de la sesión actual (Ajusta las claves según tu login)
+    // Obtenemos los datos dinámicos de la sesión actual
     this.estudianteId = Number(localStorage.getItem('student_id')) || 0;
     this.usuarioActualEmail = localStorage.getItem('user_email') || '';
 
     if (this.estudianteId === 0) {
       console.warn('SGTIC: No se encontró el ID del estudiante en localStorage. Verifica el login.');
-      // Opcional: Redirigir al login si no hay ID
     }
 
     this.cargarDashboard(this.periodoSeleccionado);
 
-    // Usar flag del servicio para no suscribirse más de una vez
+    // Usar flag del servicio para no suscribirse más de una vez al chat
     if (!this.chatService.isBackgroundSubscribed()) {
       this.chatService.setBackgroundSubscribed(true);
       this.chatService.initConnectionSocket().then(() => {
@@ -98,7 +95,6 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   }
 
   cargarDashboard(periodoId: number): void {
-    // CORRECCIÓN 1: Apagar el loader si no hay ID válido
     if (!this.estudianteId || this.estudianteId === 0) {
       this.isLoading = false;
       this.status = this.getEmptyStatus();
@@ -140,36 +136,6 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   abrirModalAnteproyecto(): void {
     console.log('Solicitud para entregar anteproyecto');
     alert('El gestor de entregables está en construcción.');
-  }
-
-  abrirModalMatricula(): void {
-    this.mostrarModalMatricula = true;
-  }
-
-  cerrarModalMatricula(): void {
-    this.mostrarModalMatricula = false;
-  }
-
-  confirmarMatricula(): void {
-    if (this.estudianteId === 0) return;
-
-    this.isEnrolling = true;
-    const payload = {
-      studentId: this.estudianteId,
-      periodId: this.periodoSeleccionado
-    };
-
-    this.dashboardService.matricularEstudiante(payload).subscribe({
-      next: () => {
-        this.isEnrolling = false;
-        this.cerrarModalMatricula();
-        this.cargarDashboard(this.periodoSeleccionado);
-      },
-      error: (err) => {
-        this.isEnrolling = false;
-        alert('Error al matricular: ' + (err.error?.message || 'Revisa tu historial'));
-      }
-    });
   }
 
   private getEmptyStatus(): DashboardStatus {
