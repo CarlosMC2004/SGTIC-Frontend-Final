@@ -71,16 +71,15 @@
             </div>
           </li>
 
-          <li *ngFor="let msg of unreadMessages" (click)="goToChat()">
-            <span class="material-symbols-outlined icon-small">chat</span>
-            <div class="notification-content">
-              <span class="notification-user">{{ msg.user }}</span>
-              <span class="notification-text">{{ msg.message }}</span>
-              <span class="notification-time">
-                {{ msg.timestamp ? (msg.timestamp | date:'HH:mm') : '' }}
-              </span>
-            </div>
-          </li>
+          <li *ngIf="unreadMessages_count > 0" (click)="goToChat()">
+           <span class="material-symbols-outlined icon-small">chat</span>
+         <div class="notification-content">
+         <span class="notification-user">Chat</span>
+        <span class="notification-text">
+      Tienes <b>{{ unreadMessages_count }}</b> mensaje(s) pendiente(s) sin leer.
+    </span>
+  </div>
+</li>
         </ul>
 
         <ng-template #noNotifications>
