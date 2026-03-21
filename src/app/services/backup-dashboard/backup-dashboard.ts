@@ -345,4 +345,10 @@ export class BackupAdminService {
     const map: Record<string, number> = { SUNDAY: 0, MONDAY: 1, TUESDAY: 2, WEDNESDAY: 3, THURSDAY: 4, FRIDAY: 5, SATURDAY: 6 };
     return map[day] ?? null;
   }
+
+  syncDatabase(adminId: number): Observable<BackupMessageResponse> {
+    return this.http.post<BackupMessageResponse>(`${this.backupBaseUrl}/sync`, null, {
+      params: { adminId: adminId.toString() }
+    });
+  }
 }
