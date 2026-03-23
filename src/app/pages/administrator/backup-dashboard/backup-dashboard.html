@@ -1,4 +1,3 @@
-<!-- src/app/pages/admin/backup-dashboard/backup-dashboard.html -->
 <div class="page-container">
   <header class="page-header">
     <div class="breadcrumb">
@@ -34,7 +33,7 @@
         type="button"
         class="btn-secondary"
         (click)="syncToSecondary()"
-        [disabled]="isRunningBackup || isSyncing || isLoading"
+        [disabled]="isRunningBackup || isSyncing || isLoading || isRestoring"
       >
         <span class="material-symbols-outlined">sync</span>
         {{ isSyncing ? 'Sincronizando...' : 'Sincronizar Réplica' }}
@@ -44,7 +43,7 @@
         type="button"
         class="btn-primary"
         (click)="executeBackupNow()"
-        [disabled]="isRunningBackup || isSyncing || isLoading"
+        [disabled]="isRunningBackup || isSyncing || isLoading || isRestoring"
       >
         <span class="material-symbols-outlined">cloud_upload</span>
         {{ isRunningBackup ? 'Ejecutando...' : 'Ejecutar Respaldo' }}
@@ -194,6 +193,15 @@
                 >
                   sync
                 </span>
+
+                <span
+                  class="material-symbols-outlined action-icon action-icon-danger"
+                  *ngIf="act.status === 'COMPLETADO' && act.fileName?.endsWith('.zip')"
+                  title="Restaurar Base de Datos con este archivo"
+                  (click)="restoreEmergency(act)"
+                >
+                  settings_backup_restore
+                </span>
               </td>
             </tr>
           </tbody>
@@ -235,19 +243,7 @@
   </section>
 </div>
 
-<app-config-modal
-  *ngIf="showConfigModal"
-  (closeModal)="closeConfig()"
-></app-config-modal>
-
-<app-tasks-modal
-  *ngIf="showTasksModal"
-  (closeModal)="closeTasks()"
-></app-tasks-modal>
-
+<app-config-modal *ngIf="showConfigModal" (closeModal)="closeConfig()"></app-config-modal>
+<app-tasks-modal *ngIf="showTasksModal" (closeModal)="closeTasks()"></app-tasks-modal>
 <app-drive-modal *ngIf="showDriveModal" (closeModal)="closeDrive()"></app-drive-modal>
-
-<app-history-modal
-  *ngIf="showHistoryModal"
-  (closeModal)="closeHistory()"
-></app-history-modal>
+<app-history-modal *ngIf="showHistoryModal" (closeModal)="closeHistory()"></app-history-modal>

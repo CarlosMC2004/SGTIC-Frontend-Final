@@ -44,17 +44,12 @@
             <div class="step-icon"><span class="material-symbols-outlined">{{ status.directorAsignado ? 'check' : 'person_search' }}</span></div>
             <div class="step-label">ASIGNACIÓN<br>DE DIRECTOR</div>
           </div>
-          <div class="step-line" [ngClass]="status.reunionesMinimas ? 'completed-line' : 'pending-line'"></div>
-
-          <div class="step" [ngClass]="status.reunionesMinimas ? 'completed' : 'pending'">
-            <div class="step-icon"><span class="material-symbols-outlined">{{ status.reunionesMinimas ? 'check' : 'group' }}</span></div>
-            <div class="step-label">REUNIONES<br>MÍNIMAS</div>
-          </div>
+          
           <div class="step-line" [ngClass]="status.defensaAnteproyecto ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.defensaAnteproyecto ? 'completed' : 'pending'">
             <div class="step-icon"><span class="material-symbols-outlined">{{ status.defensaAnteproyecto ? 'check' : 'description' }}</span></div>
-            <div class="step-label">DEFENSA DE<br>ANTEPROYECTO</div>
+            <div class="step-label">Presentación DE<br>ANTEPROYECTO</div>
           </div>
 
           <div class="level-separator">NIVEL 2</div>
@@ -67,7 +62,10 @@
           <div class="step-line" [ngClass]="status.asistenciaTutorias ? 'completed-line' : 'pending-line'"></div>
 
           <div class="step" [ngClass]="status.asistenciaTutorias ? 'completed' : 'pending'">
-            <div class="step-icon"><span class="material-symbols-outlined">{{ status.asistenciaTutorias ? 'check' : 'event' }}</span></div>
+            <div class="step-icon">
+              <span class="material-symbols-outlined" *ngIf="status.asistenciaTutorias">check</span>
+              <span class="fraction-text" *ngIf="!status.asistenciaTutorias">{{ status.totalTutorias || 0 }}/{{ status.minimoTutorias || 0 }}</span>
+            </div>
             <div class="step-label">ASISTENCIA A<br>TUTORÍAS</div>
           </div>
           <div class="step-line" [ngClass]="status.predefensa ? 'completed-line' : 'pending-line'"></div>
@@ -144,7 +142,7 @@
           <div class="section-header">
             <div class="title-with-icon">
               <span class="material-symbols-outlined">groups</span>
-              <h2>5 Tutorías Obligatorias del Período</h2>
+              <h2>{{ totalTutoriasObligatorias }} Tutorías Obligatorias del Período</h2>
             </div>
             <span class="period-summary">{{ tutoriasCumplidas }} / {{ totalTutoriasObligatorias }} cumplidas</span>
           </div>

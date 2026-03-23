@@ -17,7 +17,7 @@ import {
   BackupDashboardViewModel,
   BackupMessageResponse,
   RecentActivityItem
-} from '../../../services/backup-dashboard/backup-dashboard';
+} from '../../../services/backup-dashboard/backup-dashboard'; // Asegúrate de que esta ruta coincida con la real de tu servicio
 
 @Component({
   selector: 'app-backup-dashboard',
@@ -38,6 +38,8 @@ export class BackupDashboard implements OnInit, AfterViewInit, OnDestroy {
 
   isLoading = true;
   isRunningBackup = false;
+  isSyncing = false;
+  isRestoring = false; // <-- Nuevo estado para bloqueo de UI
   errorMessage = '';
 
   dashboard: BackupDashboardViewModel = {
@@ -60,7 +62,7 @@ export class BackupDashboard implements OnInit, AfterViewInit, OnDestroy {
     private readonly backupAdminService: BackupAdminService,
     private readonly router: Router,
     private readonly authService: AuthService,
-    private readonly cdr: ChangeDetectorRef // <-- INYECTADO AQUÍ
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -88,7 +90,7 @@ export class BackupDashboard implements OnInit, AfterViewInit, OnDestroy {
     this.isFetchingDashboard = true;
     if (!silent) this.isLoading = true;
     this.errorMessage = '';
-    this.cdr.detectChanges(); // Forzar actualización visual del loader
+    this.cdr.detectChanges();
 
     this.backupAdminService
       .getDashboardData()
@@ -97,25 +99,25 @@ export class BackupDashboard implements OnInit, AfterViewInit, OnDestroy {
         finalize(() => { 
           this.isFetchingDashboard = false; 
           this.isLoading = false; 
-          this.cdr.detectChanges(); // Forzar al terminar
+          this.cdr.detectChanges(); 
         }),
         takeUntil(this.destroy$)
       )
       .subscribe({
         next: (data: BackupDashboardViewModel) => { 
           this.dashboard = data; 
-          this.cdr.detectChanges(); // <-- LA MAGIA
+          this.cdr.detectChanges(); 
         },
         error: (error: unknown) => {
           console.error('Error cargando dashboard', error);
           this.errorMessage = this.extractErrorMessage(error);
-          this.cdr.detectChanges(); // <-- LA MAGIA
+          this.cdr.detectChanges();
         }
       });
   }
 
   executeBackupNow(): void {
-    if (this.isRunningBackup) return;
+    if (this.isRunningBackup || this.isRestoring) return;
 
     Swal.fire({
       title: 'Ejecutar Respaldo Manual',
@@ -172,65 +174,58 @@ export class BackupDashboard implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
-  openConfig(): void { this.showConfigModal = true; this.cdr.detectChanges(); }
-  closeConfig(): void { this.showConfigModal = false; this.loadDashboard(true, true); }
-  openTasks(): void { this.showTasksModal = true; this.cdr.detectChanges(); }
-  closeTasks(): void { this.showTasksModal = false; this.loadDashboard(true, true); }
-  openDrive(): void { this.showDriveModal = true; this.cdr.detectChanges(); }
-  closeDrive(): void { this.showDriveModal = false; this.loadDashboard(true, true); }
-  openHistory(): void { this.showHistoryModal = true; this.cdr.detectChanges(); }
-  closeHistory(): void { this.showHistoryModal = false; this.loadDashboard(true, true); }
+  // --- NUEVA LÓGICA DE RESTAURACIÓN DE EMERGENCIA ---
+  restoreEmergency(act: RecentActivityItem): void {
+    if (!act.fileName) {
+      Swal.fire('Error', 'No se encontró un archivo asociado a este respaldo.', 'error');
+      return;
+    }
 
-  trackByRecentActivity(_: number, item: RecentActivityItem): string { return item.id; }
+    Swal.fire({
+      title: '¡ALERTA CRÍTICA!',
+      html: `Va a restaurar la base de datos principal usando el archivo <b>${act.fileName}</b>.<br><br><b>ESTO BORRARÁ TODOS LOS DATOS ACTUALES DE LA BASE PRINCIPAL y los reemplazará.</b><br><br>¿Está absolutamente seguro de proceder?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626', // Rojo alerta
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Sí, RESTAURAR SISTEMA',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isRestoring = true;
+        this.cdr.detectChanges();
 
-  private listenRouteChanges(): void {
-    this.router.events
-      .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((event: NavigationEnd) => {
-        if (event.urlAfterRedirects.includes('/admin/backups')) {
-          setTimeout(() => { this.loadDashboard(true, true); }, 50);
-        }
-      });
-  }
+        Swal.fire({
+          title: 'Restaurando Sistema...',
+          text: 'Recreando la base de datos e inyectando datos. Esto puede tomar unos minutos, NO CIERRE esta página.',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
 
-  private startAutoRefresh(): void {
-    const periodicRefresh$ = interval(this.AUTO_REFRESH_MS);
-    const focusRefresh$ = fromEvent(window, 'focus');
-    const visibilityRefresh$ = fromEvent(document, 'visibilitychange').pipe(filter(() => document.visibilityState === 'visible'));
-
-    merge(periodicRefresh$, focusRefresh$, visibilityRefresh$)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => { if (this.canAutoRefresh()) this.loadDashboard(true, false); });
-  }
-
-  private canAutoRefresh(): boolean { return !this.isRunningBackup && !this.hasOpenModal(); }
-  private hasOpenModal(): boolean { return (this.showConfigModal || this.showTasksModal || this.showDriveModal || this.showHistoryModal); }
-
-  private extractErrorMessage(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      const backendError = error.error as { message?: string; error?: string } | string | null | undefined;
-      if (typeof backendError === 'string' && backendError.trim()) return backendError;
-      if (backendError && typeof backendError === 'object') {
-        if (backendError.message) return backendError.message;
-        if (backendError.error) return backendError.error;
+        this.backupAdminService.emergencyRestore(act.fileName).subscribe({
+          next: (res) => {
+            this.isRestoring = false;
+            Swal.fire({
+              title: '¡Restauración Exitosa!',
+              text: res.message,
+              icon: 'success',
+              confirmButtonText: 'Entendido'
+            });
+            this.loadDashboard(true, true);
+          },
+          error: (err) => {
+            this.isRestoring = false;
+            Swal.fire('Error Crítico', this.extractErrorMessage(err), 'error');
+            this.loadDashboard(true, true);
+          }
+        });
       }
-      if (error.message) return error.message;
-      return 'No se pudo completar la operación.';
-    }
-    if (error instanceof Error) {
-      if (error.name === 'TimeoutError') return 'La carga del dashboard tardó demasiado. Revise la conexión o el backend.';
-      return error.message;
-    }
-    return 'No se pudo completar la operación.';
+    });
   }
-
-  isSyncing = false;
+  // --------------------------------------------------
 
   syncToSecondary(): void {
-    if (this.isRunningBackup || this.isSyncing) return;
+    if (this.isRunningBackup || this.isSyncing || this.isRestoring) return;
 
     Swal.fire({
       title: 'Sincronizar Base de Datos',
@@ -268,5 +263,60 @@ export class BackupDashboard implements OnInit, AfterViewInit, OnDestroy {
         });
       }
     });
+  }
+
+  openConfig(): void { this.showConfigModal = true; this.cdr.detectChanges(); }
+  closeConfig(): void { this.showConfigModal = false; this.loadDashboard(true, true); }
+  openTasks(): void { this.showTasksModal = true; this.cdr.detectChanges(); }
+  closeTasks(): void { this.showTasksModal = false; this.loadDashboard(true, true); }
+  openDrive(): void { this.showDriveModal = true; this.cdr.detectChanges(); }
+  closeDrive(): void { this.showDriveModal = false; this.loadDashboard(true, true); }
+  openHistory(): void { this.showHistoryModal = true; this.cdr.detectChanges(); }
+  closeHistory(): void { this.showHistoryModal = false; this.loadDashboard(true, true); }
+
+  trackByRecentActivity(_: number, item: RecentActivityItem): string { return item.id; }
+
+  private listenRouteChanges(): void {
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event: NavigationEnd) => {
+        if (event.urlAfterRedirects.includes('/admin/backups')) {
+          setTimeout(() => { this.loadDashboard(true, true); }, 50);
+        }
+      });
+  }
+
+  private startAutoRefresh(): void {
+    const periodicRefresh$ = interval(this.AUTO_REFRESH_MS);
+    const focusRefresh$ = fromEvent(window, 'focus');
+    const visibilityRefresh$ = fromEvent(document, 'visibilitychange').pipe(filter(() => document.visibilityState === 'visible'));
+
+    merge(periodicRefresh$, focusRefresh$, visibilityRefresh$)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => { if (this.canAutoRefresh()) this.loadDashboard(true, false); });
+  }
+
+  private canAutoRefresh(): boolean { return !this.isRunningBackup && !this.isRestoring && !this.hasOpenModal(); }
+  private hasOpenModal(): boolean { return (this.showConfigModal || this.showTasksModal || this.showDriveModal || this.showHistoryModal); }
+
+  private extractErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const backendError = error.error as { message?: string; error?: string } | string | null | undefined;
+      if (typeof backendError === 'string' && backendError.trim()) return backendError;
+      if (backendError && typeof backendError === 'object') {
+        if (backendError.message) return backendError.message;
+        if (backendError.error) return backendError.error;
+      }
+      if (error.message) return error.message;
+      return 'No se pudo completar la operación.';
+    }
+    if (error instanceof Error) {
+      if (error.name === 'TimeoutError') return 'La carga del dashboard tardó demasiado. Revise la conexión o el backend.';
+      return error.message;
+    }
+    return 'No se pudo completar la operación.';
   }
 }

@@ -127,6 +127,7 @@ export interface RecentActivityItem {
   origin: string;
   size: string;
   status: 'COMPLETADO' | 'FALLIDO' | 'EN EJECUCIÓN';
+  fileName: string; // <-- AÑADIDO PARA SABER QUÉ ARCHIVO RESTAURAR
 }
 
 export interface BackupDashboardViewModel {
@@ -172,7 +173,6 @@ export class BackupAdminService {
     return this.http.get<BackupExecutionResponse[]>(`${this.backupBaseUrl}/executions`);
   }
 
-  // --- NUEVOS MÉTODOS PARA BACKUP MANUAL Y RESTORE ---
   runManualBackup(type: string, adminId: number): Observable<BackupMessageResponse> {
     return this.http.post<BackupMessageResponse>(`${this.backupBaseUrl}/run`, null, {
       params: { type, adminId: adminId.toString() }
@@ -184,7 +184,14 @@ export class BackupAdminService {
       params: { adminId: adminId.toString() }
     });
   }
-  // ---------------------------------------------------
+
+  // --- NUEVO: ENDPOINT DE EMERGENCIA PARA RESTAURAR ---
+  emergencyRestore(fileName: string): Observable<BackupMessageResponse> {
+    return this.http.post<BackupMessageResponse>(`${this.apiBase}/api/backup/emergency-restore`, null, {
+      params: { fileName }
+    });
+  }
+  // ----------------------------------------------------
 
   getSchedules(): Observable<BackupScheduleResponse[]> {
     return this.http.get<BackupScheduleResponse[]>(this.scheduleBaseUrl);
@@ -259,7 +266,8 @@ export class BackupAdminService {
             time: this.timeAgo(e.startedAt),
             origin: `${e.backupType} / ${e.triggeredBy}`,
             size: this.formatBytes(e.fileSizeBytes),
-            status: this.mapStatus(e.status)
+            status: this.mapStatus(e.status),
+            fileName: e.fileName || '' // <-- AÑADIDO PARA LA RESTAURACIÓN
           })),
           nodeTitle: config.localPath || 'Servidor local',
           nodeStatus: config.active ? 'Online' : 'Offline',

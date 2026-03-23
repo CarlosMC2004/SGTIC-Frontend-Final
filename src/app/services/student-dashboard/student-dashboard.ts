@@ -7,7 +7,6 @@ export interface DashboardStatus {
   prerequisitosNivel1: boolean;
   temaSeleccionado: boolean;
   directorAsignado: boolean;
-  reunionesMinimas: boolean;
   defensaAnteproyecto: boolean;
   prerequisitosNivel2: boolean;
   asistenciaTutorias: boolean;
@@ -17,6 +16,7 @@ export interface DashboardStatus {
   nombreDirector?: string;
   nombreOpcion?: string;
   totalTutorias?: number;
+  minimoTutorias?: number;
 }
 
 @Injectable({

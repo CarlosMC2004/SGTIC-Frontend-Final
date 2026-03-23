@@ -769,7 +769,7 @@
 }
 
 @media (max-width: 768px) {
-  .layout-wrapper { padding-left: 0; /* Asumiendo que colapsas el sidebar en móvil */ }
+  .layout-wrapper { padding-left: 0; }
   
   .stepper {
     flex-direction: column;
@@ -797,8 +797,17 @@
   .tutoria-card { flex-wrap: wrap; }
   .badge-estado { margin-left: 56px; }
   
-  /* Ajuste responsivo para la nueva tarjeta de acción */
   .action-card { flex-direction: column; text-align: center; }
   .action-card .btn-action { width: 100%; justify-content: center; }
   .action-status { justify-content: center; width: 100%; }
+}
+
+.fraction-text {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

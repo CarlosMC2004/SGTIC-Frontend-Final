@@ -43,7 +43,7 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   usuarioActualEmail: string = '';
   
   periodoSeleccionado = 1;
-  totalTutoriasObligatorias = 5;
+  totalTutoriasObligatorias = 0;
   tutoriasObligatoriasPeriodo: TutoriaObligatoria[] = [];
 
   tutorias: Tutoria[] = [
@@ -56,7 +56,6 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Obtenemos los datos dinámicos de la sesión actual
     this.estudianteId = Number(localStorage.getItem('student_id')) || 0;
     this.usuarioActualEmail = localStorage.getItem('user_email') || '';
 
@@ -66,13 +65,11 @@ export class StudentDashboardd implements OnInit, OnDestroy {
 
     this.cargarDashboard(this.periodoSeleccionado);
 
-    // Usar flag del servicio para no suscribirse más de una vez al chat
     if (!this.chatService.isBackgroundSubscribed()) {
       this.chatService.setBackgroundSubscribed(true);
       this.chatService.initConnectionSocket().then(() => {
         ['student', 'coordinator'].forEach(sala => {
           this.chatService.joinRoom(sala, (message) => {
-            // Validación dinámica con el correo del usuario actual
             if (message.user !== this.usuarioActualEmail) {
               this.chatService.incrementUnread(message);
             }
@@ -85,7 +82,6 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // No desconectar para mantener suscripción activa
   }
 
   onPeriodoChange(periodoId: number): void {
@@ -110,6 +106,7 @@ export class StudentDashboardd implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.status = data;
           if (this.status.estaMatriculado) {
+            this.totalTutoriasObligatorias = data.minimoTutorias || 0;
             this.generarTutoriasObligatorias(data.totalTutorias ?? 0);
           }
           this.isLoading = false;
@@ -120,6 +117,7 @@ export class StudentDashboardd implements OnInit, OnDestroy {
         console.error('Error al cargar el progreso:', err);
         this.ngZone.run(() => {
           this.status = this.getEmptyStatus();
+          this.totalTutoriasObligatorias = 0;
           this.generarTutoriasObligatorias(0);
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -142,9 +140,9 @@ export class StudentDashboardd implements OnInit, OnDestroy {
     return {
       estaMatriculado: false,
       prerequisitosNivel1: false, temaSeleccionado: false, directorAsignado: false,
-      reunionesMinimas: false, defensaAnteproyecto: false, prerequisitosNivel2: false,
+      defensaAnteproyecto: false, prerequisitosNivel2: false,
       asistenciaTutorias: false, predefensa: false, defensaFinal: false,
-      nombreTema: '', nombreDirector: '', nombreOpcion: '', totalTutorias: 0
+      nombreTema: '', nombreDirector: '', nombreOpcion: '', totalTutorias: 0, minimoTutorias: 0
     };
   }
 
