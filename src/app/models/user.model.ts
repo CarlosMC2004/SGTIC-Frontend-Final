@@ -35,6 +35,7 @@ export interface User {
   username?: string;
   active: boolean;
   roles: string[];
+  lastLogin?: string;
 }
 
 export interface RoleDTO {
