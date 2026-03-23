@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { Topbar } from '../../../components/top-bar/top-bar';
@@ -34,6 +35,7 @@ export class StudentDashboardd implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly chatService = inject(ChatService);
+  private readonly router = inject(Router);
 
   status: DashboardStatus | null = null;
   isLoading = true;
@@ -83,6 +85,10 @@ export class StudentDashboardd implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
   }
+  
+  contactarDirector(): void {
+  this.router.navigate(['/chat/student']);
+}
 
   onPeriodoChange(periodoId: number): void {
     if (!periodoId || periodoId === this.periodoSeleccionado) return;

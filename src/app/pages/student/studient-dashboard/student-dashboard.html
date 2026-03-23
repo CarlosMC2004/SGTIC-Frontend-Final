@@ -133,7 +133,11 @@
             <span class="card-subtitle">DIRECTOR ASIGNADO</span>
             <span class="card-title">{{ status.nombreDirector || 'Por asignar' }}</span>
           </div>
-          <button class="btn-outline-green" [disabled]="!status.directorAsignado">CONTACTAR</button>
+          <button class="btn-outline-green" 
+        [disabled]="!status?.directorAsignado"
+        (click)="contactarDirector()">
+         CONTACTAR
+          </button>
         </div>
       </section>
 
