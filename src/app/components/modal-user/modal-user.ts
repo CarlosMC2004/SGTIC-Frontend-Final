@@ -55,6 +55,7 @@ export class UserModalComponent implements OnInit {
     this.loadRoles();
     this.loadFaculties();
     this.loadPeriods();
+    this.cdr.detectChanges();
 
     if (this.user) {
       this.isEditing = true;
@@ -87,6 +88,7 @@ export class UserModalComponent implements OnInit {
       next: (roles) => this.availableRoles = roles,
       error: (err) => console.error('Error cargando roles:', err)
     });
+    this.cdr.detectChanges();
   }
 
   loadPeriods() {

@@ -24,3 +24,8 @@ export interface AssignedWorkDTO {
   studentName: string;
   title: string;
 }
+
+export interface TutorshipReportDTO {
+  attendance: boolean;
+  observations: string;
+}

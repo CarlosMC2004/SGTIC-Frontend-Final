@@ -1,16 +1,17 @@
 import {Component, inject, OnInit, ChangeDetectorRef, forwardRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Topbar } from '../../../components/top-bar/top-bar';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { ScheduleTutorshipModalComponent, AssignedWorkOption } from '../../../components/modal-schedule-tutorship/modal-schedule-tutorship';
 import { TutorshipService } from '../../../services/tutorship/tutorship';
-import { TutorshipRequestDTO,TutorshipResponseDTO, AssignedWorkDTO } from '../../../models/tutorship.model';
-import {FormBuilder} from '@angular/forms';
+import { TutorshipReportDTO,TutorshipResponseDTO, AssignedWorkDTO } from '../../../models/tutorship.model';
+import { Topbar } from '../../../components/top-bar/top-bar';
+import { ModalReportTutorship } from '../../../components/modal-report-tutorship/modal-report-tutorship';
+
 
 @Component({
   selector: 'app-director-tutorships',
   standalone: true,
-  imports: [CommonModule, Topbar, SidebarComponent, ScheduleTutorshipModalComponent],
+  imports: [CommonModule, SidebarComponent, ScheduleTutorshipModalComponent, Topbar, ModalReportTutorship],
   templateUrl: './tutorships.html',
   styleUrls: ['./tutorships.css']
 })
@@ -23,6 +24,9 @@ export class TutorshipsComponent implements OnInit {
   activeTab: 'upcoming' | 'history' = 'upcoming';
   isScheduleModalOpen = false;
   assignedWorksForSelect: AssignedWorkDTO[] = [];
+  isReportModalOpen = false;
+  isScheduling = false;
+  selectedTutoringId!: number;
 
   ngOnInit(): void {
     this.loadTutorships();
@@ -50,6 +54,35 @@ export class TutorshipsComponent implements OnInit {
       }
     });
   }
+  openReportModal(id: number) {
+    console.log('Abriendo modal para la tutoría:', id);
+    this.selectedTutoringId = id;
+    this.isReportModalOpen = true;
+  }
+
+  handleReportSaved() {
+    this.isReportModalOpen = false;
+    this.loadTutorships();
+  }
+
+  downloadReport(id: number) {
+    this.tutorshipService.downloadReport(id).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `informe_tutoria_${id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error al descargar el informe:', err);
+        alert('No se pudo descargar el archivo. Es posible que el archivo no exista en el servidor.');
+      }
+    });
+  }
   openScheduleModal() {
     this.isScheduleModalOpen = true;
   }
@@ -57,13 +90,15 @@ export class TutorshipsComponent implements OnInit {
     this.isScheduleModalOpen = false;
   }
   handleScheduleSave(data: any) {
+    this.isScheduling = true;
     this.tutorshipService.scheduleTutorship(data).subscribe({
       next: (response) => {
-        alert('Reunión agendada exitosamente en el sistema.');
+        this.isScheduling = false;
         this.closeScheduleModal();
         this.loadTutorships();
       },
       error: (err) => {
+        this.isScheduling = false;
         console.error('Error al agendar la reunión:', err);
         const errorMsg = err.error?.error || 'Ocurrió un error al agendar la reunión.';
         alert(errorMsg);
@@ -81,11 +116,6 @@ export class TutorshipsComponent implements OnInit {
       return this.tutorships.filter(t => t.status === 'completed');
     }
   }
-
-  openReportModal(tutorshipId: number) {
-    alert(`Abrir modal para subir informe de la tutoría #${tutorshipId}`);
-  }
-
   acceptProposal(tutorshipId: number) {
     alert(`Tutoría #${tutorshipId} aceptada y agendada.`);
   }

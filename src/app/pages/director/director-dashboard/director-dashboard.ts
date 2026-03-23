@@ -54,7 +54,7 @@ export class DirectorDashboardComponent implements OnInit {
     // 2. Cargar Tutorías (Para el panel lateral derecho)
     this.tutorshipService.getMyTutorships().subscribe({
       next: (tutorships) => {
-        this.proximasAsesorias = tutorships.filter(t => t.status !== 'completed');
+        this.proximasAsesorias = tutorships.filter(t => t.status !== 'completed').reverse();
         this.stats.asesoriasPendientes = this.proximasAsesorias.length;
         if (this.proximasAsesorias.length > 0) {
           const prox = this.proximasAsesorias[0];

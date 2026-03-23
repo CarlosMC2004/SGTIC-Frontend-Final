@@ -19,6 +19,7 @@ export interface AssignedWorkOption {
 export class ScheduleTutorshipModalComponent implements OnInit {
 
   @Input() assignedWorks: AssignedWorkDTO[] = [];
+  @Input() isSubmitting: boolean = false;
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<any>();
