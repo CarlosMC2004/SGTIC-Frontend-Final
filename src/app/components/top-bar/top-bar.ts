@@ -10,6 +10,7 @@ import { AdmissionRequestsService } from '../../services/admission-requests.serv
 import { PendingProposalService } from '../../services/pending-proposal/pending-proposal';
 import { TeacherAssignmentService } from '../../services/teacher-assignment/teacher-assignment.service';
 import { ChangePasswordModal } from '../modal-change-password/modal-change-password';
+import { ThemeService } from '../../services/themes/theme';
 
 @Component({
   selector: 'app-topbar',
@@ -46,7 +47,8 @@ export class Topbar implements OnInit {
     private admissionRequestsService: AdmissionRequestsService,
     private pendingProposalService: PendingProposalService,
     private teacherAssignmentService: TeacherAssignmentService,
-    private http: HttpClient
+    private http: HttpClient,
+    public themeService: ThemeService // ← agregado
   ) {}
 
   get totalNotifications(): number {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 
 export interface CertifiableWork {
@@ -15,7 +15,7 @@ export interface CertifiableWork {
 @Component({
   selector: 'app-director-certifications',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, SidebarComponent],
+  imports: [CommonModule, Topbar, SidebarComponent],
   templateUrl: './certifications.html',
   styleUrls: ['./certifications.css']
 })

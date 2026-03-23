@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { TutorshipService } from '../../../services/tutorship/tutorship';
 import {FormGroup, FormsModule} from '@angular/forms';
@@ -8,7 +8,7 @@ import {FormGroup, FormsModule} from '@angular/forms';
 @Component({
   selector: 'app-director-dashboard',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, SidebarComponent, FormsModule],
+  imports: [CommonModule, Topbar, SidebarComponent, FormsModule],
   templateUrl: './director-dashboard.html',
   styleUrls: ['./director-dashboard.css']
 })

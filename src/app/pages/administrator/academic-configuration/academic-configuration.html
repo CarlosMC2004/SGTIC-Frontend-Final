@@ -1,14 +1,6 @@
-<header class="page-header-bar">
-  <div class="breadcrumbs">
-    <span class="text-muted">Panel de Control</span>
-    <span class="separator">›</span>
-    <span class="current">Configuración Académica</span>
-  </div>
-</header>
-
 <div class="page-header-flex">
   <div>
-    <h2 class="page-title">Configuración Académica</h2>
+    <h1 class="page-title">Configuración Académica</h1>
     <p class="page-subtitle">Gestión de modalidades de titulación y áreas de conocimiento</p>
   </div>
   <button class="btn-primary" (click)="openModal()">
@@ -33,7 +25,10 @@
 <div class="tab-content" *ngIf="activeTab === 'degrees'">
   <div class="card-container">
 
-    <div class="modality-item" *ngFor="let option of degreeOptions">
+    <div class="modality-item"
+         *ngFor="let option of degreeOptions"
+         [style.display]="option.hidden ? 'none' : 'flex'">
+
       <div class="modality-info">
         <div class="modality-icon">
           <span class="material-symbols-outlined">{{ option.icon }}</span>
@@ -51,9 +46,20 @@
             <div class="toggle-circle"></div>
           </div>
         </div>
-        <button class="btn-icon">
-          <span class="material-symbols-outlined">more_vert</span>
-        </button>
+
+        <!-- Menú con opción ocultar -->
+        <div class="action-menu-wrapper">
+          <button class="btn-icon" (click)="toggleMenu(option.id); $event.stopPropagation()">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+          <div class="action-dropdown" *ngIf="openMenuId === option.id" (click)="$event.stopPropagation()">
+            <button (click)="toggleVisibility(option); openMenuId = null">
+              <span class="material-symbols-outlined">{{ option.hidden ? 'visibility' : 'visibility_off' }}</span>
+              {{ option.hidden ? 'Mostrar' : 'Eliminar' }}
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
 

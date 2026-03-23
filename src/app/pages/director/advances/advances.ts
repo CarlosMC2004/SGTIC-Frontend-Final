@@ -1,6 +1,6 @@
 import {Component, inject, OnInit, ChangeDetectorRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../../../components/header/header';
+import { Topbar } from '../../../components/top-bar/top-bar';
 import { SidebarComponent } from '../../../components/sidebar/sidebar';
 import { RequestAdvanceModalComponent } from '../../../components/modal-request-advance/modal-request-advance';
 import { TutorshipService } from '../../../services/tutorship/tutorship';
@@ -18,7 +18,7 @@ export interface AdvanceDocument {
 @Component({
   selector: 'app-director-advances',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, SidebarComponent, RequestAdvanceModalComponent],
+  imports: [CommonModule, Topbar, SidebarComponent, RequestAdvanceModalComponent],
   templateUrl: './advances.html',
   styleUrls: ['./advances.css']
 })

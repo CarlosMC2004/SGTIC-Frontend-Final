@@ -1,4 +1,5 @@
 <header class="topbar">
+  <div class="mejora">Sistema de Gestion de trabajos Curricular</div>
   <div class="topbar-left"></div>
 
   <div class="topbar-right">
@@ -24,6 +25,15 @@
       </div>
     </div>
 
+    <!-- ← botón de tema oscuro -->
+    <button class="btn-theme-toggle"
+            (click)="themeService.toggle()"
+            [title]="themeService.darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+      <span class="material-symbols-outlined">
+        {{ themeService.darkMode ? 'light_mode' : 'dark_mode' }}
+      </span>
+    </button>
+
     <div class="notification-wrapper" (click)="$event.stopPropagation()">
       <button class="notification-btn" type="button" (click)="toggleNotifications($event)">
         <span class="material-symbols-outlined">notifications</span>
@@ -37,9 +47,8 @@
         </div>
 
         <ul *ngIf="totalNotifications > 0; else noNotifications">
-          
           <li *ngIf="pendingRequestsCount > 0" (click)="goToSolicitudes()">
-            <span class="material-symbols-outlined icon-small text-orange" style="color: #f97316;">assignment_ind</span>
+            <span class="material-symbols-outlined icon-small" style="color: #f97316;">assignment_ind</span>
             <div class="notification-content">
               <span class="notification-user">Sistema SGTIC</span>
               <span class="notification-text">Tienes <b>{{ pendingRequestsCount }}</b> solicitud(es) de titulación pendiente(s) por revisar.</span>
@@ -47,7 +56,7 @@
           </li>
 
           <li *ngIf="pendingProposalsCount > 0" (click)="goToPropuestas()">
-            <span class="material-symbols-outlined icon-small text-blue" style="color: #2563eb;">topic</span>
+            <span class="material-symbols-outlined icon-small" style="color: #2563eb;">topic</span>
             <div class="notification-content">
               <span class="notification-user">Sistema SGTIC</span>
               <span class="notification-text">Tienes <b>{{ pendingProposalsCount }}</b> propuesta(s) de tema pendiente(s) por evaluar.</span>
@@ -55,23 +64,22 @@
           </li>
 
           <li *ngIf="pendingAssignmentsCount > 0" (click)="goToAsignaciones()">
-            <span class="material-symbols-outlined icon-small text-purple" style="color: #9333ea;">person_add</span>
+            <span class="material-symbols-outlined icon-small" style="color: #9333ea;">person_add</span>
             <div class="notification-content">
               <span class="notification-user">Sistema SGTIC</span>
               <span class="notification-text">Tienes <b>{{ pendingAssignmentsCount }}</b> proyecto(s) pendiente(s) por asignar director.</span>
             </div>
           </li>
 
-          <li *ngFor="let msg of unreadMessages" (click)="goToChat()">
-            <span class="material-symbols-outlined icon-small">chat</span>
-            <div class="notification-content">
-              <span class="notification-user">{{ msg.user }}</span>
-              <span class="notification-text">{{ msg.message }}</span>
-              <span class="notification-time">
-                {{ msg.timestamp ? (msg.timestamp | date:'HH:mm') : '' }}
-              </span>
-            </div>
-          </li>
+          <li *ngIf="unreadMessages_count > 0" (click)="goToChat()">
+           <span class="material-symbols-outlined icon-small">chat</span>
+         <div class="notification-content">
+         <span class="notification-user">Chat</span>
+        <span class="notification-text">
+      Tienes <b>{{ unreadMessages_count }}</b> mensaje(s) pendiente(s) sin leer.
+    </span>
+  </div>
+</li>
         </ul>
 
         <ng-template #noNotifications>
@@ -122,8 +130,8 @@
             Cambio de foto
           </li>
           <li (click)="openPasswordModal()">
-          <span class="material-symbols-outlined icon-small">lock</span>
-          Cambio de clave
+            <span class="material-symbols-outlined icon-small">lock</span>
+            Cambio de clave
           </li>
         </ul>
         <hr>
@@ -139,7 +147,7 @@
   </div>
 </header>
 
-<app-change-password-modal 
-  *ngIf="showPasswordModal" 
+<app-change-password-modal
+  *ngIf="showPasswordModal"
   (close)="closePasswordModal()">
 </app-change-password-modal>
