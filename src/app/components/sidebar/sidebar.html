@@ -17,7 +17,7 @@
         <span class="material-symbols-outlined">people</span>
         <span>Gestión de Usuarios</span>
       </a>
-     
+
       <a class="menu-item" routerLink="/admin/catalogs" routerLinkActive="active">
         <span class="material-symbols-outlined">folder_open</span>
         <span>Catálogos</span>
@@ -34,7 +34,10 @@
         <span class="material-symbols-outlined">database</span>
         <span>Gestión de Respaldos</span>
       </a>
-     
+      <a class="menu-item" routerLink="/admin/audit" routerLinkActive="active">
+        <span class="material-symbols-outlined">analytics</span>
+        <span>Auditoria</span>
+      </a>
     </ng-container>
 
     <ng-container *ngIf="role === 'coordinador'">
@@ -66,7 +69,7 @@
         <span class="material-symbols-outlined">bar_chart</span>
         <span>Reportes</span>
       </a>
-     
+
     </ng-container>
 
     <ng-container *ngIf="role === 'estudiante'">

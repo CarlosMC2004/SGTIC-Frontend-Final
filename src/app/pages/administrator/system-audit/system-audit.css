@@ -1,0 +1,229 @@
+/* Layout y Contenedores */
+.content-body {
+  padding: 30px;
+  background-color: #f8fafc;
+  min-height: 100%;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a5d43;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Botón PDF estilo original */
+.btn-export-pdf {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+  font-weight: 700;
+  color: #334155;
+  transition: 0.2s;
+}
+
+.btn-export-pdf:hover {
+  background-color: #f1f5f9;
+}
+
+/* Filtros con Grid para evitar amontonamiento */
+.toolbar {
+  background-color: white;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 25px;
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 15px;
+  align-items: center;
+}
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.search-wrapper input, .filter-select, .filter-date {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px 11px 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  outline: none;
+}
+
+.filter-select, .filter-date {
+  padding-left: 12px;
+}
+
+.btn-filter-action {
+  background: #0d1b15;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* --- SOLUCIÓN DE LA TABLA --- */
+.table-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto; /* Permite scroll si la pantalla es muy pequeña */
+}
+
+.audit-table {
+  width: 100%; /* ESTO ARREGLA EL ANCHO */
+  border-collapse: collapse;
+  min-width: 800px; /* Evita que las columnas se aplasten demasiado */
+}
+
+.audit-table th {
+  padding: 16px;
+  background: #f8fafc;
+  text-align: left;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 700;
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+}
+
+.audit-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+/* Detalles estéticos */
+.user-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #475569;
+}
+
+.badge-action {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.crear {
+  background: #ecfdf5;
+  color: #15803d;
+}
+
+.actualizar {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.eliminar {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.btn-icon-view {
+  background: none;
+  border: none;
+  color: #1a5d43;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+/* Footer de tabla */
+.table-footer {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-pag {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.btn-pag:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.empty-row-msg {
+  text-align: center;
+  padding: 40px !important;
+  color: #94a3b8;
+  font-style: italic;
+}

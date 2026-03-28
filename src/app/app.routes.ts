@@ -70,6 +70,10 @@ export const routes: Routes = [
         path: 'backups',
         loadComponent: () => import('./pages/administrator/backup-dashboard/backup-dashboard').then(m => m.BackupDashboard)
       },
+      {
+        path: 'audit', // Cambialo a 'audit' para que sea más corto
+        loadComponent: () => import('./pages/administrator/system-audit/system-audit').then(m => m.SystemAuditComponent)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
