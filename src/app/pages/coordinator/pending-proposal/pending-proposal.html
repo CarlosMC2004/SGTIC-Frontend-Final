@@ -1,0 +1,158 @@
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+
+  <main class="main-area">
+    <app-topbar></app-topbar>
+
+    <div class="content-body">
+      <div class="navigation-tabs">
+        <a routerLink="/coordinator/BankThemes" class="tab-link">
+          Banco Oficial de Temas
+        </a>
+        <a routerLink="/coordinator/PendingProposalComponent" class="tab-link active">
+          Propuestas Pendientes
+          <span class="badge-count" *ngIf="propuestas.length > 0">{{ propuestas.length }}</span>
+        </a>
+      </div>
+
+      <div class="section-header">
+        <div class="text-group">
+          <p class="page-subtitle">Panel de revisión y aprobación de propuestas de investigación.</p>
+        </div>
+        <span class="results-count">
+          Pendientes: <strong>{{ propuestas.length }}</strong>
+        </span>
+      </div>
+
+      <div class="propuestas-grid">
+        <div class="propuesta-card" *ngFor="let prop of propuestas">
+
+          <div class="card-header">
+            <div class="student-info">
+              <div class="name-row">
+                <h3>{{ prop.nombreEstudiante }}</h3>
+                <span class="badge-student">Estudiante</span>
+              </div>
+              <div class="meta-row">
+                <span><i class="material-symbols-outlined">id_card</i> ID: {{ prop.identificacionEstudiante }}</span>
+                <span><i class="material-symbols-outlined">school</i> {{ prop.carreraNombre }}</span>
+              </div>
+            </div>
+            <div class="date-info">
+              <small>FECHA DE ENVÍO</small>
+              <p>{{ prop.fechaEnvio }}</p>
+            </div>
+          </div>
+
+          <div class="card-content">
+            <div class="title-box">
+              <h4>{{ prop.titulo }}</h4>
+              <p class="description">{{ prop.descripcion }}</p>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <div class="action-buttons-top">
+              <button class="btn-secondary" (click)="verDocumento(prop.urlDocumento)">
+                <i class="material-symbols-outlined">description</i> Ver Anteproyecto (PDF)
+              </button>
+
+              <button class="btn-ia" (click)="verificarDuplicado(prop.idTemaPropuesto)" [disabled]="isLoadingIA">
+                <i class="material-symbols-outlined" *ngIf="!isLoadingIA">auto_awesome</i>
+                <span *ngIf="isLoadingIA" style="margin-right: 5px;"></span>
+                {{ isLoadingIA ? 'Analizando...' : 'Verificar Duplicados' }}
+              </button>
+
+            </div>
+            <div class="action-buttons-bottom">
+              <button class="btn-reject" (click)="abrirModalRechazo(prop.idTemaPropuesto)">Rechazar</button>
+              <button class="btn-approve" (click)="aprobarPropuesta(prop.idTemaPropuesto)">Aprobar Propuesta</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="propuestas.length === 0 && !loading" class="empty-state">
+        <p>No hay propuestas pendientes por revisar en tu carrera.</p>
+      </div>
+    </div>
+  </main>
+
+  <app-modal-rechazo
+    *ngIf="mostrarModalRechazo"
+    titulo="Rechazar Propuesta de Tema"
+    descripcion="Detalle el feedback técnico para que el alumno pueda replantear su propuesta. Este mensaje le llegará directamente al estudiante."
+    labelMotivo="Observaciones / Feedback"
+    placeholderMotivo="Ingrese las observaciones sobre la viabilidad, alcance o metodología..."
+    (cerrar)="cerrarModalRechazo()"
+    (confirmar)="confirmarRechazo($event)">
+  </app-modal-rechazo>
+
+  <div class="modal-overlay" *ngIf="isLoadingIA || resultadoIA">
+    <div class="modal-ia-content">
+      <div class="modal-ia-header">
+        <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;">
+          Reporte de Similitud  IA
+        </h3>
+        <button class="btn-close-ia" (click)="cerrarModalIA()">✕</button>
+      </div>
+
+      <div class="modal-ia-body">
+
+        <div *ngIf="isLoadingIA" class="ia-loading-state">
+          <div class="spinner-ia"></div>
+          <p>La Inteligencia Artificial está comparando esta propuesta con el historial de temas y extrayendo datos del PDF...</p>
+        </div>
+
+        <div *ngIf="resultadoIA && !isLoadingIA">
+
+          <div class="ia-tabs">
+            <button class="ia-tab-btn" [class.active]="activeTab === 'estudiantes'" (click)="cambiarTab('estudiantes')">
+              Propuestas de Alumnos ({{resultadoIA.duplicados_estudiantes.length}})
+            </button>
+            <button class="ia-tab-btn" [class.active]="activeTab === 'banco'" (click)="cambiarTab('banco')">
+              Banco Oficial ({{resultadoIA.duplicados_banco.length}})
+            </button>
+          </div>
+
+          <div class="ia-tab-content">
+            <div *ngIf="activeTab === 'estudiantes'">
+              <div class="alert-ia-success" *ngIf="resultadoIA.duplicados_estudiantes.length === 0">
+                No se detectaron propuestas de alumnos con alta similitud.
+              </div>
+              <div class="ia-result-card" *ngFor="let item of resultadoIA.duplicados_estudiantes">
+                <div class="ia-similitud" [ngClass]="{'high': item.similitud >= 80, 'medium': item.similitud < 80}">
+                  {{item.similitud}}%
+                </div>
+                <div class="ia-card-info">
+                  <h4>{{item.titulo}}</h4>
+                  <p>{{item.motivo}}</p>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="activeTab === 'banco'">
+              <div class="alert-ia-success" *ngIf="resultadoIA.duplicados_banco.length === 0">
+                No se detectaron coincidencias en el Banco Oficial de Temas.
+              </div>
+              <div class="ia-result-card" *ngFor="let item of resultadoIA.duplicados_banco">
+                <div class="ia-similitud" [ngClass]="{'high': item.similitud >= 80, 'medium': item.similitud < 80}">
+                  {{item.similitud}}%
+                </div>
+                <div class="ia-card-info">
+                  <h4>{{item.titulo}}</h4>
+                  <p>{{item.motivo}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-ia-footer" *ngIf="!isLoadingIA">
+        <button class="btn-reject" (click)="cerrarModalIA()" style="width: auto; padding: 10px 20px;">Cerrar Reporte</button>
+      </div>
+    </div>
+  </div>
+
+</div>

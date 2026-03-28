@@ -1,0 +1,61 @@
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-area">
+    <app-topbar></app-topbar>
+
+    <main class="content-area">
+      <div class="page-header">
+        <h2 class="page-title">Directorio de Opciones de Titulación</h2>
+      </div>
+
+      <div class="filters-bar">
+        <div class="search-input">
+          <span class="material-symbols-outlined icon">search</span>
+          <input type="text"
+                 placeholder="Buscar por nombre de modalidad..."
+                 class="search-input-field"
+                 [(ngModel)]="searchTerm"
+                 (input)="aplicarFiltros()">
+        </div>
+
+        <div class="filters-actions">
+          <div class="select-wrapper">
+            <select class="custom-select" [(ngModel)]="estadoActual" (change)="setFilter(estadoActual)">
+              <option value="todos">Todas las Modalidades</option>
+              <option value="seleccionados">Seleccionados</option>
+              <option value="no_seleccionados">No Seleccionados</option>
+            </select>
+            <span class="material-symbols-outlined select-icon">expand_more</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="teachers-grid"> <div class="method-card" *ngFor="let opt of filteredOptions">
+        <div class="card-content">
+          <div class="card-top">
+            <div class="icon-box">
+              <span class="material-symbols-outlined">{{ opt.icon_name }}</span>
+            </div>
+            <div class="status-badge" [ngClass]="{'status-inactive': !opt.seleccionado}">
+              <div class="dot"></div>
+              {{ opt.seleccionado ? 'HABILITADO' : 'DESHABILITADO' }}
+            </div>
+          </div>
+
+          <h3 class="method-name">{{ opt.nombre }}</h3>
+          <p class="method-desc">{{ opt.descripcion }}</p>
+        </div>
+
+        <div class="card-footer">
+          <span class="switch-label">HABILITAR EN MI CARRERA</span>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="opt.seleccionado" (change)="onToggle(opt)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      </div>
+    </main>
+  </div>
+</div>

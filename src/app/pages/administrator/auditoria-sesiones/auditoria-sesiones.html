@@ -1,0 +1,99 @@
+<div class="auditoria-container">
+
+  <div class="header-card">
+    <div class="header-icon">
+      <span class="material-symbols-outlined">security</span>
+    </div>
+    <div class="header-text">
+      <h2>Auditorías del Sistema</h2>
+      <p>Monitoreo avanzado de usuarios, sesiones y movimientos del sistema.</p>
+    </div>
+  </div>
+
+  <div class="tabs-container">
+    <button class="tab-btn" [class.active]="tabActiva === 'usuarios'" (click)="cambiarTab('usuarios')">
+      <span class="material-symbols-outlined">people</span> Usuarios
+    </button>
+    <button class="tab-btn" [class.active]="tabActiva === 'sesiones'" (click)="cambiarTab('sesiones')">
+      <span class="material-symbols-outlined">shield</span> Sesiones
+    </button>
+  </div>
+
+  <div class="content-card" *ngIf="tabActiva === 'sesiones'">
+
+    <div class="toolbar">
+      <div class="search-box">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" placeholder="Buscar usuario o IP...">
+      </div>
+
+      <div class="actions-box">
+        <select [(ngModel)]="filtroEstado" class="select-estado">
+          <option>Todos los estados</option>
+          <option>Activas</option>
+          <option>Inactivas</option>
+        </select>
+        <button class="btn-icon" (click)="cargarSesiones()" title="Actualizar">
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="cargando" style="text-align: center; padding: 20px; color: #6b7280;">
+      Cargando usuarios desde la base de datos...
+    </div>
+
+    <table class="sgtic-table" *ngIf="!cargando">
+      <thead>
+      <tr>
+        <th>USUARIO</th>
+        <th>CONEXIÓN / CIERRE</th>
+        <th>IP ADDRESS</th>
+        <th>ESTADO SESIÓN</th>
+        <th>ACCIONES</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let sesion of sesiones">
+        <td>
+          <div class="user-cell">
+            <div class="avatar">{{ sesion.inicial }}</div>
+            <div class="user-info">
+              <span class="email">{{ sesion.correo }}</span>
+              <span class="id-log">Perfil: {{ sesion.perfil }}</span>
+            </div>
+          </div>
+        </td>
+
+        <td>
+          <div class="info-cell">
+            <span class="material-symbols-outlined icon-muted">login</span>
+            <span class="text-bold">{{ sesion.fechaConexion || 'Reciente' }}</span>
+          </div>
+        </td>
+
+        <td>
+          <div class="info-cell badge-light">
+            <span class="material-symbols-outlined icon-muted">wifi</span>
+            <span>{{ sesion.ip || '192.168.1.X' }}</span>
+          </div>
+        </td>
+
+        <td>
+            <span class="badge" [ngClass]="sesion.estado === 'ACTIVA' ? 'badge-success' : 'badge-gray'">
+              {{ sesion.estado }}
+            </span>
+        </td>
+
+        <td>
+          <button class="btn-cerrar-sesion" *ngIf="sesion.estado === 'ACTIVA'" (click)="cerrarSesionForzada(sesion)">
+            <span class="material-symbols-outlined">power_settings_new</span>
+            Cerrar Sesión
+          </button>
+          <span *ngIf="sesion.estado !== 'ACTIVA'" class="text-muted">-</span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

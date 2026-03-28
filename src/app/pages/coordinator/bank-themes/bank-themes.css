@@ -1,0 +1,249 @@
+.navigation-tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 32px;
+  padding-left: 4px;
+}
+
+.tab-link {
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 700;
+  padding: 12px 0;
+  font-size: 18px;
+  position: relative;
+  transition: color 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.tab-link.active {
+  color: #1a5d43;
+}
+
+.tab-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #1a5d43;
+  border-radius: 3px 3px 0 0;
+}
+
+.badge-count {
+  background-color: #ef4444;
+  color: white;
+  font-size: 13px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin-left: 10px;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0d1b15;
+  margin: 0;
+}
+
+.page-subtitle {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0;
+}
+
+.results-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  padding: 6px 0;
+}
+
+.layout-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: "Public Sans", sans-serif;
+}
+
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 260px;
+  width: calc(100% - 260px);
+}
+
+.content-body {
+  padding: 32px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.toolbar {
+  background-color: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.search-wrapper input {
+  width: 100%;
+  padding: 10px 16px 10px 40px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.btn-new-topic {
+  background-color: #1a5d43;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-new-topic:hover {
+  background-color: #144632;
+}
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+}
+
+.topic-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.topic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+  padding: 24px;
+  flex: 1;
+}
+
+.topic-title {
+  color: #000000;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.topic-desc {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.card-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #f1f5f9;
+  background-color: #f8fafc;
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0d1b15;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background-color: #f1f5f9;
+}
+
+.btn-icon.edit:hover {
+  background-color: #f0fdf4;
+  border-color: #1a5d43;
+  color: #1a5d43;
+}
+
+.btn-icon.delete:hover {
+  background-color: #fef2f2;
+  border-color: #ef4444;
+  color: #ef4444;
+}

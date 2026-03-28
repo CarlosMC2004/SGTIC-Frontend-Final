@@ -1,0 +1,90 @@
+<div class="chat-layout">
+  
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>SGTIC Chat</h3>
+      <p class="user-status">Estudiante: <strong>{{ userName }}</strong></p>
+    </div>
+
+    <div class="contact-list">
+      <div *ngFor="let coord of coordinadores" 
+           (click)="seleccionarConversacion(coord.idConversacion, coord.fullName)"
+           [class.active]="idConversacionActual === coord.idConversacion"
+           class="contact-item">
+        <div class="avatar">{{ coord.fullName.charAt(0) }}</div>
+        <div class="contact-info">
+          <span class="contact-name">{{ coord.fullName }}</span>
+          <span class="contact-email">{{ coord.email }}</span>
+        </div>
+        <span class="unread-badge" *ngIf="getUnreadCount(coord.idConversacion) > 0">
+          {{ getUnreadCount(coord.idConversacion) }}
+        </span>
+      </div>
+
+      <div *ngIf="coordinadores.length === 0" class="no-contacts">
+        <p>No hay coordinadores disponibles o cargando...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-main">
+    
+    <div class="chat-header" *ngIf="idConversacionActual !== 0">
+      <button class="btn-back" (click)="goBack()">←</button>
+      <div class="header-info">
+        <h4>{{ nombreDestinatario }}</h4>
+        <span class="status-badge">
+          <span class="online-dot"></span>Chat de Tutoría
+        </span>
+      </div>
+    </div>
+
+    <div class="messages-area" #scrollContainer>
+      
+      <div class="no-chat-selected" *ngIf="idConversacionActual === 0">
+        <div class="icon-chat"></div>
+        <h3>Bienvenido {{ userName }}</h3>
+        <p>Selecciona un coordinador de la izquierda para ver tus mensajes.</p>
+      </div>
+
+      <div *ngFor="let msg of messages" 
+           [id]="'msg-' + msg.id"
+           [ngClass]="{'my-message': msg.user === userName, 'other-message': msg.user !== userName}"
+           class="message-wrapper">
+        
+        <div class="message-bubble" (dblclick)="setReplyTo(msg)">
+          <div class="reply-content" *ngIf="msg.replyTo" (click)="scrollToMessage(msg.replyTo.id)">
+            <small>Respondiendo a {{ msg.replyTo.user }}</small>
+            <p>{{ msg.replyTo.message }}</p>
+          </div>
+
+          <span class="message-user" *ngIf="msg.user !== userName">{{ msg.user }}</span>
+          <p class="message-text">{{ msg.message }}</p>
+          <span class="message-time">{{ msg.timestamp | date:'HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area" *ngIf="idConversacionActual !== 0">
+      <div class="reply-preview" *ngIf="replyToMessage">
+        <div class="reply-info">
+          <small>Respondiendo a {{ replyToMessage.user }}</small>
+          <p>{{ replyToMessage.message }}</p>
+        </div>
+        <button (click)="cancelReply()" class="btn-close-reply">×</button>
+      </div>
+
+      <div class="input-wrapper">
+        <input type="text" 
+               [(ngModel)]="newMessage" 
+               (keyup.enter)="sendMessage()"
+               placeholder="Escribe aquí tu mensaje..."
+               class="message-input">
+        <button (click)="sendMessage()" [disabled]="!newMessage.trim()" class="btn-send">
+          ➤
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

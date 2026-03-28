@@ -1,0 +1,468 @@
+.topbar {
+  background-color: #1b5e20;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin: -24px -32px 32px -32px;
+  margin-top: 0px;
+}
+.topbar-background {
+  margin-left: 23px;
+}
+.mejora{
+  font-size: 20px;
+  margin-left: 40px;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+/* Forzamos la fuente moderna para todo el contenido de la barra */
+.topbar {
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+/* Si el texto está dentro de una etiqueta específica (como h1, span, o .header-title), puedes asegurarlo aquí: */
+
+.empty-message {
+  padding: 16px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.period-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.period-selector:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.period-text {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.notification-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.notification-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid #1b5e20;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  position: relative;
+  padding: 4px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.user-profile:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.user-role {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.icon-small {
+  font-size: 18px;
+}
+
+.icon-tiny {
+  font-size: 14px;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background-color: white;
+  color: #333;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+  z-index: 100;
+  border: 1px solid #e9ecef;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.dropdown-menu li {
+  padding: 12px 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #495057;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f8f9fa;
+  color: #1b5e20;
+}
+
+.dropdown-menu li.active {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+.dropdown-menu hr {
+  border: 0;
+  border-top: 1px solid #e9ecef;
+  margin: 0;
+}
+
+.menu-section-title {
+  padding: 16px 20px 8px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6c757d;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-new {
+  background-color: #10b981;
+  color: white;
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.logout-item {
+  color: #dc3545 !important;
+  font-weight: 500;
+}
+
+.logout-item:hover {
+  background-color: #fff5f5 !important;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 12px 16px;
+    margin: -24px -16px 24px -16px;
+  }
+
+  .hide-on-mobile,
+  .period-text {
+    display: none;
+  }
+
+  .topbar-right {
+    gap: 12px;
+  }
+
+  .period-selector {
+    padding: 8px;
+  }
+}
+.chat-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d9fdd3;
+  border: 1px solid #00a884;
+  color: #075e54;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-alert:hover {
+  background: #c5f5bc;
+}
+
+.close-alert {
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-dropdown {
+  min-width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notification-user {
+  font-weight: 600;
+  font-size: 12px;
+  color: #128C7E;
+}
+
+.notification-text {
+  font-size: 13px;
+  color: #333;
+}
+
+.notification-time {
+  font-size: 11px;
+  color: #999;
+}
+
+.chat-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #d9fdd3;
+  border: 1px solid #00a884;
+  color: #075e54;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-alert:hover {
+  background: #c5f5bc;
+}
+
+.close-alert {
+  font-size: 16px;
+  margin-left: 4px;
+  cursor: pointer;
+}
+/* (todo tu CSS existente se mantiene igual, agrega esto al final) */
+
+/* ── Botón tema oscuro ── */
+.btn-theme-toggle {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Modo oscuro: dropdown ── */
+body.dark .dropdown-menu {
+  background-color: #1a2420;
+  border-color: #2d3d36;
+  color: #e5e7eb;
+}
+
+body.dark .dropdown-menu li {
+  color: #d1d5db;
+}
+
+body.dark .dropdown-menu li:hover {
+  background-color: #1f2e28;
+  color: #4ade80;
+}
+
+body.dark .dropdown-menu li.active {
+  background-color: #1e3028;
+  color: #4ade80;
+}
+
+body.dark .dropdown-menu hr {
+  border-color: #2d3d36;
+}
+
+body.dark .menu-section-title {
+  color: #6b7280;
+}
+
+body.dark .empty-message {
+  color: #6b7280;
+}
+
+body.dark .notification-text {
+  color: #d1d5db;
+}
+
+body.dark .logout-item {
+  color: #f87171 !important;
+}
+
+body.dark .logout-item:hover {
+  background-color: #2a1a1a !important;
+}
+/* ── MODO OSCURO ── */
+:host-context(body.dark) .dropdown-menu {
+  background-color: #1a2420;
+  border-color: #2d3d36;
+  color: #e5e7eb;
+}
+
+:host-context(body.dark) .dropdown-menu li {
+  color: #d1d5db;
+}
+
+:host-context(body.dark) .dropdown-menu li:hover {
+  background-color: #1f2e28;
+  color: #4ade80;
+}
+
+:host-context(body.dark) .dropdown-menu li.active {
+  background-color: #1e3028;
+  color: #4ade80;
+}
+
+:host-context(body.dark) .dropdown-menu hr {
+  border-top-color: #2d3d36;
+}
+
+:host-context(body.dark) .menu-section-title {
+  color: #6b7280;
+}
+
+:host-context(body.dark) .empty-message {
+  color: #6b7280;
+}
+
+:host-context(body.dark) .notification-text {
+  color: #d1d5db;
+}
+
+:host-context(body.dark) .notification-user {
+  color: #4ade80;
+}
+
+:host-context(body.dark) .notification-time {
+  color: #6b7280;
+}
+
+:host-context(body.dark) .logout-item {
+  color: #f87171 !important;
+}
+
+:host-context(body.dark) .logout-item:hover {
+  background-color: #2a1a1a !important;
+}
+
+:host-context(body.dark) .badge {
+  border-color: #1b5e20;
+}

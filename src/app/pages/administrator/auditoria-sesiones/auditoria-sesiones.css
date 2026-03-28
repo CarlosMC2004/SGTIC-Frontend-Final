@@ -1,0 +1,133 @@
+.auditoria-container {
+  font-family: 'Public Sans', 'Segoe UI', Tahoma, sans-serif;
+  color: #374151;
+}
+
+/* Cabecera */
+.header-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+.header-icon {
+  background: rgba(39, 104, 74, 0.1); /* Fondo verde suave SGTIC */
+  color: #27684a; /* VERDE SGTIC */
+  min-width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex; justify-content: center; align-items: center;
+  margin-right: 15px;
+}
+.header-icon .material-symbols-outlined { font-size: 28px; }
+.header-text h2 { margin: 0 0 5px 0; font-size: 1.4rem; color: #111827; }
+.header-text p { margin: 0; color: #6b7280; font-size: 0.95rem; }
+
+/* Tabs */
+.tabs-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 5px;
+}
+.tab-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: none;
+  padding: 10px 15px;
+  font-size: 0.95rem; font-weight: 600;
+  color: #6b7280; cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: 0.2s;
+}
+.tab-btn:hover { background: #f3f4f6; color: #374151; }
+.tab-btn.active {
+  color: #27684a; /* VERDE SGTIC */
+  border-bottom: 3px solid #27684a;
+}
+
+/* Tarjeta Principal */
+.content-card {
+  background: white; border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  border: 1px solid #e5e7eb; padding: 20px;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex; justify-content: space-between;
+  margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
+}
+.search-box {
+  display: flex; align-items: center;
+  border: 1px solid #d1d5db; border-radius: 8px;
+  padding: 8px 15px; width: 300px;
+}
+.search-box .material-symbols-outlined { color: #9ca3af; margin-right: 8px; }
+.search-box input { border: none; outline: none; width: 100%; font-size: 0.9rem; }
+
+.actions-box { display: flex; gap: 10px; }
+.select-estado {
+  border: 1px solid #d1d5db; border-radius: 8px; padding: 8px 15px;
+  outline: none; font-size: 0.9rem; color: #374151;
+}
+.btn-icon {
+  background: white; border: 1px solid #d1d5db;
+  border-radius: 8px; padding: 8px; cursor: pointer; color: #6b7280;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-exportar {
+  display: flex; align-items: center; gap: 6px;
+  background: #27684a; /* VERDE SGTIC */
+  color: white; border: none; border-radius: 8px;
+  padding: 8px 15px; font-weight: 600; cursor: pointer;
+}
+.btn-exportar:hover { background: #1e523a; }
+
+/* Tabla */
+.sgtic-table { width: 100%; border-collapse: collapse; text-align: left; }
+.sgtic-table th {
+  font-size: 0.75rem; font-weight: 700; color: #6b7280;
+  text-transform: uppercase; padding: 15px 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.sgtic-table td { padding: 15px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+
+/* Celdas específicas */
+.user-cell { display: flex; align-items: center; gap: 12px; }
+.avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(39, 104, 74, 0.1); color: #27684a; /* Inicial verde SGTIC */
+  font-weight: bold; display: flex; align-items: center; justify-content: center;
+}
+.user-info { display: flex; flex-direction: column; }
+.email { font-weight: 600; color: #1f2937; }
+.id-log { font-size: 0.75rem; color: #9ca3af; }
+
+.info-cell { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+.icon-muted { color: #9ca3af; font-size: 1.1rem; }
+.text-bold { font-weight: 600; color: #374151; }
+.badge-light { background: #f9fafb; padding: 4px 8px; border-radius: 6px; border: 1px solid #e5e7eb; }
+
+.browser-cell { display: flex; flex-direction: column; }
+.device-text { font-size: 0.8rem; color: #6b7280; }
+
+/* Badges */
+.badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; }
+.badge-success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+.badge-gray { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+
+/* Botón Acción */
+.btn-cerrar-sesion {
+  display: flex; align-items: center; gap: 5px;
+  background: transparent; color: #ef4444;
+  border: 1px solid #fca5a5; border-radius: 6px;
+  padding: 6px 12px; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: 0.2s;
+}
+.btn-cerrar-sesion:hover { background: #fef2f2; border-color: #ef4444; }
+.btn-cerrar-sesion .material-symbols-outlined { font-size: 1.1rem; }

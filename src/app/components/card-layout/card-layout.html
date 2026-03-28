@@ -1,0 +1,14 @@
+<div class="layout-container">
+  <div class="card">
+
+    <header class="card-header" *ngIf="title">
+      <h1>{{ title }}</h1>
+      <p *ngIf="subtitle">{{ subtitle }}</p>
+    </header>
+
+    <div class="card-content">
+      <ng-content></ng-content>
+    </div>
+
+  </div>
+</div>

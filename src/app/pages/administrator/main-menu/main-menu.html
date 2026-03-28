@@ -1,0 +1,90 @@
+<div class="page-header-flex">
+  <div>
+    <h1 class="page-title">Panel de Administración</h1>
+    <p class="page-subtitle">Gestiona usuarios, configuraciones académicas y estructura institucional.</p>
+  </div>
+  <button class="btn-primary" routerLink="/admin/users">
+    <span class="material-symbols-outlined">person_add</span>
+    Crear Nuevo Usuario
+  </button>
+</div>
+
+<h3 class="section-title">Configuración y Datos Maestros</h3>
+<div class="grid-cards">
+  <div class="config-card" *ngFor="let item of masterConfigs">
+    <div class="icon-wrapper">
+      <span class="material-symbols-outlined">{{ item.icon }}</span>
+    </div>
+    <h4>{{item.title}}</h4>
+    <p>{{item.description}}</p>
+    <button class="btn-secondary" [routerLink]="item.route">
+      {{item.actionText}}
+    </button>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="card-header">
+    <h3>Usuarios Recientes</h3>
+    <div class="header-actions">
+      <button class="icon-btn"><span class="material-symbols-outlined">filter_list</span></button>
+      <button class="icon-btn"><span class="material-symbols-outlined">download</span></button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>USUARIO</th>
+          <th>ROL</th>
+          <th>ESTADO</th>
+          <th>ÚLTIMO ACCESO</th>
+          <th>ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of recentUsers">
+          <td>
+            <div class="user-cell">
+              <div class="avatar-circle"
+                   [style.background-color]="getAvatarColor(user.roles?.[0] || '')">
+                {{ getInitials(user.firstName, user.lastName) }}
+              </div>
+              <div class="user-details">
+                <span class="name">{{ user.firstName }} {{ user.lastName }}</span>
+                <span class="email">{{ user.email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge"
+                  [ngClass]="'badge-' + getRolLabel(user.roles).toLowerCase()">
+              {{ getRolLabel(user.roles) }}
+            </span>
+          </td>
+          <td>
+            <span class="status-indicator">
+              <span class="dot" [class.active]="user.active"></span>
+              {{ user.active ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="text-muted">
+            {{ user.lastLogin ? (user.lastLogin | date:'dd/MM/yyyy HH:mm') : '—' }}
+          </td>
+          <td>
+            <button class="action-btn">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="recentUsers.length === 0">
+          <td colspan="5" style="text-align:center; padding: 24px; color: #9ca3af;">
+            No hay usuarios recientes.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

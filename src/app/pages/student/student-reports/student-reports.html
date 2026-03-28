@@ -1,0 +1,144 @@
+<div class="layout-wrapper">
+  <app-sidebar role="estudiante"></app-sidebar>
+  <main class="main-content">
+    <app-topbar (periodoChange)="onPeriodoChange($event)"></app-topbar>
+
+    <header class="view-header">
+      <h1 class="page-title">Mi Progreso Académico</h1>
+      <p class="page-subtitle">Visualización de hitos y descarga de reportes oficiales del <strong>{{ selectedPeriodLabel }}</strong></p>
+    </header>
+
+    <div class="dashboard-grid">
+      
+      <div class="glass-card">
+        <h3 class="section-title">
+          <span class="material-symbols-outlined">donut_large</span>
+          Estadísticas del Reporte
+        </h3>
+        <div class="chart-container">
+          <canvas id="studentActivityChart"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <h3 class="section-title">
+          <span class="material-symbols-outlined">analytics</span>
+          Resumen del Proceso
+        </h3>
+        <div class="stats-container">
+          <div class="stat-card">
+            <div class="icon-box blue">
+              <span class="material-symbols-outlined">verified_user</span>
+            </div>
+            <div class="stat-info">
+              <span class="label">Estado Actual</span>
+              <div class="value">En Curso</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="icon-box green">
+              <span class="material-symbols-outlined">inventory_2</span>
+            </div>
+            <div class="stat-info">
+              <span class="label">Total de Registros</span>
+              <div class="value">{{ previewCount }}</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="icon-box purple">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </div>
+            <div class="stat-info">
+              <span class="label">Periodo Activo</span>
+              <div class="value">{{ selectedPeriodId || '--' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="reports-section-title">Documentos y Reportes</h2>
+    <div class="download-grid">
+      <div 
+        *ngFor="let item of catalog" 
+        class="report-item-card"
+        [class.selected]="selectedReport?.type === item.type"
+        (click)="selectReport(item)"
+      >
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="icon-box blue" style="width: 48px; height: 48px;">
+            <span class="material-symbols-outlined">description</span>
+          </div>
+          <div>
+            <h4 style="margin:0; font-size: 1rem; color: #1e293b;">{{ item.title }}</h4>
+            <p style="margin:0; font-size: 0.85rem; color: #64748b;">Generar reporte oficial</p>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 8px;">
+          <button 
+            class="btn-download-circle" 
+            (click)="downloadPdf(item, $event)"
+            [disabled]="isDownloadingPdf || isLoadingPreview"
+            title="Descargar PDF"
+          >
+            <span class="material-symbols-outlined">picture_as_pdf</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-section" *ngIf="selectedReport">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 class="section-title" style="margin: 0;">
+          <span class="material-symbols-outlined">visibility</span>
+          Vista previa: {{ selectedReport.title }}
+        </h3>
+        
+        <button 
+          class="btn-download-circle" 
+          style="background: #10b981; border-radius: 12px; width: auto; padding: 0 16px; display: flex; gap: 8px;"
+          (click)="exportToCsv()"
+          [disabled]="previewRows.length === 0 || isLoadingPreview"
+          title="Exportar a Excel/CSV"
+        >
+          <span class="material-symbols-outlined" style="font-size: 20px;">grid_on</span>
+          <span style="font-size: 0.9rem; font-weight: 600;">Exportar a Excel</span>
+        </button>
+      </div>
+      
+      <div class="table-wrapper">
+        <div *ngIf="isLoadingPreview" style="padding: 3rem; text-align: center; color: #64748b;">
+          <span class="material-symbols-outlined spin" style="font-size: 2rem;">autorenew</span>
+          <p>Consultando base de datos...</p>
+        </div>
+
+        <table class="modern-table" *ngIf="!isLoadingPreview && previewMode === 'array'">
+          <thead>
+            <tr>
+              <th *ngFor="let col of previewColumns">{{ col.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of previewRows">
+              <td *ngFor="let col of previewColumns">
+                <span *ngIf="isStatusColumn(row[col.key])" [ngClass]="getStatusClass(row[col.key])">
+                  {{ row[col.key] }}
+                </span>
+                <span *ngIf="!isStatusColumn(row[col.key])">
+                  {{ row[col.key] }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="!isLoadingPreview && previewRows.length === 0 && previewMode === 'empty'" style="padding: 2rem; text-align: center; color: #64748b;">
+          No se encontraron registros para este reporte.
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

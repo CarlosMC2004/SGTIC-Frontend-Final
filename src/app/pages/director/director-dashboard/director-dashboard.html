@@ -1,0 +1,143 @@
+<div class="layout-container">
+  <app-sidebar [role]="'director'"></app-sidebar>
+
+  <div class="main-content">
+    <app-topbar></app-topbar>
+
+    <div class="page-content">
+
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <h1>Buenos días, {{ userName }}</h1>
+          <p>Tienes {{ stats.asesoriasPendientes }} tutoria/s próximas agendadas.</p>
+        </div>
+        <div class="welcome-badge">
+          {{ stats.totalEstudiantes }} estudiantes asignados
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-blue"><span class="material-symbols-outlined">group</span></div>
+          <div class="stat-info">
+            <span class="stat-label">Estudiantes</span>
+            <span class="stat-value">{{ stats.totalEstudiantes }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-green"><span class="material-symbols-outlined">description</span></div>
+          <div class="stat-info">
+            <span class="stat-label">TIC Activos</span>
+            <span class="stat-value">{{ stats.ticActivos }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-yellow"><span class="material-symbols-outlined">event</span></div>
+          <div class="stat-info">
+            <span class="stat-label">Tutorías Agendadas</span>
+            <span class="stat-value">{{ stats.asesoriasPendientes }}</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-orange"><span class="material-symbols-outlined">schedule</span></div>
+          <div class="stat-info">
+            <span class="stat-label">Próxima Tutoría</span>
+            <span class="stat-value text-small">{{ stats.proximaAsesoria }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-columns">
+
+        <div class="main-column">
+          <div class="card-panel">
+            <div class="panel-header">
+              <h2>Estudiantes Asignados</h2>
+              <div class="filter-box">
+                <span class="material-symbols-outlined">filter_list</span>
+                <select [(ngModel)]="filterStatus">
+                  <option value="all">Todos</option>
+                  <option value="activo">Al día</option>
+                  <option value="atrasado">Atrasados</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="students-list">
+              <div class="empty-state" *ngIf="filteredEstudiantes.length === 0">
+                No hay estudiantes asignados con este estado.
+              </div>
+
+              <div class="student-card" *ngFor="let est of filteredEstudiantes">
+                <div class="student-header">
+                  <div class="student-avatar">{{ est.avatar }}</div>
+                  <div class="student-info-main">
+                    <div class="name-row">
+                      <h3>{{ est.studentName }}</h3>
+                      <span class="badge phase-badge" [style.color]="getFaseColor(est.fase)" [style.backgroundColor]="getFaseColor(est.fase) + '20'">
+                        {{ est.fase }}
+                      </span>
+                    </div>
+                    <p class="thesis-title">{{ est.thesisTitle }}</p>
+                  </div>
+                  <button class="btn-outline">
+                    <span class="material-symbols-outlined">visibility</span> Ver TIC
+                  </button>
+                </div>
+
+                <div class="student-progress">
+                  <div class="progress-label">Progreso general</div>
+                  <div class="progress-bar-container">
+                    <div class="progress-fill" [style.width]="est.progreso + '%'"></div>
+                  </div>
+                  <span class="progress-text">{{ est.progreso }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-column">
+          <div class="card-panel panel-accent">
+            <div class="panel-header">
+              <span class="material-symbols-outlined accent-icon">event_upcoming</span>
+              <h2 class="accent-title">Próximas Tutorías</h2>
+            </div>
+
+            <div class="meetings-list">
+              <div class="empty-state-small" *ngIf="proximasAsesorias.length === 0">
+                No tienes reuniones agendadas próximas.
+              </div>
+
+              <div class="meeting-card" *ngFor="let meeting of proximasAsesorias">
+                <div class="meeting-top">
+                  <span class="material-symbols-outlined user-icon">person</span>
+                  <span class="meeting-student">{{ meeting.studentName }}</span>
+                </div>
+                <div class="meeting-title">{{ meeting.type | titlecase }}</div>
+                <div class="meeting-details">
+                  <div class="detail-badge">
+                    <span class="material-symbols-outlined">calendar_today</span>
+                    {{ meeting.date }}
+                  </div>
+                  <div class="detail-badge">
+                    <span class="material-symbols-outlined">
+                      {{ meeting.modality === 'virtual' ? 'computer' : 'location_on' }}
+                    </span>
+                    {{ meeting.modality | titlecase }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

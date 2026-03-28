@@ -1,0 +1,98 @@
+
+
+<section class="page-header">
+  <div class="header-text">
+    <h1>Gestión de Usuarios</h1>
+    <p>Administra usuarios, credenciales y roles del sistema.</p>
+  </div>
+  <button class="btn-primary" (click)="openModal()">
+    <span class="material-symbols-outlined">person_add</span>
+    Nuevo Usuario
+  </button>
+</section>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <span class="material-symbols-outlined icon">group</span>
+    <div>
+      <h3>{{ users.length }}</h3>
+      <p>Total Usuarios</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <span class="material-symbols-outlined icon">verified_user</span>
+    <div>
+      <h3>{{ getActiveCount() }}</h3>
+      <p>Usuarios Activos</p>
+    </div>
+  </div>
+</div>
+
+<div class="table-container">
+  <div class="table-actions">
+    <div class="search-box">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" placeholder="Buscar por nombre, ID o email..." [(ngModel)]="searchText">
+    </div>
+  </div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Usuario</th>
+      <th>ID / Email</th>
+      <th>Roles Asignados</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let u of filteredUsers">
+      <td>
+        <div class="user-cell">
+          <div class="avatar-circle">{{ u.firstName?.charAt(0) }}{{ u.lastName?.charAt(0) }}</div>
+          <div>
+            <div class="font-bold">{{ u.firstName }} {{ u.lastName }}</div>
+            <!-- CORREGIDO: Usar &#64; en lugar de @ -->
+            <div class="text-small text-muted">&#64;{{ u.username }}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="text-small">{{ u.identification }}</div>
+        <div class="text-small text-muted">{{ u.email }}</div>
+      </td>
+      <td>
+        <div class="role-tags">
+            <span *ngFor="let role of u.roles" class="role-badge" [ngClass]="role?.toLowerCase()">
+              {{ role }}
+            </span>
+          <span *ngIf="u.roles.length === 0" class="text-muted text-small">Sin roles</span>
+        </div>
+      </td>
+      <td>
+          <span class="status-badge" [class.active]="u.active" [class.inactive]="!u.active">
+            {{ u.active ? 'Activo' : 'Inactivo' }}
+          </span>
+      </td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn-icon" (click)="openModal(u)" title="Editar">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+          <button class="btn-icon delete" title="Desactivar">
+            <span class="material-symbols-outlined">block</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<app-user-modal
+  *ngIf="showModal"
+  [user]="selectedUser"
+  (close)="closeModal()"
+  (save)="handleSave()">
+</app-user-modal>

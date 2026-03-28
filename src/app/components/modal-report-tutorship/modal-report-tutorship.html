@@ -1,0 +1,62 @@
+<div class="modal-overlay" (click)="close.emit()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div>
+        <h2>Registrar Informe de Tutoría</h2>
+        <p class="subtitle">Complete los resultados de la reunión y adjunte el acta.</p>
+      </div>
+      <button class="btn-close" (click)="close.emit()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="alert-error" *ngIf="errorMessage">
+        <span class="material-symbols-outlined">error</span>
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-section form-section-inline">
+        <label class="toggle-label">Asistencia del Estudiante</label>
+        <div class="toggle-wrapper">
+          <span class="toggle-text" [class.active]="reportData.attendance">Presente</span>
+          <div class="toggle-switch" [class.active]="reportData.attendance" (click)="reportData.attendance = !reportData.attendance">
+            <div class="toggle-circle"></div>
+          </div>
+          <span class="toggle-text" [class.inactive]="!reportData.attendance">Ausente</span>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <label class="label-bold">Observaciones y Compromisos <span class="required">*</span></label>
+        <textarea
+          [(ngModel)]="reportData.observations"
+          placeholder="Escriba los puntos clave tratados en la tutoría..."
+          rows="4"
+          class="custom-textarea">
+        </textarea>
+      </div>
+
+      <div class="form-section">
+        <label class="label-bold">Documento del Informe (PDF) <span class="required">*</span></label>
+        <div class="file-upload-wrapper" [class.has-file]="selectedFile">
+          <input type="file" (change)="onFileSelected($event)" accept="application/pdf" id="fileInput" hidden>
+          <label for="fileInput" class="file-label">
+            <span class="material-symbols-outlined">cloud_upload</span>
+            {{ selectedFile ? selectedFile.name : 'Seleccionar archivo PDF...' }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="close.emit()" [disabled]="loading">Cancelar</button>
+      <button class="btn-primary" (click)="onSave()" [disabled]="loading">
+        <span *ngIf="loading" class="spinner">⟳</span>
+        <span *ngIf="!loading">Guardar Informe</span>
+      </button>
+    </div>
+
+  </div>
+</div>

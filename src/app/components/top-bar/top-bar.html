@@ -1,0 +1,153 @@
+<header class="topbar">
+  <div class="mejora">Sistema de Gestion de trabajos Curricular</div>
+  <div class="topbar-left"></div>
+
+  <div class="topbar-right">
+
+    <div class="period-selector" (click)="togglePeriodMenu($event)">
+      <span class="material-symbols-outlined icon-small">calendar_month</span>
+      <span class="period-text">{{ periodoSeleccionado?.name || 'Seleccionar período' }}</span>
+      <span class="material-symbols-outlined icon-small">expand_more</span>
+
+      <div class="dropdown-menu period-menu" *ngIf="isPeriodMenuOpen" (click)="$event.stopPropagation()">
+        <ul *ngIf="periodosAceptados.length > 0; else emptyPeriods">
+          <li
+            *ngFor="let periodo of periodosAceptados; trackBy: trackByPeriodo"
+            [class.active]="periodoSeleccionado?.idPeriod === periodo.idPeriod"
+            (click)="seleccionarPeriodo(periodo)"
+          >
+            {{ periodo.name }}
+          </li>
+        </ul>
+        <ng-template #emptyPeriods>
+          <div class="empty-message">No hay períodos aceptados disponibles</div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- ← botón de tema oscuro -->
+    <button class="btn-theme-toggle"
+            (click)="themeService.toggle()"
+            [title]="themeService.darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+      <span class="material-symbols-outlined">
+        {{ themeService.darkMode ? 'light_mode' : 'dark_mode' }}
+      </span>
+    </button>
+
+    <div class="notification-wrapper" (click)="$event.stopPropagation()">
+      <button class="notification-btn" type="button" (click)="toggleNotifications($event)">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="badge" *ngIf="totalNotifications > 0">{{ totalNotifications }}</span>
+      </button>
+
+      <div class="dropdown-menu notification-dropdown" *ngIf="showNotificationDropdown">
+        <div class="menu-section-title">
+          <span class="material-symbols-outlined icon-tiny">notifications</span>
+          NOTIFICACIONES
+        </div>
+
+        <ul *ngIf="totalNotifications > 0; else noNotifications">
+          <li *ngIf="pendingRequestsCount > 0" (click)="goToSolicitudes()">
+            <span class="material-symbols-outlined icon-small" style="color: #f97316;">assignment_ind</span>
+            <div class="notification-content">
+              <span class="notification-user">Sistema SGTIC</span>
+              <span class="notification-text">Tienes <b>{{ pendingRequestsCount }}</b> solicitud(es) de titulación pendiente(s) por revisar.</span>
+            </div>
+          </li>
+
+          <li *ngIf="pendingProposalsCount > 0" (click)="goToPropuestas()">
+            <span class="material-symbols-outlined icon-small" style="color: #2563eb;">topic</span>
+            <div class="notification-content">
+              <span class="notification-user">Sistema SGTIC</span>
+              <span class="notification-text">Tienes <b>{{ pendingProposalsCount }}</b> propuesta(s) de tema pendiente(s) por evaluar.</span>
+            </div>
+          </li>
+
+          <li *ngIf="pendingAssignmentsCount > 0" (click)="goToAsignaciones()">
+            <span class="material-symbols-outlined icon-small" style="color: #9333ea;">person_add</span>
+            <div class="notification-content">
+              <span class="notification-user">Sistema SGTIC</span>
+              <span class="notification-text">Tienes <b>{{ pendingAssignmentsCount }}</b> proyecto(s) pendiente(s) por asignar director.</span>
+            </div>
+          </li>
+
+          <li *ngIf="unreadMessages_count > 0" (click)="goToChat()">
+           <span class="material-symbols-outlined icon-small">chat</span>
+         <div class="notification-content">
+         <span class="notification-user">Chat</span>
+        <span class="notification-text">
+      Tienes <b>{{ unreadMessages_count }}</b> mensaje(s) pendiente(s) sin leer.
+    </span>
+  </div>
+</li>
+        </ul>
+
+        <ng-template #noNotifications>
+          <div class="empty-message">No tienes notificaciones nuevas</div>
+        </ng-template>
+
+        <hr>
+        <ul>
+          <li (click)="goToChat()">
+            <span class="material-symbols-outlined icon-small">open_in_new</span>
+            Ir al chat
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="user-profile" (click)="toggleProfileMenu($event)">
+      <div class="user-info hide-on-mobile">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-role">{{ userRole }}</span>
+      </div>
+      <img
+        [src]="'https://ui-avatars.com/api/?name=' + userName + '&background=e9ecef&color=1a5d43'"
+        alt="Avatar"
+        class="avatar"
+      >
+      <span class="material-symbols-outlined icon-small hide-on-mobile">expand_more</span>
+
+      <div class="dropdown-menu profile-menu" *ngIf="isProfileMenuOpen" (click)="$event.stopPropagation()">
+        <div class="menu-section-title">
+          <span class="material-symbols-outlined icon-tiny">person</span>
+          PERFILES DISPONIBLES
+        </div>
+        <ul>
+          <li class="active">
+            <span class="material-symbols-outlined icon-small">check</span>
+            {{ userRole | uppercase }}
+          </li>
+        </ul>
+        <hr>
+        <ul>
+          <li>
+            <span class="material-symbols-outlined icon-small">person_outline</span>
+            Mi perfil
+          </li>
+          <li>
+            <span class="material-symbols-outlined icon-small">image</span>
+            Cambio de foto
+          </li>
+          <li (click)="openPasswordModal()">
+            <span class="material-symbols-outlined icon-small">lock</span>
+            Cambio de clave
+          </li>
+        </ul>
+        <hr>
+        <ul class="logout-menu">
+          <li class="logout-item" (click)="logout()">
+            <span class="material-symbols-outlined icon-small">logout</span>
+            Cerrar sesión
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<app-change-password-modal
+  *ngIf="showPasswordModal"
+  (close)="closePasswordModal()">
+</app-change-password-modal>

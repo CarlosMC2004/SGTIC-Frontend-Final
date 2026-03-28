@@ -1,0 +1,150 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h2>
+        <span class="material-symbols-outlined header-icon">
+          {{ periodo?.id ? 'edit' : 'add_circle' }}
+        </span>
+        {{ periodo?.id ? 'Editar período' : 'Nuevo período' }}
+      </h2>
+      <button class="btn-close" (click)="closeModal()" [disabled]="isSaving">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+
+      <!-- NOMBRE DEL PERÍODO -->
+      <div class="form-group">
+        <label class="form-label">
+          Nombre del período
+          <span class="required-star">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="formData.name"
+          placeholder="ej: Regular 2025-2026"
+          name="name"
+          [disabled]="isSaving">
+      </div>
+
+      <!-- FECHAS INICIO Y FIN -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            Fecha inicio
+            <span class="required-star">*</span>
+          </label>
+          <input
+            type="date"
+            [(ngModel)]="formData.startDate"
+            name="startDate"
+            [disabled]="isSaving">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Fecha fin
+            <span class="required-star">*</span>
+          </label>
+          <input
+            type="date"
+            [(ngModel)]="formData.endDate"
+            name="endDate"
+            [disabled]="isSaving">
+        </div>
+      </div>
+
+      <!-- FECHA LÍMITE DE MATRICULACIÓN -->
+      <div class="form-group">
+        <label class="form-label">
+          Fecha límite de matriculación
+          <span class="required-star">*</span>
+        </label>
+        <input
+          type="date"
+          [(ngModel)]="formData.enrollmentDeadline"
+          name="enrollmentDeadline"
+          [disabled]="isSaving">
+        <p class="field-hint">
+          <span class="material-symbols-outlined hint-icon">info</span>
+          Debe estar entre la fecha de inicio y fecha de fin
+        </p>
+      </div>
+
+      <!-- PLAZO Y AVANCES MÍNIMOS -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">
+            Plazo para cambio de tema
+            <span class="required-star">*</span>
+          </label>
+          <div class="input-suffix-wrapper">
+            <input
+              type="number"
+              [(ngModel)]="formData.plazoCambioTema"
+              placeholder="30"
+              name="plazoCambioTema"
+              min="0"
+              [disabled]="isSaving">
+            <span class="input-suffix">días</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Mínimo de avances
+            <span class="required-star">*</span>
+          </label>
+          <input
+            type="number"
+            [(ngModel)]="formData.minimoAvances"
+            placeholder="3"
+            name="minimoAvances"
+            min="1"
+            [disabled]="isSaving">
+        </div>
+      </div>
+
+      <!-- ESTADO (solo en edición) -->
+      <div class="form-group" *ngIf="periodo?.id">
+        <label class="form-label">Estado del período</label>
+        <div class="status-toggle">
+          <div class="toggle-switch"
+               [class.active]="formData.active"
+               (click)="!isSaving && (formData.active = !formData.active)"
+               [class.disabled]="isSaving">
+            <div class="toggle-circle"></div>
+          </div>
+          <span class="status-label" [class.active]="formData.active">
+            {{ formData.active ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeModal()" [disabled]="isSaving">
+        Cancelar
+      </button>
+      <button
+        class="btn btn-primary"
+        (click)="savePeriodo()"
+        [disabled]="!isValid() || isSaving">
+        <span class="material-symbols-outlined" *ngIf="!isSaving">
+          {{ periodo?.id ? 'update' : 'add' }}
+        </span>
+        <span class="spinner" *ngIf="isSaving"></span>
+        {{ isSaving ? 'Guardando...' : (periodo?.id ? 'Actualizar período' : 'Crear período') }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<app-toast-mensaje #toast></app-toast-mensaje>

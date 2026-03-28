@@ -1,0 +1,77 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="header-titles">
+        <h2>Solicitar Nuevo Entregable</h2>
+        <span class="subtitle">Crear requerimiento en el historial de versiones</span>
+      </div>
+      <button class="btn-close" (click)="onClose()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="context-info">
+        <span class="material-symbols-outlined icon-info">history_edu</span>
+        <div>
+          <strong>Estudiante:</strong> {{ student?.studentName }}<br>
+          <span class="text-muted">Esta acción abrirá una nueva solicitud de versión en el sistema.</span>
+        </div>
+      </div>
+
+      <form [formGroup]="requestForm" (ngSubmit)="onSend()">
+
+        <div class="form-row split">
+          <div class="form-group">
+            <label>Título del Entregable Esperado <span class="required">*</span></label>
+            <input type="text" formControlName="expectedTitle" placeholder="Ej: Capítulo III - Metodología"
+                   [class.error]="requestForm.get('expectedTitle')?.invalid && requestForm.get('expectedTitle')?.touched">
+          </div>
+
+          <div class="form-group">
+            <label>Motivo de la Solicitud <span class="required">*</span></label>
+            <div class="select-wrapper">
+              <select formControlName="reason" [class.error]="requestForm.get('reason')?.invalid && requestForm.get('reason')?.touched">
+                <option value="" disabled selected>Selecciona el motivo...</option>
+                <option value="Siguiente Fase">Avance a Siguiente Fase</option>
+                <option value="Correcciones Mayores">Correcciones Mayores</option>
+                <option value="Correcciones Menores">Correcciones Menores de Formato</option>
+                <option value="Revision Final">Revisión Final pre-Defensa</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha Límite de Entrega Sugerida <span class="required">*</span></label>
+          <input type="date" formControlName="deadline" [min]="minDate"
+                 [class.error]="requestForm.get('deadline')?.invalid && requestForm.get('deadline')?.touched"
+                 style="max-width: 250px;">
+        </div>
+
+        <div class="form-group">
+          <label>Instrucciones / Feedback Inicial <span class="required">*</span></label>
+          <p class="field-hint">Detalla exactamente qué debe contener esta nueva versión del documento.</p>
+          <textarea formControlName="instructions" rows="4"
+                    placeholder="Ej: Se requiere ampliar el marco teórico basándose en las observaciones hechas en la última reunión..."
+                    [class.error]="requestForm.get('instructions')?.invalid && requestForm.get('instructions')?.touched">
+          </textarea>
+          <div class="error-msg" *ngIf="requestForm.get('instructions')?.invalid && requestForm.get('instructions')?.touched">
+            Las instrucciones deben tener al menos 10 caracteres.
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="onClose()">Cancelar</button>
+      <button type="button" class="btn-primary" (click)="onSend()">
+        <span class="material-symbols-outlined">send</span>
+        Registrar Solicitud
+      </button>
+    </div>
+
+  </div>
+</div>

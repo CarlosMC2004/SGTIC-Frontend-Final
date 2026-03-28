@@ -1,0 +1,202 @@
+/* Añadir al inicio del archivo */
+.login-container {
+  font-family: var(--font-family-primary);
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  text-align: center;
+  line-height: var(--leading-snug);
+}
+
+label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+input {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+}
+
+input::placeholder {
+  color: rgba(140,140,140,0.68);
+  font-size: var(--font-size-sm);
+}
+
+.error-msg {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-medium);
+  color: #dc2626;
+  margin-top: 0.5rem;
+}
+
+.btn-login {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wide);
+}
+
+.footer-links {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+}
+
+.login-container {
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.subtitle {
+  color: #333;
+  font-size: 1.1rem; /* CORREGIDO: era 1.5rem muy grande */
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* CORREGIDO: font-size: 100rem era un error catastrófico */
+.form-group {
+  margin-bottom: 1.5rem;
+  font-size: 1rem; /* Normalizado */
+}
+
+/* CORREGIDO: font-size: 1% era ilegible */
+label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem; /* Tamaño legible */
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+input {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  background-color: #f3f4f6;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  background-color: #fff;
+  border-color: #1b5e20;
+  box-shadow: 0 0 0 3px rgba(27, 94, 32, 0.1);
+}
+
+input.error {
+  border-color: #d32f2f;
+  background-color: #fff5f5;
+}
+
+.icon {
+  position: absolute;
+  right: 15px;
+  color: #1b5e20;
+  font-size: 1.1rem;
+  user-select: none; /* Evita seleccionar el emoji */
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.error-msg {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+/* NUEVO: Estilo para errores del servidor */
+.server-error {
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.forgot-pass {
+  text-align: right;
+  margin-bottom: 1.5rem;
+}
+
+.forgot-pass a {
+  color: #1b5e20;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-login {
+  width: 100%;
+  background-color: #1b5e20;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-login:hover:not(:disabled) {
+  background-color: #144a18;
+}
+
+.btn-login:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* NUEVO: Spinner simple */
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.footer-links {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.footer-links a {
+  color: #1b5e20;
+  font-weight: bold;
+  text-decoration: none;
+}
