@@ -10,8 +10,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/general/login/login').then(m => m.LoginComponent)
   },
 
-
- // ✅ Ruta del chat - PÚBLICA (sin authGuard)
   {
   path: 'chat/:id',  // Cambiado para aceptar parámetro :id
    component: ChatComponent
@@ -34,7 +32,6 @@ export const routes: Routes = [
   },
 
   // Rutas de Administrador
-  // Rutas de Administrador
   {
     path: 'admin',
     canActivate: [authGuard],
@@ -48,7 +45,7 @@ export const routes: Routes = [
         path: 'users',
         loadComponent: () => import('./pages/administrator/user-management/user-management').then(m => m.UserManagementComponent)
       },
-      // 🔥 AQUÍ ESTÁ LA NUEVA RUTA DE AUDITORÍA 🔥
+
       {
         path: 'auditorias',
         loadComponent: () => import('./pages/administrator/auditoria-sesiones/auditoria-sesiones').then(m => m.AuditoriaSesionesComponent)
@@ -75,6 +72,10 @@ export const routes: Routes = [
       {
         path: 'backups',
         loadComponent: () => import('./pages/administrator/backup-dashboard/backup-dashboard').then(m => m.BackupDashboard)
+      },
+      {
+        path: 'audit',
+        loadComponent: () => import('./pages/administrator/system-audit/system-audit').then(m => m.SystemAuditComponent)
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

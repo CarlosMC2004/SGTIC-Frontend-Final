@@ -1,0 +1,104 @@
+<div class="content-body">
+  <div class="section-header">
+    <div class="text-group">
+      <h2 class="page-title">Auditoría del Sistema</h2>
+      <p class="page-subtitle">Registro detallado de acciones y eventos realizados por los usuarios en SGTIC.</p>
+    </div>
+    <div class="action-buttons">
+      <button class="btn-export-pdf">
+        <span class="material-symbols-outlined">picture_as_pdf</span>
+        Exportar PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="filters-row">
+      <div class="search-wrapper">
+        <span class="material-symbols-outlined search-icon">person</span>
+        <input type="text" placeholder="Buscar por ID usuario...">
+      </div>
+
+      <select class="filter-select">
+        <option value="">Todas las acciones</option>
+        <option value="INSERT">INSERT</option>
+        <option value="UPDATE">UPDATE</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+
+      <button class="btn-filter-action">Filtrar</button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="audit-table">
+        <thead>
+        <tr>
+          <th>Fecha y Hora</th>
+          <th>Usuario</th>
+          <th>Acción</th>
+          <th>Módulo / Tabla</th>
+          <th>Dirección IP</th>
+          <th class="text-center">Cambios</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let audit of historial">
+          <td class="date-cell">{{ audit.fechaHora | date:'dd MMM yyyy, HH:mm:ss' }}</td>
+          <td>
+            <div class="user-tag">
+              <span class="avatar-sm">{{ audit.idUsuario ? 'U' : 'S' }}</span>
+              <span class="user-id-text">{{ audit.idUsuario ? 'ID: ' + audit.idUsuario : 'Sistema' }}</span>
+            </div>
+          </td>
+          <td>
+              <span class="badge-action" [ngClass]="audit.accion.toLowerCase()">
+                {{ audit.accion }}
+              </span>
+          </td>
+          <td>{{ audit.moduloTabla }}</td>
+          <td class="ip-cell">{{ audit.direccionIp || '0.0.0.0' }}</td>
+          <td class="text-center">
+            <button class="btn-icon-view" (click)="audit.expandido = !audit.expandido" title="Ver Detalle JSON">
+                <span class="material-symbols-outlined">
+                  {{ audit.expandido ? 'keyboard_arrow_up' : 'visibility' }}
+                </span>
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="cargando">
+          <td colspan="6" class="empty-row-msg">Cargando registros de auditoría...</td>
+        </tr>
+
+        <tr *ngIf="!cargando && historial.length === 0">
+          <td colspan="6" class="empty-row-msg">No se encontraron registros de auditoría.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-container *ngFor="let audit of historial">
+      <div class="json-detail-container" *ngIf="audit.expandido">
+
+        <div class="json-box" *ngIf="audit.valoresAnteriores">
+          <p><strong>Valores Anteriores:</strong></p>
+          <pre>{{ formatearJSON(audit.valoresAnteriores) }}</pre>
+        </div>
+
+        <br *ngIf="audit.valoresAnteriores && audit.valoresNuevos">
+
+        <div class="json-box" *ngIf="audit.valoresNuevos">
+          <p><strong>Valores Nuevos:</strong></p>
+          <pre>{{ formatearJSON(audit.valoresNuevos) }}</pre>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <div class="table-footer">
+      <span class="results-info">Mostrando <b>{{ historial.length }}</b> registros</span>
+    </div>
+  </div>
+</div>
